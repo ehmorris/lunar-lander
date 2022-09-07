@@ -1,4 +1,4 @@
-const degToRad = (deg) => deg * (Math.PI / 180);
+export const degToRad = (deg) => deg * (Math.PI / 180);
 
 export const generateCanvas = ({ width, height, attachNode }) => {
   const element = document.createElement("canvas");
@@ -16,12 +16,3 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 
   return context;
 };
-
-export const nextPositionAlongHeading = ({
-  position,
-  velocity,
-  headingInDeg,
-}) => ({
-  x: position.x + velocity * Math.cos(degToRad(headingInDeg)),
-  y: position.y + velocity * Math.sin(degToRad(headingInDeg)),
-});

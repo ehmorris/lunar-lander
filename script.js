@@ -1,4 +1,4 @@
-import { generateCanvas, nextPositionAlongHeading } from "./helpers.js";
+import { generateCanvas, degToRad } from "./helpers.js";
 
 const canvasProps = {
   width: 400,
@@ -18,19 +18,33 @@ const lander = {
   thrust: 0,
   heading: 90,
   position: {
-    x: 0,
+    x: 50,
     y: 0,
+  },
+  getNextPosition: function () {
+    return new Promise((resolve) => {
+      const prospectiveNewLocation = {
+        x: this.position.x + this.velocity * Math.cos(degToRad(this.heading)),
+        y: this.position.y + this.velocity * Math.sin(degToRad(this.heading)),
+      };
+
+      if (prospectiveNewLocation.y > canvasProps.height - this.height) {
+        return resolve({
+          x: prospectiveNewLocation.x,
+          y: canvasProps.height - this.height,
+        });
+      } else {
+        return resolve(prospectiveNewLocation);
+      }
+    });
   },
   draw: function (CTX) {
     CTX.save();
-    CTX.fillStyle = "green";
-    CTX.fillRect(this.position.x, this.position.y, this.width, this.height);
-    CTX.restore();
-
-    this.position = nextPositionAlongHeading({
-      position: this.position,
-      velocity: this.velocity,
-      headingInDeg: this.heading,
+    this.getNextPosition().then((nextPosition) => {
+      CTX.fillStyle = "green";
+      CTX.fillRect(this.position.x, this.position.y, this.width, this.height);
+      CTX.restore();
+      this.position = nextPosition;
     });
   },
 };
