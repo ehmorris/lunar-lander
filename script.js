@@ -2,13 +2,13 @@ import { generateCanvas, nextPositionAlongHeading } from "./helpers.js";
 
 const canvasProps = {
   width: 400,
-  height: 400
-}
+  height: 400,
+};
 
 const CTX = generateCanvas({
   width: canvasProps.width,
   height: canvasProps.height,
-  attachNode: ".gameContainer"
+  attachNode: ".gameContainer",
 });
 
 const lander = {
@@ -21,22 +21,22 @@ const lander = {
     x: 0,
     y: 0,
   },
-  draw: function(CTX) {
+  draw: function (CTX) {
     CTX.save();
-    CTX.fillStyle = 'green';
+    CTX.fillStyle = "green";
     CTX.fillRect(this.position.x, this.position.y, this.width, this.height);
     CTX.restore();
 
     this.position = nextPositionAlongHeading({
       position: this.position,
       velocity: this.velocity,
-      headingInDeg: this.heading
+      headingInDeg: this.heading,
     });
   },
-}
+};
 
 let frameCount = 0;
-const gravity = .08;
+const gravity = 0.08;
 const drawFrame = () => {
   CTX.clearRect(0, 0, canvasProps.width, canvasProps.height);
 
@@ -47,14 +47,14 @@ const drawFrame = () => {
   window.requestAnimationFrame(drawFrame);
 };
 
-document.addEventListener('keydown', ({ key }) => {
-  if (key === 'ArrowUp') {
-    lander.thrust += .1;
+document.addEventListener("keydown", ({ key }) => {
+  if (key === "ArrowUp") {
+    lander.thrust += 0.1;
   }
 });
 
-document.addEventListener('keyup', ({ key }) => {
-  if (key === 'ArrowUp') {
+document.addEventListener("keyup", ({ key }) => {
+  if (key === "ArrowUp") {
     lander.thrust = 0;
   }
 });

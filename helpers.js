@@ -23,5 +23,5 @@ export const nextPositionAlongHeading = ({
   headingInDeg,
 }) => ({
   x: position.x + velocity * Math.cos(degToRad(headingInDeg)),
-  y: position.y + velocity * Math.sin(degToRad(headingInDeg))
+  y: position.y + velocity * Math.sin(degToRad(headingInDeg)),
 });
