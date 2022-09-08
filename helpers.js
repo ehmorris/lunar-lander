@@ -1,5 +1,8 @@
 export const degToRad = (deg) => deg * (Math.PI / 180);
 
+export const clampNumber = ({ number, min, max }) =>
+  Math.max(min, Math.min(number, max));
+
 export const generateCanvas = ({ width, height, attachNode }) => {
   const element = document.createElement("canvas");
   const context = element.getContext("2d");
