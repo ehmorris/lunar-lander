@@ -5,6 +5,7 @@ import {
   roundToNDigits,
 } from "./helpers.js";
 import { spawnEntityGraph } from "./smallgraph.js";
+import { spawnPosNegGraph } from "./posneggraph.js";
 
 const canvasProps = {
   width: 640,
@@ -137,10 +138,10 @@ spawnEntityGraph({
   fillColor: "white",
 });
 
-spawnEntityGraph({
+spawnPosNegGraph({
   attachNode: ".statsContainer",
   getNumerator: () => lander.speed,
-  getDenominator: () => 10,
+  getDenominator: () => 15,
   topLabel: "SPEED",
   getBottomLabel: () => `${roundToNDigits(lander.speed, 1)}MPH`,
   backgroundColor: "#999",
