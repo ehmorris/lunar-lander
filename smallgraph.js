@@ -9,7 +9,7 @@ export const spawnEntityGraph = ({
   getNumerator,
   getDenominator,
   topLabel,
-  bottomLabel,
+  getBottomLabel,
   showPercent,
   backgroundColor,
   fillColor,
@@ -50,6 +50,7 @@ export const spawnEntityGraph = ({
     const percentFill = getNumerator() / getDenominator();
     addValueToBarLog(percentFill);
     drawGraphPolygon(barLog);
+    const bottomLabel = getBottomLabel();
     const bottomLabelWithOptions = showPercent
       ? `${bottomLabel} (${Math.round(percentFill * 1000) / 10}%)`
       : bottomLabel;

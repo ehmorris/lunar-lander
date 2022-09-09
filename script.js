@@ -12,14 +12,18 @@ const CTX = generateCanvas({
   attachNode: ".gameContainer",
 });
 
+const MAX_FUEL = 300;
+const THRUST_MAX = 0.5;
+
 const lander = {
   width: 20,
   height: 20,
   gravity: 0.4,
   speed: 0,
+  emptyMass: 100,
   engine: {
     thrust: 0,
-    fuel: 300,
+    fuel: MAX_FUEL,
     thrusting: false,
     startTime: null,
     start: function () {
@@ -33,7 +37,7 @@ const lander = {
         this.thrust = clampNumber({
           number: 0.05 * timeDelta,
           min: 0.05,
-          max: 0.5,
+          max: THRUST_MAX,
         });
       } else {
         this.end();
@@ -51,14 +55,14 @@ const lander = {
   },
   getSpeed: function () {
     return new Promise((resolve) => {
-      if (this.position.y > canvasProps.height - this.height) {
-        return resolve(0);
-      } else {
-        const timeDelta = (currentFrameTime - previousFrameTime) / 100;
-        const newSpeed =
-          this.speed - this.engine.thrust + this.gravity * timeDelta;
-        return resolve(newSpeed);
-      }
+      const timeDelta = (currentFrameTime - previousFrameTime) / 100;
+      const currentSpeed =
+        this.position.y >= canvasProps.height - this.height ? 0 : this.speed;
+
+      const groundedSpeed = 0;
+      const newSpeed =
+        currentSpeed - this.engine.thrust + this.gravity * timeDelta;
+      return resolve(newSpeed);
     });
   },
   getNextPosition: function () {
@@ -121,10 +125,29 @@ window.requestAnimationFrame(drawFrame);
 spawnEntityGraph({
   attachNode: ".statsContainer",
   getNumerator: () => lander.engine.fuel,
-  getDenominator: () => 300,
-  topLabel: "FUEL GALLONS: 300",
-  bottomLabel: "REMAINING",
-  showPercent: true,
+  getDenominator: () => MAX_FUEL,
+  topLabel: "FUEL",
+  getBottomLabel: () => `${lander.engine.fuel} GALLONS`,
+  backgroundColor: "#999",
+  fillColor: "white",
+});
+
+spawnEntityGraph({
+  attachNode: ".statsContainer",
+  getNumerator: () => lander.speed,
+  getDenominator: () => 10,
+  topLabel: "SPEED",
+  getBottomLabel: () => `${lander.speed}MPH`,
+  backgroundColor: "#999",
+  fillColor: "white",
+});
+
+spawnEntityGraph({
+  attachNode: ".statsContainer",
+  getNumerator: () => lander.engine.thrust,
+  getDenominator: () => THRUST_MAX,
+  topLabel: "THRUST",
+  getBottomLabel: () => lander.engine.thrust,
   backgroundColor: "#999",
   fillColor: "white",
 });
