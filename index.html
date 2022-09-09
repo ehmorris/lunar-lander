@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
@@ -10,25 +10,31 @@
       body {
         background: #222;
         margin: 0;
-        display: grid;
-        width: 100%;
-        min-height: 100vh;
-        justify-items: center;
-        align-content: center;
-        grid-gap: 2rem;
-        padding: 2rem;
-        box-sizing: border-box;
       }
       canvas {
+        display: block;
         background: #fff;
         box-shadow: 0 0 20px #000;
-        display: block;
+      }
+      .layoutContainer {
+        display: grid;
+        grid-gap: 20px;
+      }
+      .gameContainer {
+        grid-column: span 3;
+      }
+      .statsContainer {
+        display: grid;
+        grid-template-columns: 200px 200px 200px;
+        grid-gap: 20px;
       }
     </style>
   </head>
   <body>
-    <div class="gameContainer"></div>
-    <div class="statsContainer"></div>
+    <div class="layoutContainer">
+      <div class="gameContainer"></div>
+      <div class="statsContainer"></div>
+    </div>
     <script type="module" src="./script.js"></script>
   </body>
 </html>

@@ -19,3 +19,6 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 
   return context;
 };
+
+export const roundToNDigits = (number, digits = 0) =>
+  Math.round(number * Math.pow(10, digits)) / Math.pow(10, digits);

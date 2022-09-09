@@ -1,8 +1,13 @@
-import { generateCanvas, degToRad, clampNumber } from "./helpers.js";
+import {
+  generateCanvas,
+  degToRad,
+  clampNumber,
+  roundToNDigits,
+} from "./helpers.js";
 import { spawnEntityGraph } from "./smallgraph.js";
 
 const canvasProps = {
-  width: 400,
+  width: 640,
   height: 400,
 };
 
@@ -127,7 +132,7 @@ spawnEntityGraph({
   getNumerator: () => lander.engine.fuel,
   getDenominator: () => MAX_FUEL,
   topLabel: "FUEL",
-  getBottomLabel: () => `${lander.engine.fuel} GALLONS`,
+  getBottomLabel: () => `${roundToNDigits(lander.engine.fuel, 1)} GALLONS`,
   backgroundColor: "#999",
   fillColor: "white",
 });
@@ -137,7 +142,7 @@ spawnEntityGraph({
   getNumerator: () => lander.speed,
   getDenominator: () => 10,
   topLabel: "SPEED",
-  getBottomLabel: () => `${lander.speed}MPH`,
+  getBottomLabel: () => `${roundToNDigits(lander.speed, 1)}MPH`,
   backgroundColor: "#999",
   fillColor: "white",
 });
@@ -147,7 +152,7 @@ spawnEntityGraph({
   getNumerator: () => lander.engine.thrust,
   getDenominator: () => THRUST_MAX,
   topLabel: "THRUST",
-  getBottomLabel: () => lander.engine.thrust,
+  getBottomLabel: () => roundToNDigits(lander.engine.thrust, 1),
   backgroundColor: "#999",
   fillColor: "white",
 });
