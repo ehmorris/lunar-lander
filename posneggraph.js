@@ -14,7 +14,9 @@ export const spawnPosNegGraph = ({
   backgroundColor,
   fillColor,
 }) => {
-  let barLog = [];
+  let barLog = Array(maxDataPoints).fill(
+    (getNumerator() + getDenominator()) / (getDenominator() * 2)
+  );
   const CTX = generateCanvas({
     width: graphWidth,
     height: graphHeight,

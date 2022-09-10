@@ -14,7 +14,7 @@ export const spawnEntityGraph = ({
   backgroundColor,
   fillColor,
 }) => {
-  let barLog = [];
+  let barLog = Array(maxDataPoints).fill(getNumerator());
   const CTX = generateCanvas({
     width: graphWidth,
     height: graphHeight,

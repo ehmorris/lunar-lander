@@ -42,7 +42,7 @@ const lander = {
         this.fuel = Math.max(this.fuel - timeDelta, 0);
         this.thrust = clampNumber({
           number: 0.05 * timeDelta,
-          min: 0.05,
+          min: 0,
           max: THRUST_MAX,
         });
       } else {
@@ -62,13 +62,13 @@ const lander = {
   getSpeed: function () {
     return new Promise((resolve) => {
       const timeDelta = (currentFrameTime - previousFrameTime) / 100;
-      const currentSpeed =
-        this.position.y >= canvasProps.height - this.height ? 0 : this.speed;
-
-      const groundedSpeed = 0;
+      const isGrounded = this.position.y >= canvasProps.height - this.height;
+      const boundedCurrentSpeed = isGrounded ? 0 : this.speed;
       const newSpeed =
-        currentSpeed - this.engine.thrust + this.gravity * timeDelta;
-      return resolve(newSpeed);
+        boundedCurrentSpeed - this.engine.thrust + this.gravity * timeDelta;
+      const boundedNewSpeed = isGrounded ? Math.min(newSpeed, 0) : newSpeed;
+
+      return resolve(boundedNewSpeed);
     });
   },
   getNextPosition: function () {
