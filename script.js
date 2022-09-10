@@ -133,17 +133,22 @@ const lander = {
   },
   draw: function (CTX) {
     CTX.save();
-    //this.getHeading().then((newHeading) => {
-    //  this.heading = newHeading;
     this.getSpeed().then((newSpeed) => {
       this.speed = newSpeed;
-      this.getNextPosition().then((nextPosition) => {
-        CTX.fillStyle = "green";
-        CTX.fillRect(this.position.x, this.position.y, this.width, this.height);
-        this.position = nextPosition;
+      this.getHeading().then((newHeading) => {
+        this.heading = newHeading;
+        this.getNextPosition().then((nextPosition) => {
+          CTX.fillStyle = "green";
+          CTX.fillRect(
+            this.position.x,
+            this.position.y,
+            this.width,
+            this.height
+          );
+          this.position = nextPosition;
+        });
       });
     });
-    //});
     CTX.restore();
   },
 };
