@@ -8,7 +8,7 @@ import { spawnEntityGraph } from "./smallgraph.js";
 import { spawnPosNegGraph } from "./posneggraph.js";
 
 const canvasProps = {
-  width: 640,
+  width: 860,
   height: 400,
 };
 
@@ -19,6 +19,7 @@ const CTX = generateCanvas({
 });
 
 const MAX_FUEL = 300;
+const MAX_BOOSTER_FUEL = 20;
 const THRUST_MAX = 0.5;
 
 const lander = {
@@ -26,7 +27,40 @@ const lander = {
   height: 20,
   gravity: 0.4,
   speed: 0,
-  emptyMass: 100,
+  heading: 90,
+  position: {
+    x: 50,
+    y: 0,
+  },
+  boosters: {
+    thrust: 0,
+    boosterAngle: 0,
+    fuel: MAX_BOOSTER_FUEL,
+    thrusting: false,
+    startTime: null,
+    start: function ({ angle }) {
+      if (this.fuel > 0) {
+        if (!this.thrusting) {
+          this.startTime = Date.now();
+          this.boosterAngle = angle;
+          this.thrusting = true;
+        }
+        const timeDelta = (Date.now() - this.startTime) / 100;
+        this.fuel = Math.max(this.fuel - timeDelta, 0);
+        this.thrust = clampNumber({
+          number: 0.05 * timeDelta,
+          min: 0,
+          max: THRUST_MAX,
+        });
+      } else {
+        this.end();
+      }
+    },
+    end: function () {
+      this.thrusting = false;
+      this.thrust = 0;
+    },
+  },
   engine: {
     thrust: 0,
     fuel: MAX_FUEL,
@@ -54,10 +88,19 @@ const lander = {
       this.thrust = 0;
     },
   },
-  heading: 90,
-  position: {
-    x: 50,
-    y: 0,
+  getHeading: function () {
+    return new Promise((resolve) => {
+      const timeDelta = (currentFrameTime - previousFrameTime) / 100;
+      let newHeading;
+      if (this.boosters.boosterAngle < this.heading) {
+        newHeading = this.heading - this.boosters.thrust;
+      }
+      if (this.boosters.boosterAngle > this.heading) {
+        newHeading = this.heading + this.boosters.thrust;
+      }
+
+      return resolve(newHeading);
+    });
   },
   getSpeed: function () {
     return new Promise((resolve) => {
@@ -90,15 +133,18 @@ const lander = {
   },
   draw: function (CTX) {
     CTX.save();
+    //this.getHeading().then((newHeading) => {
+    //  this.heading = newHeading;
     this.getSpeed().then((newSpeed) => {
       this.speed = newSpeed;
       this.getNextPosition().then((nextPosition) => {
         CTX.fillStyle = "green";
         CTX.fillRect(this.position.x, this.position.y, this.width, this.height);
-        CTX.restore();
         this.position = nextPosition;
       });
     });
+    //});
+    CTX.restore();
   },
 };
 
@@ -118,11 +164,20 @@ document.addEventListener("keydown", ({ key }) => {
   if (key === "ArrowUp") {
     lander.engine.start();
   }
+  if (key === "ArrowLeft") {
+    lander.boosters.start({ angle: 180 });
+  }
+  if (key === "ArrowRight") {
+    lander.boosters.start({ angle: 0 });
+  }
 });
 
 document.addEventListener("keyup", ({ key }) => {
   if (key === "ArrowUp") {
     lander.engine.end();
+  }
+  if (key === "ArrowLeft" || key === "ArrowRight") {
+    lander.boosters.end();
   }
 });
 
@@ -134,6 +189,16 @@ spawnEntityGraph({
   getDenominator: () => MAX_FUEL,
   topLabel: "FUEL",
   getBottomLabel: () => `${roundToNDigits(lander.engine.fuel, 1)} GALLONS`,
+  backgroundColor: "#999",
+  fillColor: "white",
+});
+
+spawnEntityGraph({
+  attachNode: ".statsContainer",
+  getNumerator: () => lander.boosters.fuel,
+  getDenominator: () => MAX_BOOSTER_FUEL,
+  topLabel: "BOOSTER FUEL",
+  getBottomLabel: () => `${roundToNDigits(lander.boosters.fuel, 1)} GALLONS`,
   backgroundColor: "#999",
   fillColor: "white",
 });
