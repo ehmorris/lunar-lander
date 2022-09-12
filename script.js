@@ -21,17 +21,19 @@ const CTX = generateCanvas({
 
 const MAX_FUEL = 300;
 const MAX_BOOSTER_FUEL = 300;
-const THRUST_MAX = 0.5;
+const THRUST_MAX = 0.1;
+const SPEED_FACTOR = 15;
+const SPEED_BOUND = 20;
 
 // LANDER PROPS AND ACTIONS
 
 const lander = {
   width: 20,
   height: 20,
-  gravity: 0.4,
+  gravity: 0.04,
   speed: 0,
   heading: 90,
-  rotation: 0,
+  rotation: 15,
   position: {
     x: 50,
     y: 0,
@@ -52,7 +54,7 @@ const lander = {
         const timeDelta = (Date.now() - this.startTime) / 100;
         this.fuel = Math.max(this.fuel - timeDelta, 0);
         this.thrust = clampNumber({
-          number: 0.05 * timeDelta,
+          number: (THRUST_MAX / 4) * timeDelta,
           min: 0,
           max: THRUST_MAX,
         });
@@ -143,11 +145,11 @@ const lander = {
         this.rotation = rotation;
         this.getNextPosition().then((nextPosition) => {
           // ROTATE LANDER
-          CTX.save();
           const shapeCenter = {
             x: this.position.x + this.width / 2,
             y: this.position.y + this.height / 2,
           };
+          CTX.save();
           CTX.translate(shapeCenter.x, shapeCenter.y);
           CTX.rotate(degToRad(this.rotation));
           CTX.translate(-this.width / 2, -this.height / 2);
@@ -229,9 +231,9 @@ spawnEntityGraph({
 spawnEntityGraph({
   attachNode: ".statsContainer",
   getNumerator: () => lander.speed,
-  getDenominator: () => 15,
+  getDenominator: () => SPEED_BOUND / SPEED_FACTOR,
   topLabel: "SPEED",
-  getBottomLabel: () => `${roundToNDigits(lander.speed, 1)}MPH`,
+  getBottomLabel: () => `${roundToNDigits(lander.speed * SPEED_FACTOR, 0)}MPH`,
   backgroundColor: "#999",
   fillColor: "white",
   style: "posneg",

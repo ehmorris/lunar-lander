@@ -67,11 +67,26 @@ export const spawnEntityGraph = ({
     CTX.fillRect(0, 0, graphWidth, graphHeight);
 
     if (style === "posneg") {
-      CTX.strokeStyle = "red";
+      CTX.save();
+
+      // SAFE ZONE
+      const safeZoneSize = 15;
+      CTX.strokeStyle = "rgb(0, 255, 0, .5)";
+      CTX.lineWidth = safeZoneSize;
+      CTX.beginPath();
+      CTX.moveTo(0, graphHeight / 2 - safeZoneSize / 2);
+      CTX.lineTo(graphWidth, graphHeight / 2 - safeZoneSize / 2);
+      CTX.stroke();
+
+      // POS/NEG DIVIDER
+      CTX.strokeStyle = "black";
+      CTX.lineWidth = 1;
       CTX.beginPath();
       CTX.moveTo(0, graphHeight / 2);
       CTX.lineTo(graphWidth, graphHeight / 2);
       CTX.stroke();
+
+      CTX.restore();
     }
 
     const percentFill = getPercentFill();
