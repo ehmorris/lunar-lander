@@ -31,6 +31,7 @@ const lander = {
   gravity: 0.4,
   speed: 0,
   heading: 90,
+  rotation: 0,
   position: {
     x: 50,
     y: 0,
@@ -91,18 +92,18 @@ const lander = {
       this.thrust = 0;
     },
   },
-  getHeading: function () {
+  getHeadingAndRotation: function () {
     return new Promise((resolve) => {
       const timeDelta = (currentFrameTime - previousFrameTime) / 100;
-      let newHeading;
+      let newHeading = this.heading;
+      let newRotation;
       if (this.boosters.boosterAngle < this.heading) {
-        newHeading = this.heading - this.boosters.thrust;
-      }
-      if (this.boosters.boosterAngle > this.heading) {
-        newHeading = this.heading + this.boosters.thrust;
+        newRotation = this.rotation - this.boosters.thrust;
+      } else {
+        newRotation = this.rotation + this.boosters.thrust;
       }
 
-      return resolve(newHeading);
+      return resolve({ heading: newHeading, rotation: newRotation });
     });
   },
   getSpeed: function () {
@@ -135,23 +136,21 @@ const lander = {
     });
   },
   draw: function (CTX) {
-    CTX.save();
     this.getSpeed().then((newSpeed) => {
       this.speed = newSpeed;
-      this.getHeading().then((newHeading) => {
-        this.heading = newHeading;
+      this.getHeadingAndRotation().then(({ heading, rotation }) => {
+        this.heading = heading;
+        this.rotation = rotation;
         this.getNextPosition().then((nextPosition) => {
           // ROTATE LANDER
           CTX.save();
           const shapeCenter = {
-            x: lander.position.x + lander.width / 2,
-            y: lander.position.y + lander.height / 2,
+            x: this.position.x + this.width / 2,
+            y: this.position.y + this.height / 2,
           };
           CTX.translate(shapeCenter.x, shapeCenter.y);
-          CTX.rotate(degToRad(lander.heading));
-          CTX.translate(-lander.width / 2, -lander.height / 2);
-          CTX.restore();
-
+          CTX.rotate(degToRad(this.rotation));
+          CTX.translate(-this.width / 2, -this.height / 2);
           // RENDER LANDER
           CTX.fillStyle = "green";
           CTX.fillRect(
@@ -160,11 +159,11 @@ const lander = {
             this.width,
             this.height
           );
+          CTX.restore();
           this.position = nextPosition;
         });
       });
     });
-    CTX.restore();
   },
 };
 
