@@ -13,8 +13,14 @@ export const spawnEntityGraph = ({
   showPercent,
   backgroundColor,
   fillColor,
+  style,
 }) => {
-  let barLog = Array(maxDataPoints).fill(getNumerator());
+  const getPercentFill = () =>
+    style === "posneg"
+      ? (getNumerator() + getDenominator()) / (getDenominator() * 2)
+      : getNumerator() / getDenominator();
+
+  let barLog = Array(maxDataPoints).fill(getPercentFill());
   const CTX = generateCanvas({
     width: graphWidth,
     height: graphHeight,
@@ -28,26 +34,47 @@ export const spawnEntityGraph = ({
     }
   };
 
-  const drawGraphPolygon = (arrayOfNums) => {
-    CTX.fillStyle = fillColor;
-    CTX.beginPath();
-    CTX.moveTo(0, graphHeight);
+  const drawDataPoints = (arrayOfNums) => {
     arrayOfNums.forEach((barHeightPercent, index) => {
       CTX.lineTo(
         (graphWidth / (arrayOfNums.length - 1)) * index,
         graphHeight - graphHeight * barHeightPercent
       );
     });
-    CTX.lineTo(graphWidth, graphHeight);
-    CTX.closePath();
-    CTX.fill();
+  };
+
+  const drawGraphPolygon = (arrayOfNums) => {
+    if (style === "area") {
+      CTX.fillStyle = fillColor;
+      CTX.beginPath();
+      CTX.moveTo(0, graphHeight);
+      drawDataPoints(arrayOfNums);
+      CTX.lineTo(graphWidth, graphHeight);
+      CTX.closePath();
+      CTX.fill();
+    }
+
+    if (style === "line" || style === "posneg") {
+      CTX.strokeStyle = fillColor;
+      CTX.beginPath();
+      drawDataPoints(arrayOfNums);
+      CTX.stroke();
+    }
   };
 
   const drawFrame = () => {
     CTX.fillStyle = backgroundColor;
     CTX.fillRect(0, 0, graphWidth, graphHeight);
 
-    const percentFill = getNumerator() / getDenominator();
+    if (style === "posneg") {
+      CTX.strokeStyle = "red";
+      CTX.beginPath();
+      CTX.moveTo(0, graphHeight / 2);
+      CTX.lineTo(graphWidth, graphHeight / 2);
+      CTX.stroke();
+    }
+
+    const percentFill = getPercentFill();
     addValueToBarLog(percentFill);
     drawGraphPolygon(barLog);
     const bottomLabel = getBottomLabel();

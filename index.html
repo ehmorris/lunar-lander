@@ -17,15 +17,18 @@
         box-shadow: 0 0 20px #000;
       }
       .layoutContainer {
-        display: grid;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         grid-gap: 20px;
+        margin: 20px;
       }
       .gameContainer {
         grid-column: span 3;
       }
       .statsContainer {
         display: grid;
-        grid-template-columns: repeat(4, 200px);
+        grid-template-columns: repeat(5, 200px);
         grid-gap: 20px;
       }
     </style>

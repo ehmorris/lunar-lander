@@ -5,10 +5,11 @@ import {
   roundToNDigits,
 } from "./helpers.js";
 import { spawnEntityGraph } from "./smallgraph.js";
-import { spawnPosNegGraph } from "./posneggraph.js";
+
+// SETUP AND CONSTS
 
 const canvasProps = {
-  width: 860,
+  width: 1080,
   height: 400,
 };
 
@@ -19,8 +20,10 @@ const CTX = generateCanvas({
 });
 
 const MAX_FUEL = 300;
-const MAX_BOOSTER_FUEL = 20;
+const MAX_BOOSTER_FUEL = 300;
 const THRUST_MAX = 0.5;
+
+// LANDER PROPS AND ACTIONS
 
 const lander = {
   width: 20,
@@ -138,6 +141,18 @@ const lander = {
       this.getHeading().then((newHeading) => {
         this.heading = newHeading;
         this.getNextPosition().then((nextPosition) => {
+          // ROTATE LANDER
+          CTX.save();
+          const shapeCenter = {
+            x: lander.position.x + lander.width / 2,
+            y: lander.position.y + lander.height / 2,
+          };
+          CTX.translate(shapeCenter.x, shapeCenter.y);
+          CTX.rotate(degToRad(lander.heading));
+          CTX.translate(-lander.width / 2, -lander.height / 2);
+          CTX.restore();
+
+          // RENDER LANDER
           CTX.fillStyle = "green";
           CTX.fillRect(
             this.position.x,
@@ -158,12 +173,14 @@ let currentFrameTime = Date.now();
 const drawFrame = () => {
   currentFrameTime = Date.now();
   CTX.clearRect(0, 0, canvasProps.width, canvasProps.height);
-
   lander.draw(CTX);
-
   previousFrameTime = Date.now();
   window.requestAnimationFrame(drawFrame);
 };
+
+window.requestAnimationFrame(drawFrame);
+
+// CONTROLS
 
 document.addEventListener("keydown", ({ key }) => {
   if (key === "ArrowUp") {
@@ -186,7 +203,7 @@ document.addEventListener("keyup", ({ key }) => {
   }
 });
 
-window.requestAnimationFrame(drawFrame);
+// OBSERVABILITY
 
 spawnEntityGraph({
   attachNode: ".statsContainer",
@@ -196,6 +213,7 @@ spawnEntityGraph({
   getBottomLabel: () => `${roundToNDigits(lander.engine.fuel, 1)} GALLONS`,
   backgroundColor: "#999",
   fillColor: "white",
+  style: "area",
 });
 
 spawnEntityGraph({
@@ -206,9 +224,10 @@ spawnEntityGraph({
   getBottomLabel: () => `${roundToNDigits(lander.boosters.fuel, 1)} GALLONS`,
   backgroundColor: "#999",
   fillColor: "white",
+  style: "area",
 });
 
-spawnPosNegGraph({
+spawnEntityGraph({
   attachNode: ".statsContainer",
   getNumerator: () => lander.speed,
   getDenominator: () => 15,
@@ -216,6 +235,7 @@ spawnPosNegGraph({
   getBottomLabel: () => `${roundToNDigits(lander.speed, 1)}MPH`,
   backgroundColor: "#999",
   fillColor: "white",
+  style: "posneg",
 });
 
 spawnEntityGraph({
@@ -226,4 +246,16 @@ spawnEntityGraph({
   getBottomLabel: () => roundToNDigits(lander.engine.thrust, 1),
   backgroundColor: "#999",
   fillColor: "white",
+  style: "area",
+});
+
+spawnEntityGraph({
+  attachNode: ".statsContainer",
+  getNumerator: () => lander.heading,
+  getDenominator: () => 360,
+  topLabel: "HEADING",
+  getBottomLabel: () => `${roundToNDigits(lander.heading, 1)}°`,
+  backgroundColor: "#999",
+  fillColor: "white",
+  style: "line",
 });
