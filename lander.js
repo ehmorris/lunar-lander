@@ -4,7 +4,6 @@ export const makeLander = (CTX, canvasProps) => {
   let _width = 20;
   let _height = 20;
   let _gravity = 0.04;
-  let _rotation = 15;
   let _position = {
     x: 50,
     y: 0,
@@ -49,6 +48,7 @@ export const makeLander = (CTX, canvasProps) => {
         min: 0,
         max: props.THRUST_MAX,
       });
+      angle < props.heading ? (props.heading += 1) : (props.heading -= 1);
     } else {
       endBooster();
     }
@@ -72,6 +72,7 @@ export const makeLander = (CTX, canvasProps) => {
         min: 0,
         max: props.THRUST_MAX,
       });
+      props.heading = 90;
     } else {
       endEngine();
     }
@@ -82,25 +83,10 @@ export const makeLander = (CTX, canvasProps) => {
     engineProps.thrust = 0;
   };
 
-  const _getHeadingAndRotation = (currentFrameTime, previousFrameTime) => {
-    return new Promise((resolve) => {
-      const timeDelta = (currentFrameTime - previousFrameTime) / 100;
-      let newHeading = props.heading;
-      let newRotation;
-      if (_boosterAngle < props.heading) {
-        newRotation = _rotation - _boosterThrust;
-      } else {
-        newRotation = _rotation + _boosterThrust;
-      }
-
-      return resolve({ heading: newHeading, rotation: newRotation });
-    });
-  };
-
   const _getSpeed = (currentFrameTime, previousFrameTime) => {
     return new Promise((resolve) => {
       const timeDelta = (currentFrameTime - previousFrameTime) / 100;
-      const isGrounded = _position.y >= canvasProps.height - props.height;
+      const isGrounded = _position.y >= canvasProps.height - _height;
       const boundedCurrentSpeed = isGrounded ? 0 : props.speed;
       const newSpeed =
         boundedCurrentSpeed - engineProps.thrust + _gravity * timeDelta;
@@ -117,34 +103,44 @@ export const makeLander = (CTX, canvasProps) => {
         y: _position.y + props.speed * Math.sin(degToRad(props.heading)),
       };
 
-      if (prospectiveNewLocation.y > canvasProps.height - props.height) {
+      if (prospectiveNewLocation.y > canvasProps.height - _height) {
         return resolve({
           x: prospectiveNewLocation.x,
-          y: canvasProps.height - props.height,
+          y: canvasProps.height - _height,
         });
       } else {
         return resolve(prospectiveNewLocation);
       }
     });
   };
+
   async function draw(currentFrameTime, previousFrameTime) {
     props.speed = await _getSpeed(currentFrameTime, previousFrameTime);
-    ({ heading: props.heading, rotation: _rotation } =
-      await _getHeadingAndRotation(currentFrameTime, previousFrameTime));
 
-    // ROTATE LANDER
-    const shapeCenter = {
-      x: _position.x + _width / 2,
-      y: _position.y + _height / 2,
-    };
-    CTX.save();
-    CTX.translate(shapeCenter.x, shapeCenter.y);
-    CTX.rotate(degToRad(_rotation));
-    CTX.translate(-_width / 2, -_height / 2);
     // RENDER LANDER
     CTX.fillStyle = "green";
     CTX.fillRect(_position.x, _position.y, _width, _height);
-    CTX.restore();
+
+    if (engineProps.thrust > 0) {
+      CTX.fillStyle = "orange";
+      const thrustSize = _width / 2;
+      CTX.fillRect(
+        _position.x + _width / 2 - thrustSize / 2,
+        _position.y + _height,
+        thrustSize,
+        thrustSize
+      );
+    }
+
+    if (_boosterThrust > 0) {
+      CTX.save();
+      CTX.fillStyle = "orange";
+      const boosterSize = _width / 3;
+      CTX.translate(_position.x + _width / 2, _position.y + _height / 2);
+      CTX.rotate(degToRad(_boosterAngle));
+      CTX.fillRect(0, 0, boosterSize, boosterSize);
+      CTX.restore();
+    }
 
     _position = await _getNextPosition();
   }

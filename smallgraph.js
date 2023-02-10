@@ -1,4 +1,4 @@
-import { generateCanvas, clampNumber } from "./helpers.js";
+import { animate, generateCanvas } from "./helpers.js";
 
 const maxDataPoints = 200;
 const graphWidth = 200;
@@ -21,18 +21,12 @@ export const spawnEntityGraph = ({
       : getNumerator() / getDenominator();
 
   let barLog = Array(maxDataPoints).fill(getPercentFill());
+
   const CTX = generateCanvas({
     width: graphWidth,
     height: graphHeight,
     attachNode: attachNode,
   });
-
-  const addValueToBarLog = (value) => {
-    barLog.push(value);
-    if (barLog.length > maxDataPoints) {
-      barLog = barLog.slice(-maxDataPoints);
-    }
-  };
 
   const drawDataPoints = (arrayOfNums) => {
     arrayOfNums.forEach((barHeightPercent, index) => {
@@ -62,14 +56,13 @@ export const spawnEntityGraph = ({
     }
   };
 
-  const drawFrame = () => {
+  animate(() => {
     CTX.fillStyle = backgroundColor;
     CTX.fillRect(0, 0, graphWidth, graphHeight);
 
     if (style === "posneg") {
-      CTX.save();
-
       // SAFE ZONE
+      CTX.save();
       const safeZoneSize = 15;
       CTX.strokeStyle = "rgb(0, 255, 0, .5)";
       CTX.lineWidth = safeZoneSize;
@@ -85,25 +78,26 @@ export const spawnEntityGraph = ({
       CTX.moveTo(0, graphHeight / 2);
       CTX.lineTo(graphWidth, graphHeight / 2);
       CTX.stroke();
-
       CTX.restore();
     }
 
-    const percentFill = getPercentFill();
-    addValueToBarLog(percentFill);
+    barLog.push(getPercentFill());
+    if (barLog.length > maxDataPoints) {
+      barLog = barLog.slice(-maxDataPoints);
+    }
+
     drawGraphPolygon(barLog);
+
     const bottomLabel = getBottomLabel();
     const bottomLabelWithOptions = showPercent
-      ? `${bottomLabel} (${Math.round(percentFill * 1000) / 10}%)`
+      ? `${bottomLabel} (${Math.round(getPercentFill() * 1000) / 10}%)`
       : bottomLabel;
 
+    CTX.save();
     CTX.fillStyle = "#000";
     CTX.font = "10px sans-serif";
     CTX.fillText(topLabel, 3, 12);
     CTX.fillText(bottomLabelWithOptions, 3, graphHeight - 5);
-
-    window.requestAnimationFrame(drawFrame);
-  };
-
-  window.requestAnimationFrame(drawFrame);
+    CTX.restore();
+  });
 };
