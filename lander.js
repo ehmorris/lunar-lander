@@ -72,7 +72,7 @@ export const makeLander = (CTX, canvasProps) => {
         min: 0,
         max: props.THRUST_MAX,
       });
-      props.heading = 90;
+      props.heading < 90 ? (props.heading += 1) : (props.heading -= 1);
     } else {
       endEngine();
     }
