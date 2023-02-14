@@ -26,12 +26,24 @@ document.addEventListener("keyup", ({ key }) => {
   if (key === "ArrowLeft" || key === "ArrowRight") lander.stopRotating();
 });
 
-document.addEventListener("touchstart", () => {
-  lander.engineOn();
+document.addEventListener("touchstart", (e) => {
+  const touchLocation = e.touches[0].clientX / canvasWidth;
+
+  if (touchLocation > 0 && touchLocation < 0.33) {
+    lander.rotateLeft();
+  } else if (touchLocation >= 0.33 && touchLocation <= 0.66) {
+    lander.engineOn();
+  } else {
+    lander.rotateRight();
+  }
+
+  e.preventDefault();
 });
 
-document.addEventListener("touchend", () => {
+document.addEventListener("touchend", (e) => {
   lander.engineOff();
+  lander.stopRotating();
+  e.preventDefault();
 });
 
 let crashed = false;
