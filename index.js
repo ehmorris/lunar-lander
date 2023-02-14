@@ -26,6 +26,14 @@ document.addEventListener("keyup", ({ key }) => {
   if (key === "ArrowLeft" || key === "ArrowRight") lander.stopRotating();
 });
 
+document.addEventListener("touchstart", () => {
+  lander.engineOn();
+});
+
+document.addEventListener("touchend", () => {
+  lander.engineOff();
+});
+
 let crashed = false;
 let explosionPieces = false;
 let lastVelocity;
