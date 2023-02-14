@@ -1,107 +1,69 @@
-import { generateCanvas, roundToNDigits, animate } from "./helpers.js";
-import { spawnEntityGraph } from "./smallgraph.js";
+import { animate, generateCanvas, roundToNDigits } from "./helpers.js";
 import { makeLander } from "./lander.js";
+import { makeExplosionPiece } from "./explosion.js";
+import { spawnEntityGraph } from "./smallgraph.js";
 
-// SETUP AND CONSTS
-
-const canvasProps = {
-  width: 1080,
-  height: 400,
-};
-
+const [canvasWidth, canvasHeight] = [window.innerWidth, window.innerHeight / 2];
 const CTX = generateCanvas({
-  width: canvasProps.width,
-  height: canvasProps.height,
-  attachNode: ".gameContainer",
+  width: canvasWidth,
+  height: canvasHeight,
+  attachNode: ".game",
 });
 
-const lander = makeLander(CTX, canvasProps);
-
-animate((currentFrameTime, previousFrameTime) => {
-  CTX.clearRect(0, 0, canvasProps.width, canvasProps.height);
-  lander.draw(currentFrameTime, previousFrameTime);
-});
-
-// CONTROLS
+const lander = makeLander(CTX, canvasWidth, canvasHeight);
 
 document.addEventListener("keydown", ({ key }) => {
-  if (key === "ArrowUp") {
-    lander.startEngine();
-  }
-  if (key === "ArrowLeft") {
-    lander.startBooster({ angle: 180 });
-  }
-  if (key === "ArrowRight") {
-    lander.startBooster({ angle: 0 });
-  }
+  if (key === "ArrowUp") lander.engineOn();
+  if (key === "ArrowLeft") lander.rotateLeft();
+  if (key === "ArrowRight") lander.rotateRight();
 });
 
 document.addEventListener("keyup", ({ key }) => {
-  if (key === "ArrowUp") {
-    lander.endEngine();
-  }
-  if (key === "ArrowLeft" || key === "ArrowRight") {
-    lander.endBooster();
+  if (key === "ArrowUp") lander.engineOff();
+  if (key === "ArrowLeft" || key === "ArrowRight") lander.stopRotating();
+});
+
+let crashed = false;
+let explosionPieces = false;
+
+animate(() => {
+  CTX.fillStyle = "#02071E";
+  CTX.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  if (!crashed) {
+    lander.draw();
+    crashed = lander.isGrounded() && lander.readOnlyProps.velocity.y > 0.4;
+  } else {
+    if (!explosionPieces) {
+      explosionPieces = new Array(10)
+        .fill()
+        .map(() =>
+          makeExplosionPiece(
+            CTX,
+            lander.readOnlyProps.position.x,
+            lander.readOnlyProps.velocity,
+            canvasWidth,
+            canvasHeight
+          )
+        );
+    } else {
+      explosionPieces.forEach((e) => e.draw());
+    }
   }
 });
 
 // OBSERVABILITY
 
-spawnEntityGraph({
-  attachNode: ".statsContainer",
-  getNumerator: () => lander.engineProps.fuel,
-  getDenominator: () => lander.props.MAX_FUEL,
-  topLabel: "FUEL",
-  getBottomLabel: () => `${roundToNDigits(lander.engineProps.fuel, 1)} GALLONS`,
-  backgroundColor: "#999",
-  fillColor: "white",
-  style: "area",
-});
-
-spawnEntityGraph({
-  attachNode: ".statsContainer",
-  getNumerator: () => lander.boosterProps.fuel,
-  getDenominator: () => lander.props.MAX_BOOSTER_FUEL,
-  topLabel: "BOOSTER FUEL",
-  getBottomLabel: () =>
-    `${roundToNDigits(lander.boosterProps.fuel, 1)} GALLONS`,
-  backgroundColor: "#999",
-  fillColor: "white",
-  style: "area",
-});
-
 const SPEED_FACTOR = 15;
 const SPEED_BOUND = 20;
 spawnEntityGraph({
-  attachNode: ".statsContainer",
-  getNumerator: () => lander.props.speed,
+  attachNode: ".stats",
+  getNumerator: () => lander.readOnlyProps.velocity.y,
   getDenominator: () => SPEED_BOUND / SPEED_FACTOR,
   topLabel: "SPEED",
   getBottomLabel: () =>
-    `${roundToNDigits(lander.props.speed * SPEED_FACTOR, 0)}MPH`,
+    `${roundToNDigits(lander.readOnlyProps.velocity.y * SPEED_FACTOR, 0)}MPH`,
   backgroundColor: "#999",
   fillColor: "white",
   style: "posneg",
-});
-
-spawnEntityGraph({
-  attachNode: ".statsContainer",
-  getNumerator: () => lander.engineProps.thrust,
-  getDenominator: () => lander.props.THRUST_MAX,
-  topLabel: "THRUST",
-  getBottomLabel: () => roundToNDigits(lander.engineProps.thrust, 1),
-  backgroundColor: "#999",
-  fillColor: "white",
-  style: "area",
-});
-
-spawnEntityGraph({
-  attachNode: ".statsContainer",
-  getNumerator: () => lander.props.heading,
-  getDenominator: () => 360,
-  topLabel: "HEADING",
-  getBottomLabel: () => `${roundToNDigits(lander.props.heading, 1)}°`,
-  backgroundColor: "#999",
-  fillColor: "white",
-  style: "line",
 });

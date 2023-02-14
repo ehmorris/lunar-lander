@@ -1,11 +1,3 @@
-export const degToRad = (deg) => deg * (Math.PI / 180);
-
-export const clampNumber = ({ number, min, max }) =>
-  Math.max(min, Math.min(number, max));
-
-export const roundToNDigits = (number, digits = 0) =>
-  Math.round(number * Math.pow(10, digits)) / Math.pow(10, digits);
-
 export const generateCanvas = ({ width, height, attachNode }) => {
   const element = document.createElement("canvas");
   const context = element.getContext("2d");
@@ -22,6 +14,7 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 
   return context;
 };
+
 export const animate = (drawFunc) => {
   let previousFrameTime = Date.now();
   let currentFrameTime = Date.now();
@@ -35,3 +28,10 @@ export const animate = (drawFunc) => {
 
   window.requestAnimationFrame(drawFuncContainer);
 };
+
+export const randomBool = (probability = 0.5) => Math.random() >= probability;
+
+export const randomBetween = (min, max) => Math.random() * (max - min) + min;
+
+export const roundToNDigits = (number, digits = 0) =>
+  Math.round(number * Math.pow(10, digits)) / Math.pow(10, digits);

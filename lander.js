@@ -1,158 +1,180 @@
-import { degToRad, clampNumber } from "./helpers.js";
+import { randomBool } from "./helpers.js";
 
-export const makeLander = (CTX, canvasProps) => {
-  let _width = 20;
-  let _height = 20;
-  let _gravity = 0.04;
+export const makeLander = (CTX, canvasWidth, canvasHeight) => {
+  const _width = 24;
+  const _height = 40;
+  const _gravity = 0.004;
+  const _thrust = 0.01;
+  const _groundedHeight = canvasHeight - _height + _height / 2;
+  const _trajectoryPointWidth = 2;
+  const _trajectoryPointHeight = 8;
+
   let _position = {
-    x: 50,
+    x: canvasWidth / 2,
+    y: _height * 2,
+  };
+  let _velocity = {
+    x: 0,
     y: 0,
   };
+  let _rotationVelocity = 0;
+  let _angle = Math.PI * 2;
+  let _engineOn = false;
+  let _rotatingLeft = false;
+  let _rotatingRight = false;
 
-  let _boosterThrust = 0;
-  let _boosterAngle = 0;
-  let _boosterThrusting = false;
-  let _boosterStartTime = null;
+  const _updateProps = () => {
+    _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
 
-  let _engineThrusting = false;
-  let _engineStartTime = null;
-
-  const props = {
-    speed: 0,
-    heading: 90,
-    MAX_FUEL: 300,
-    MAX_BOOSTER_FUEL: 300,
-    THRUST_MAX: 0.1,
-  };
-
-  const boosterProps = {
-    fuel: props.MAX_BOOSTER_FUEL,
-  };
-
-  const engineProps = {
-    thrust: 0,
-    fuel: props.MAX_FUEL,
-  };
-
-  const startBooster = ({ angle }) => {
-    if (boosterProps.fuel > 0) {
-      if (!_boosterThrusting) {
-        _boosterStartTime = Date.now();
-        _boosterAngle = angle;
-        _boosterThrusting = true;
+    if (_position.y < _groundedHeight) {
+      if (_rotatingRight) {
+        _rotationVelocity += 0.01;
+      } else if (_rotatingLeft) {
+        _rotationVelocity -= 0.01;
       }
-      const timeDelta = (Date.now() - _boosterStartTime) / 100;
-      boosterProps.fuel = Math.max(boosterProps.fuel - timeDelta, 0);
-      _boosterThrust = clampNumber({
-        number: (props.THRUST_MAX / 4) * timeDelta,
-        min: 0,
-        max: props.THRUST_MAX,
-      });
-      angle < props.heading ? (props.heading += 1) : (props.heading -= 1);
+
+      _position.x += _velocity.x;
+      _angle += (Math.PI / 180) * _rotationVelocity;
+      _velocity.y += _gravity;
     } else {
-      endBooster();
+      _angle = Math.PI * 2;
+      _velocity = { x: 0, y: 0 };
+      _rotationVelocity = 0;
+    }
+
+    if (_engineOn) {
+      _velocity.x += _thrust * Math.sin(_angle);
+      _velocity.y -= _thrust * Math.cos(_angle);
     }
   };
 
-  const endBooster = () => {
-    _boosterThrusting = false;
-    _boosterThrust = 0;
-  };
+  const _drawTrajectory = () => {
+    let projectedYPosition = _position.y;
+    let projectedXPosition = _position.x;
+    let projectedAngle = _angle;
+    let projectedYVelocity = _velocity.y;
 
-  const startEngine = () => {
-    if (engineProps.fuel > 0) {
-      if (!_engineThrusting) {
-        _engineStartTime = Date.now();
-        _engineThrusting = true;
-      }
-      const timeDelta = (Date.now() - _engineStartTime) / 100;
-      engineProps.fuel = Math.max(engineProps.fuel - timeDelta, 0);
-      engineProps.thrust = clampNumber({
-        number: 0.05 * timeDelta,
-        min: 0,
-        max: props.THRUST_MAX,
-      });
-      props.heading < 90 ? (props.heading += 1) : (props.heading -= 1);
-    } else {
-      endEngine();
-    }
-  };
-
-  const endEngine = () => {
-    _engineThrusting = false;
-    engineProps.thrust = 0;
-  };
-
-  const _getSpeed = (currentFrameTime, previousFrameTime) => {
-    return new Promise((resolve) => {
-      const timeDelta = (currentFrameTime - previousFrameTime) / 100;
-      const isGrounded = _position.y >= canvasProps.height - _height;
-      const boundedCurrentSpeed = isGrounded ? 0 : props.speed;
-      const newSpeed =
-        boundedCurrentSpeed - engineProps.thrust + _gravity * timeDelta;
-      const boundedNewSpeed = isGrounded ? Math.min(newSpeed, 0) : newSpeed;
-
-      return resolve(boundedNewSpeed);
-    });
-  };
-
-  const _getNextPosition = () => {
-    return new Promise((resolve) => {
-      const prospectiveNewLocation = {
-        x: _position.x + props.speed * Math.cos(degToRad(props.heading)),
-        y: _position.y + props.speed * Math.sin(degToRad(props.heading)),
-      };
-
-      if (prospectiveNewLocation.y > canvasProps.height - _height) {
-        return resolve({
-          x: prospectiveNewLocation.x,
-          y: canvasProps.height - _height,
-        });
-      } else {
-        return resolve(prospectiveNewLocation);
-      }
-    });
-  };
-
-  async function draw(currentFrameTime, previousFrameTime) {
-    props.speed = await _getSpeed(currentFrameTime, previousFrameTime);
-
-    // RENDER LANDER
-    CTX.fillStyle = "green";
-    CTX.fillRect(_position.x, _position.y, _width, _height);
-
-    if (engineProps.thrust > 0) {
-      CTX.fillStyle = "orange";
-      const thrustSize = _width / 2;
-      CTX.fillRect(
-        _position.x + _width / 2 - thrustSize / 2,
-        _position.y + _height,
-        thrustSize,
-        thrustSize
+    CTX.save();
+    CTX.fillStyle = "#024220";
+    CTX.translate(_width / 2, _height / 2);
+    while (projectedYPosition < _groundedHeight) {
+      projectedYPosition = Math.min(
+        projectedYPosition + projectedYVelocity,
+        _groundedHeight
       );
-    }
+      projectedXPosition += _velocity.x;
+      projectedAngle += (Math.PI / 180) * _rotationVelocity;
+      projectedYVelocity += _gravity;
 
-    if (_boosterThrust > 0) {
       CTX.save();
-      CTX.fillStyle = "orange";
-      const boosterSize = _width / 3;
-      CTX.translate(_position.x + _width / 2, _position.y + _height / 2);
-      CTX.rotate(degToRad(_boosterAngle));
-      CTX.fillRect(0, 0, boosterSize, boosterSize);
+      CTX.translate(
+        projectedXPosition - _width / 2 - _trajectoryPointWidth / 2,
+        projectedYPosition - _height / 2 - _trajectoryPointHeight / 2
+      );
+      CTX.rotate(projectedAngle);
+      CTX.fillRect(0, 0, _trajectoryPointWidth, _trajectoryPointHeight);
       CTX.restore();
     }
+    CTX.restore();
+  };
 
-    _position = await _getNextPosition();
-  }
+  const draw = () => {
+    _updateProps();
+    _drawTrajectory();
+
+    // Draw gradient for lander
+    const gradient = CTX.createLinearGradient(-_width / 2, 0, _width / 2, 0);
+    gradient.addColorStop(0, "#DFE5E5");
+    gradient.addColorStop(0.3, "#BDBCC3");
+    gradient.addColorStop(0.6, "#4A4E6F");
+    gradient.addColorStop(1, "#3D4264");
+    CTX.fillStyle = gradient;
+
+    // Move to top left of the lander and then rotate at that origin
+    CTX.save();
+    CTX.translate(_position.x, _position.y);
+    CTX.rotate(_angle);
+
+    // Draw the lander
+    //
+    // We want the center of rotation to be in the center of the bottom
+    // rectangle, excluding the tip of the lander. To accomplish this, the
+    // lander is drawn offset to the top and left of _position.x and y.
+    // The tip is also drawn offset to the top of that so that the lander
+    // is a bit taller than _height.
+    //
+    //                                      /\
+    //                                     /  \
+    // Start at top left of this segment → |  |
+    // and work clockwise.                 |__|
+    CTX.beginPath();
+    CTX.moveTo(-_width / 2, -_height / 2);
+    CTX.lineTo(0, -_height);
+    CTX.lineTo(_width / 2, -_height / 2);
+    CTX.lineTo(_width / 2, _height / 2);
+    CTX.lineTo(-_width / 2, _height / 2);
+    CTX.closePath();
+    CTX.fill();
+
+    // Translate to the top-left corner of the lander for engine flames
+    CTX.translate(-_width / 2, -_height / 2);
+
+    if (_engineOn || _rotatingLeft || _rotatingRight) {
+      CTX.fillStyle = randomBool() ? "#415B8C" : "#F3AFA3";
+    }
+
+    // Main engine flame
+    if (_engineOn) {
+      CTX.beginPath();
+      CTX.moveTo(0, _height);
+      CTX.lineTo(_width, _height);
+      CTX.lineTo(_width / 2, _height + Math.random() * _height);
+      CTX.lineTo(0, _height);
+      CTX.closePath();
+      CTX.fill();
+    }
+
+    // Right booster flame
+    if (_rotatingLeft) {
+      CTX.beginPath();
+      CTX.moveTo(_width, 0);
+      CTX.lineTo(_width + (Math.random() * _width) / 2, _height * 0.2);
+      CTX.lineTo(_width, _height * 0.4);
+      CTX.lineTo(_width, 0);
+      CTX.closePath();
+      CTX.fill();
+    }
+
+    // Left booster flame
+    if (_rotatingRight) {
+      CTX.beginPath();
+      CTX.moveTo(0, 0);
+      CTX.lineTo((-Math.random() * _width) / 2, _height * 0.2);
+      CTX.lineTo(0, _height * 0.4);
+      CTX.lineTo(0, 0);
+      CTX.closePath();
+      CTX.fill();
+    }
+
+    CTX.restore();
+  };
 
   return {
     draw,
-    startBooster,
-    endBooster,
-    startEngine,
-    endEngine,
-    props,
-    engineProps,
-    boosterProps,
+    readOnlyProps: {
+      position: _position,
+      velocity: _velocity,
+      rotationVelocity: _rotationVelocity,
+      angle: _angle,
+    },
+    isGrounded: () => _position.y >= _groundedHeight,
+    engineOn: () => (_engineOn = true),
+    engineOff: () => (_engineOn = false),
+    rotateLeft: () => (_rotatingLeft = true),
+    rotateRight: () => (_rotatingRight = true),
+    stopRotating: () => {
+      _rotatingLeft = false;
+      _rotatingRight = false;
+    },
   };
 };
