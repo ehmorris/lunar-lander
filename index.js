@@ -3,7 +3,10 @@ import { makeLander } from "./lander.js";
 import { makeExplosionPiece } from "./explosion.js";
 import { spawnEntityGraph } from "./smallgraph.js";
 
-const [canvasWidth, canvasHeight] = [window.innerWidth, window.innerHeight / 2];
+const [canvasWidth, canvasHeight] = [
+  window.innerWidth,
+  window.innerHeight * 0.75,
+];
 const CTX = generateCanvas({
   width: canvasWidth,
   height: canvasHeight,
@@ -25,6 +28,9 @@ document.addEventListener("keyup", ({ key }) => {
 
 let crashed = false;
 let explosionPieces = false;
+let lastVelocity;
+let lastAngle;
+let lastPosition;
 
 animate(() => {
   CTX.fillStyle = "#02071E";
@@ -32,7 +38,16 @@ animate(() => {
 
   if (!crashed) {
     lander.draw();
-    crashed = lander.isGrounded() && lander.readOnlyProps.velocity.y > 0.4;
+    crashed =
+      lander.isGrounded() &&
+      (lastVelocity.y > 0.4 ||
+        Math.abs((lastAngle * 180) / Math.PI - 360) > 10);
+  }
+
+  if (!crashed) {
+    lastVelocity = lander.getVelocity();
+    lastPosition = lander.getPosition();
+    lastAngle = lander.getAngle();
   } else {
     if (!explosionPieces) {
       explosionPieces = new Array(10)
@@ -40,8 +55,8 @@ animate(() => {
         .map(() =>
           makeExplosionPiece(
             CTX,
-            lander.readOnlyProps.position.x,
-            lander.readOnlyProps.velocity,
+            lastPosition.x,
+            lastVelocity,
             canvasWidth,
             canvasHeight
           )
@@ -58,11 +73,11 @@ const SPEED_FACTOR = 15;
 const SPEED_BOUND = 20;
 spawnEntityGraph({
   attachNode: ".stats",
-  getNumerator: () => lander.readOnlyProps.velocity.y,
+  getNumerator: () => lander.getVelocity().y,
   getDenominator: () => SPEED_BOUND / SPEED_FACTOR,
   topLabel: "SPEED",
   getBottomLabel: () =>
-    `${roundToNDigits(lander.readOnlyProps.velocity.y * SPEED_FACTOR, 0)}MPH`,
+    `${roundToNDigits(lander.getVelocity().y * SPEED_FACTOR, 0)}MPH`,
   backgroundColor: "#999",
   fillColor: "white",
   style: "posneg",

@@ -161,12 +161,10 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
   return {
     draw,
-    readOnlyProps: {
-      position: _position,
-      velocity: _velocity,
-      rotationVelocity: _rotationVelocity,
-      angle: _angle,
-    },
+    getPosition: () => _position,
+    getVelocity: () => _velocity,
+    getRotationVelocity: () => _rotationVelocity,
+    getAngle: () => _angle,
     isGrounded: () => _position.y >= _groundedHeight,
     engineOn: () => (_engineOn = true),
     engineOff: () => (_engineOn = false),

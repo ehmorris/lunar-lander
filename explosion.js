@@ -19,7 +19,7 @@ export const makeExplosionPiece = (
   };
   let _velocity = {
     x: randomBetween(velocity.x / 4, velocity.x) + randomBetween(-0.1, 0.1),
-    y: randomBetween(-velocity.y / 4, -velocity.y),
+    y: randomBetween(-velocity.y / 8, -velocity.y / 3),
   };
   let _rotationVelocity = 0.1;
   let _angle = Math.PI * 2;
