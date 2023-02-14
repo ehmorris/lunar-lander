@@ -34,6 +34,14 @@ document.addEventListener("touchend", () => {
   lander.engineOff();
 });
 
+const gyroscope = new Gyroscope({ frequency: 60 });
+gyroscope.addEventListener("reading", (e) => {
+  document.querySelector(
+    ".debug"
+  ).innerHTML = `x:${gyroscope.x} and y:${gyroscope.y}`;
+});
+gyroscope.start();
+
 let crashed = false;
 let explosionPieces = false;
 let lastVelocity;
