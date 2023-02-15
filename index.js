@@ -27,20 +27,29 @@ document.addEventListener("keyup", ({ key }) => {
 });
 
 document.addEventListener("touchstart", ({ touches }) => {
-  const touchLocation = touches[0].clientX / canvasWidth;
+  for (let index = 0; index < touches.length; index++) {
+    const touchLocation = touches[index].clientX / canvasWidth;
 
-  if (touchLocation > 0 && touchLocation < 0.33) {
-    lander.rotateLeft();
-  } else if (touchLocation >= 0.33 && touchLocation <= 0.66) {
-    lander.engineOn();
-  } else {
-    lander.rotateRight();
+    if (touchLocation > 0 && touchLocation < 0.33) {
+      lander.rotateLeft();
+    } else if (touchLocation >= 0.33 && touchLocation <= 0.66) {
+      lander.engineOn();
+    } else {
+      lander.rotateRight();
+    }
   }
 });
 
-document.addEventListener("touchend", () => {
-  lander.engineOff();
-  lander.stopRotating();
+document.addEventListener("touchend", ({ changedTouches }) => {
+  for (let index = 0; index < changedTouches.length; index++) {
+    const touchLocation = changedTouches[index].clientX / canvasWidth;
+
+    if (touchLocation >= 0.33 && touchLocation <= 0.66) {
+      lander.engineOff();
+    } else {
+      lander.stopRotating();
+    }
+  }
 });
 
 let crashed = false;
