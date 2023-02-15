@@ -26,8 +26,8 @@ document.addEventListener("keyup", ({ key }) => {
   if (key === "ArrowLeft" || key === "ArrowRight") lander.stopRotating();
 });
 
-document.addEventListener("touchstart", (e) => {
-  const touchLocation = e.touches[0].clientX / canvasWidth;
+document.addEventListener("touchstart", ({ touches }) => {
+  const touchLocation = touches[0].clientX / canvasWidth;
 
   if (touchLocation > 0 && touchLocation < 0.33) {
     lander.rotateLeft();
@@ -36,15 +36,17 @@ document.addEventListener("touchstart", (e) => {
   } else {
     lander.rotateRight();
   }
-
-  e.preventDefault();
 });
 
-document.addEventListener("touchend", (e) => {
+document.addEventListener("touchend", () => {
   lander.engineOff();
   lander.stopRotating();
-  e.preventDefault();
 });
+
+// Prevent iOS text selection
+["touchstart", "touchmove", "touchend", "touchcancel"].forEach((t) =>
+  window.addEventListener(t, (e) => e.preventDefault())
+);
 
 let crashed = false;
 let explosionPieces = false;
