@@ -43,11 +43,6 @@ document.addEventListener("touchend", () => {
   lander.stopRotating();
 });
 
-// Prevent iOS text selection
-["touchstart", "touchmove", "touchend", "touchcancel"].forEach((t) =>
-  window.addEventListener(t, (e) => e.preventDefault())
-);
-
 let crashed = false;
 let explosionPieces = false;
 let lastVelocity;
