@@ -29,7 +29,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     if (_position.y < _groundedHeight) {
       if (_rotatingRight) {
         _rotationVelocity += 0.01;
-      } else if (_rotatingLeft) {
+      }
+      if (_rotatingLeft) {
         _rotationVelocity -= 0.01;
       }
 
