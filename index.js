@@ -1,12 +1,8 @@
 import { animate, generateCanvas, roundToNDigits } from "./helpers.js";
 import { makeLander } from "./lander.js";
-import { makeExplosionPiece } from "./explosion.js";
 import { spawnEntityGraph } from "./smallgraph.js";
 
-const [canvasWidth, canvasHeight] = [
-  window.innerWidth,
-  window.innerHeight * 0.75,
-];
+const [canvasWidth, canvasHeight] = [window.innerWidth, window.innerHeight];
 const CTX = generateCanvas({
   width: canvasWidth,
   height: canvasHeight,
@@ -52,45 +48,10 @@ document.addEventListener("touchend", ({ changedTouches }) => {
   }
 });
 
-let crashed = false;
-let explosionPieces = false;
-let lastVelocity;
-let lastAngle;
-let lastPosition;
-
 animate(() => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
-
-  if (!crashed) {
-    lander.draw();
-    crashed =
-      lander.isGrounded() &&
-      (lastVelocity.y > 0.4 ||
-        Math.abs((lastAngle * 180) / Math.PI - 360) > 10);
-  }
-
-  if (!crashed) {
-    lastVelocity = lander.getVelocity();
-    lastPosition = lander.getPosition();
-    lastAngle = lander.getAngle();
-  } else {
-    if (!explosionPieces) {
-      explosionPieces = new Array(10)
-        .fill()
-        .map(() =>
-          makeExplosionPiece(
-            CTX,
-            lastPosition.x,
-            lastVelocity,
-            canvasWidth,
-            canvasHeight
-          )
-        );
-    } else {
-      explosionPieces.forEach((e) => e.draw());
-    }
-  }
+  lander.draw();
 });
 
 // OBSERVABILITY
@@ -104,7 +65,7 @@ spawnEntityGraph({
   topLabel: "SPEED",
   getBottomLabel: () =>
     `${roundToNDigits(lander.getVelocity().y * SPEED_FACTOR, 0)}MPH`,
-  backgroundColor: "#999",
+  backgroundColor: "#000",
   fillColor: "white",
   style: "posneg",
 });

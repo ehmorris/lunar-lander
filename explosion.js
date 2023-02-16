@@ -1,12 +1,18 @@
 import { randomBool, randomBetween } from "./helpers.js";
 
-export const makeExplosionPiece = (
-  CTX,
-  xPos,
-  velocity,
-  canvasWidth,
-  canvasHeight
-) => {
+export const makeExplosion = (CTX, xPos, velocity, canvasHeight) => {
+  const explosionPieces = new Array(10)
+    .fill()
+    .map(() => _makeExplosionPiece(CTX, xPos, velocity, canvasHeight));
+
+  const draw = () => {
+    explosionPieces.forEach((e) => e.draw());
+  };
+
+  return { draw };
+};
+
+const _makeExplosionPiece = (CTX, xPos, velocity, canvasHeight) => {
   const _width = randomBetween(6, 14);
   const _height = randomBetween(6, 14);
   const _gravity = 0.004;

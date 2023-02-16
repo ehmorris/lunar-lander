@@ -94,7 +94,7 @@ export const spawnEntityGraph = ({
       : bottomLabel;
 
     CTX.save();
-    CTX.fillStyle = "#000";
+    CTX.fillStyle = fillColor;
     CTX.font = "10px sans-serif";
     CTX.fillText(topLabel, 3, 12);
     CTX.fillText(bottomLabelWithOptions, 3, graphHeight - 5);
