@@ -67,7 +67,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       _velocity.y < 0.4 &&
       Math.abs((_angle * 180) / Math.PI - 360) < 10
     ) {
-      debugger;
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
       _rotationVelocity = 0;
