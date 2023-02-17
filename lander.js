@@ -1,5 +1,5 @@
 import { makeExplosion } from "./explosion.js";
-import { randomBool } from "./helpers.js";
+import { randomBetween, randomBool } from "./helpers.js";
 
 export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   const _width = 20;
@@ -23,15 +23,15 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
   const _resetProps = () => {
     _position = {
-      x: canvasWidth / 2,
+      x: randomBetween(canvasWidth * 0.25, canvasWidth * 0.75),
       y: _height * 2,
     };
     _velocity = {
-      x: 0,
-      y: 0,
+      x: randomBetween(-_thrust * 120, _thrust * 120),
+      y: randomBetween(0, _thrust * 120),
     };
-    _rotationVelocity = 0;
-    _angle = Math.PI * 2;
+    _rotationVelocity = randomBetween(-0.1, 0.1);
+    _angle = randomBetween(Math.PI * 2, Math.PI);
     _engineOn = false;
     _rotatingLeft = false;
     _rotatingRight = false;
