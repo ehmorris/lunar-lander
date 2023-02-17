@@ -1,10 +1,9 @@
 import { animate, generateCanvas, roundToNDigits } from "./helpers.js";
 import { makeLander } from "./lander.js";
 
-const [canvasWidth, canvasHeight] = [window.innerWidth, window.innerHeight];
-const CTX = generateCanvas({
-  width: canvasWidth,
-  height: canvasHeight,
+const [CTX, canvasWidth, canvasHeight] = generateCanvas({
+  width: window.innerWidth,
+  height: window.innerHeight,
   attachNode: ".game",
 });
 

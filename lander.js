@@ -18,7 +18,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   let _rotatingLeft;
   let _rotatingRight;
   let _crashedTime;
-  let _landedTime;
+  let _landed;
+  let _confetti;
   let _explosion;
 
   const _resetProps = () => {
@@ -38,7 +39,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     _engineOn = false;
     _rotatingLeft = false;
     _rotatingRight = false;
-    _landedTime = false;
+    _landed = false;
+    _confetti = false;
     _crashedTime = false;
     _explosion = false;
   };
@@ -66,23 +68,38 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     }
     // Just landed
     else if (
-      !_landedTime &&
+      !_landed &&
       _velocity.y < _crashVelocity &&
       _velocity.x < _crashVelocity &&
       Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
+      _landed = { angle: _angle, velocity: _velocity };
+      _confetti = [
+        makeExplosion(
+          CTX,
+          { x: canvasWidth / 2 - 100, y: canvasHeight / 2 },
+          { x: -0.5, y: 3 },
+          canvasHeight
+        ),
+        makeExplosion(
+          CTX,
+          { x: canvasWidth / 2 + 100, y: canvasHeight / 2 },
+          { x: 0.5, y: 3 },
+          canvasHeight
+        ),
+      ];
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
       _rotationVelocity = 0;
-      _landedTime = Date.now();
-    }
-    // Landed some time ago
-    else if (_landedTime) {
-      if (Date.now() - _landedTime > 2_000) _resetProps();
     }
     // Just crashed
-    else if (!_crashedTime) {
-      _explosion = makeExplosion(CTX, _position.x, _velocity, canvasHeight);
+    else if (!_landed && !_crashedTime) {
+      _explosion = makeExplosion(
+        CTX,
+        { x: _position.x, y: _groundedHeight },
+        _velocity,
+        canvasHeight
+      );
       _crashedTime = Date.now();
     }
     // Crashed some time ago
@@ -165,12 +182,40 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     CTX.restore();
   };
 
+  const _drawLandedMessage = () => {
+    const speedInMPH = Math.round(_landed.velocity.y * 20);
+    const angleInDeg = Math.round(
+      Math.abs((_landed.angle * 180) / Math.PI - 360)
+    );
+    let landingType;
+    if (speedInMPH < 3 && angleInDeg < 3) landingType = "Perfect";
+    else if (speedInMPH < 5 && angleInDeg < 5) landingType = "Decent";
+    else if (speedInMPH < 7 && angleInDeg < 7) landingType = "OK";
+    else landingType = "Bad";
+    const line1 = `${landingType} landing`;
+    const line2 = `Speed: ${speedInMPH} MPH`;
+    const line3 = `Angle: ${angleInDeg}°`;
+
+    _confetti.forEach((c) => c.draw());
+
+    CTX.save();
+    CTX.textAlign = "center";
+    CTX.fillStyle = "rgba(255, 255, 255, .8)";
+    CTX.font = "normal 24px sans-serif";
+    CTX.fillText(line1, canvasWidth / 2, canvasHeight / 2 - 36);
+    CTX.fillText(line2, canvasWidth / 2, canvasHeight / 2);
+    CTX.fillText(line3, canvasWidth / 2, canvasHeight / 2 + 36);
+    CTX.restore();
+  };
+
   const draw = () => {
     _updateProps();
 
     if (!_engineOn && !_rotatingLeft && !_rotatingRight) _drawTrajectory();
 
     _drawSpeed();
+
+    if (_landed) _drawLandedMessage();
 
     if (_explosion) {
       _explosion.draw();
