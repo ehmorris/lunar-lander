@@ -7,8 +7,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   const _gravity = 0.004;
   const _thrust = 0.01;
   const _groundedHeight = canvasHeight - _height + _height / 2;
-  const _trajectoryPointWidth = 2;
-  const _trajectoryPointHeight = 8;
 
   let _position;
   let _velocity;
@@ -92,10 +90,18 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     let projectedXPosition = _position.x;
     let projectedAngle = _angle;
     let projectedYVelocity = _velocity.y;
+    let index = 0;
 
+    // Start trajectory line
     CTX.save();
-    CTX.fillStyle = "#024220";
     CTX.translate(_width / 2, _height / 2);
+    CTX.beginPath();
+    CTX.moveTo(
+      projectedXPosition - _width / 2,
+      projectedYPosition - _height / 2
+    );
+
+    // Draw line
     while (projectedYPosition < _groundedHeight) {
       projectedYPosition = Math.min(
         projectedYPosition + projectedYVelocity,
@@ -105,21 +111,47 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       projectedAngle += (Math.PI / 180) * _rotationVelocity;
       projectedYVelocity += _gravity;
 
-      CTX.save();
-      CTX.translate(
-        projectedXPosition - _width / 2 - _trajectoryPointWidth / 2,
-        projectedYPosition - _height / 2 - _trajectoryPointHeight / 2
-      );
-      CTX.rotate(projectedAngle);
-      CTX.fillRect(0, 0, _trajectoryPointWidth, _trajectoryPointHeight);
-      CTX.restore();
+      if (index % 2) {
+        CTX.lineTo(
+          projectedXPosition - _width / 2,
+          projectedYPosition - _height / 2
+        );
+      }
+
+      index++;
     }
+
+    CTX.strokeStyle = "rgb(0, 255, 0, .2)";
+    CTX.stroke();
+
+    // Draw landing zone angle indicator
+    if (
+      projectedYVelocity < 0.4 &&
+      Math.abs((projectedAngle * 180) / Math.PI - 360) < 20
+    ) {
+      CTX.strokeStyle = "green";
+    } else {
+      CTX.strokeStyle = "red";
+    }
+    const arrowSize = projectedYVelocity * 4;
+    CTX.translate(projectedXPosition - _width / 2, canvasHeight - _height);
+    CTX.rotate(projectedAngle + Math.PI);
+    CTX.beginPath();
+    CTX.moveTo(0, 0);
+    CTX.lineTo(0, _height);
+    CTX.lineTo(-arrowSize, _height);
+    CTX.lineTo(0, _height + arrowSize);
+    CTX.lineTo(arrowSize, _height);
+    CTX.lineTo(0, _height);
+    CTX.closePath();
+    CTX.stroke();
     CTX.restore();
   };
 
   const draw = () => {
     _updateProps();
-    _drawTrajectory();
+
+    if (!_engineOn && !_rotatingLeft && !_rotatingRight) _drawTrajectory();
 
     if (_explosion) {
       _explosion.draw();
