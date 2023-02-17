@@ -6,6 +6,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   const _height = 40;
   const _gravity = 0.004;
   const _thrust = 0.01;
+  const _crashVelocity = 0.4;
+  const _crashAngle = 10;
   const _groundedHeight = canvasHeight - _height + _height / 2;
 
   let _position;
@@ -62,8 +64,9 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     // Just landed
     else if (
       !_landedTime &&
-      _velocity.y < 0.4 &&
-      Math.abs((_angle * 180) / Math.PI - 360) < 10
+      _velocity.y < _crashVelocity &&
+      _velocity.x < _crashVelocity &&
+      Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
@@ -125,10 +128,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     CTX.stroke();
 
     // Draw landing zone angle indicator
-    if (
-      projectedYVelocity < 0.4 &&
-      Math.abs((projectedAngle * 180) / Math.PI - 360) < 20
-    ) {
+    if (Math.abs((projectedAngle * 180) / Math.PI - 360) < _crashAngle) {
       CTX.strokeStyle = "green";
     } else {
       CTX.strokeStyle = "red";
@@ -148,10 +148,26 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     CTX.restore();
   };
 
+  const _drawSpeed = () => {
+    CTX.save();
+    CTX.fillStyle =
+      _velocity.y > _crashVelocity || _velocity.x > _crashVelocity
+        ? "red"
+        : "green";
+    CTX.fillText(
+      `${Math.abs(Math.round(_velocity.y * 20))} MPH`,
+      _position.x + _width * 2,
+      _position.y
+    );
+    CTX.restore();
+  };
+
   const draw = () => {
     _updateProps();
 
     if (!_engineOn && !_rotatingLeft && !_rotatingRight) _drawTrajectory();
+
+    _drawSpeed();
 
     if (_explosion) {
       _explosion.draw();

@@ -1,35 +1,22 @@
 <!doctype html>
 <html>
   <head>
-    <title>Moon Lander</title>
+    <title>Lunar Lander</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <style>
       body {
         margin: 0;
-        -webkit-user-select: none;
+        -webkit-user-select: none; 
+        user-select: none;       
+        overflow: hidden;
       }
       canvas {
         display: block;
-      }
-      .stats {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        display: flex;
-        grid-gap: 1rem;
-        justify-content: space-around;
-        margin: 1rem;
-      }
-
-      .stats canvas {
-        border: 1px solid rgba(255, 255, 255, .3);
-        border-radius: 8px;
       }
     </style>
   </head>
   <body>
     <div class="game"></div>
-    <div class="stats"></div>
     <script src="index.js" type="module"></script>
   </body>
 </html>
