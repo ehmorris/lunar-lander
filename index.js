@@ -35,6 +35,23 @@ document.addEventListener("touchstart", ({ touches }) => {
   }
 });
 
+document.addEventListener("touchmove", ({ changedTouches }) => {
+  for (let index = 0; index < changedTouches.length; index++) {
+    const touchLocation = changedTouches[index].clientX / canvasWidth;
+
+    if (touchLocation > 0 && touchLocation < 0.33) {
+      lander.rotateLeft();
+      lander.engineOff();
+    } else if (touchLocation >= 0.33 && touchLocation <= 0.66) {
+      lander.engineOn();
+      lander.stopRotating();
+    } else {
+      lander.rotateRight();
+      lander.engineOff();
+    }
+  }
+});
+
 document.addEventListener("touchend", ({ changedTouches }) => {
   for (let index = 0; index < changedTouches.length; index++) {
     const touchLocation = changedTouches[index].clientX / canvasWidth;

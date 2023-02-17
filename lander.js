@@ -23,12 +23,15 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
   const _resetProps = () => {
     _position = {
-      x: randomBetween(canvasWidth * 0.25, canvasWidth * 0.75),
+      x: randomBetween(canvasWidth * 0.33, canvasWidth * 0.66),
       y: _height * 2,
     };
     _velocity = {
-      x: randomBetween(-_thrust * 120, _thrust * 120),
-      y: randomBetween(0, _thrust * 120),
+      x: randomBetween(
+        -_thrust * (canvasWidth / 10),
+        _thrust * (canvasWidth / 10)
+      ),
+      y: randomBetween(0, _thrust * (canvasWidth / 10)),
     };
     _rotationVelocity = randomBetween(-0.1, 0.1);
     _angle = randomBetween(Math.PI * 2, Math.PI);
@@ -84,7 +87,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     }
     // Crashed some time ago
     else if (_crashedTime) {
-      if (Date.now() - _crashedTime > 8_000) _resetProps();
+      if (Date.now() - _crashedTime > 4_000) _resetProps();
     }
   };
 
@@ -124,7 +127,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       index++;
     }
 
-    CTX.strokeStyle = "rgb(0, 255, 0, .2)";
+    CTX.strokeStyle = "rgb(255, 255, 255, .25)";
     CTX.stroke();
 
     // Draw landing zone angle indicator
