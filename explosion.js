@@ -1,9 +1,17 @@
 import { randomBool, randomBetween } from "./helpers.js";
 
-export const makeExplosion = (CTX, position, velocity, canvasHeight) => {
-  const explosionPieces = new Array(10)
+export const makeExplosion = (
+  CTX,
+  position,
+  velocity,
+  canvasWidth,
+  canvasHeight
+) => {
+  const explosionPieces = new Array(20)
     .fill()
-    .map(() => _makeExplosionPiece(CTX, position, velocity, canvasHeight));
+    .map(() =>
+      _makeExplosionPiece(CTX, position, velocity, canvasWidth, canvasHeight)
+    );
 
   const draw = () => {
     explosionPieces.forEach((e) => e.draw());
@@ -12,16 +20,22 @@ export const makeExplosion = (CTX, position, velocity, canvasHeight) => {
   return { draw };
 };
 
-const _makeExplosionPiece = (CTX, position, velocity, canvasHeight) => {
-  const _width = randomBetween(6, 14);
-  const _height = randomBetween(6, 14);
+const _makeExplosionPiece = (
+  CTX,
+  position,
+  velocity,
+  canvasWidth,
+  canvasHeight
+) => {
+  const _width = randomBetween(1, 20);
+  const _height = randomBetween(1, 40);
   const _gravity = 0.004;
   const _rotationDirection = randomBool();
   const _groundedHeight = canvasHeight - _height + _height / 2;
-  let _position = { x: position.x, y: position.y };
+  let _position = { ...position };
   let _velocity = {
     x: randomBetween(velocity.x / 4, velocity.x) + randomBetween(-0.1, 0.1),
-    y: randomBetween(-velocity.y / 8, -velocity.y / 3),
+    y: velocity.y + randomBetween(-0.1, 0.1),
   };
   let _rotationVelocity = 0.1;
   let _angle = Math.PI * 2;
@@ -30,6 +44,13 @@ const _makeExplosionPiece = (CTX, position, velocity, canvasHeight) => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight + 1);
 
     if (_position.y <= _groundedHeight) {
+      if (_position.x < 0) {
+        _position.x = canvasWidth;
+      }
+      if (_position.x > canvasWidth) {
+        _position.x = 0;
+      }
+
       _rotationDirection
         ? (_rotationVelocity += 0.01)
         : (_rotationVelocity -= 0.01);
@@ -37,14 +58,10 @@ const _makeExplosionPiece = (CTX, position, velocity, canvasHeight) => {
       _angle += (Math.PI / 180) * _rotationVelocity;
       _velocity.y += _gravity;
     } else {
-      _angle = Math.PI * 2;
-      _velocity.x =
-        _velocity.x > 0
-          ? Math.max(0, _velocity.x - 0.005)
-          : Math.min(0, _velocity.x + 0.005);
-      _velocity.y = 0;
+      _velocity.x = _velocity.x / randomBetween(1.5, 3);
+      _velocity.y = -_velocity.y / randomBetween(1.5, 3);
       _position.x += _velocity.x;
-      _rotationVelocity = 0;
+      _rotationVelocity = _rotationVelocity / 2;
     }
   };
 

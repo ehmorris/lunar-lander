@@ -1,5 +1,6 @@
 import { makeExplosion } from "./explosion.js";
 import { randomBetween, randomBool } from "./helpers.js";
+import { drawTrajectory } from "./trajectory.js";
 
 export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   const _width = 20;
@@ -57,6 +58,13 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       if (_rotatingLeft) {
         _rotationVelocity -= 0.01;
       }
+      if (_position.x < 0) {
+        _position.x = canvasWidth;
+      }
+      if (_position.x > canvasWidth) {
+        _position.x = 0;
+      }
+
       _position.x += _velocity.x;
       _angle += (Math.PI / 180) * _rotationVelocity;
       _velocity.y += _gravity;
@@ -78,13 +86,15 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
         makeExplosion(
           CTX,
           { x: canvasWidth / 2 - 100, y: canvasHeight / 2 },
-          { x: -0.5, y: 3 },
+          { x: -0.5, y: -1 },
+          canvasWidth,
           canvasHeight
         ),
         makeExplosion(
           CTX,
           { x: canvasWidth / 2 + 100, y: canvasHeight / 2 },
-          { x: 0.5, y: 3 },
+          { x: 0.5, y: -1 },
+          canvasWidth,
           canvasHeight
         ),
       ];
@@ -96,8 +106,9 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     else if (!_landed && !_crashedTime) {
       _explosion = makeExplosion(
         CTX,
-        { x: _position.x, y: _groundedHeight },
+        _position,
         _velocity,
+        canvasWidth,
         canvasHeight
       );
       _crashedTime = Date.now();
@@ -106,80 +117,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     else if (_crashedTime) {
       if (Date.now() - _crashedTime > 4_000) _resetProps();
     }
-  };
-
-  const _drawTrajectory = () => {
-    let projectedYPosition = _position.y;
-    let projectedXPosition = _position.x;
-    let projectedAngle = _angle;
-    let projectedYVelocity = _velocity.y;
-    let index = 0;
-
-    // Start trajectory line
-    CTX.save();
-    CTX.translate(_width / 2, _height / 2);
-    CTX.beginPath();
-    CTX.moveTo(
-      projectedXPosition - _width / 2,
-      projectedYPosition - _height / 2
-    );
-
-    // Draw line
-    while (projectedYPosition < _groundedHeight) {
-      projectedYPosition = Math.min(
-        projectedYPosition + projectedYVelocity,
-        _groundedHeight
-      );
-      projectedXPosition += _velocity.x;
-      projectedAngle += (Math.PI / 180) * _rotationVelocity;
-      projectedYVelocity += _gravity;
-
-      if (index % 2) {
-        CTX.lineTo(
-          projectedXPosition - _width / 2,
-          projectedYPosition - _height / 2
-        );
-      }
-
-      index++;
-    }
-
-    CTX.strokeStyle = "rgb(255, 255, 255, .25)";
-    CTX.stroke();
-
-    // Draw landing zone angle indicator
-    if (Math.abs((projectedAngle * 180) / Math.PI - 360) < _crashAngle) {
-      CTX.strokeStyle = "green";
-    } else {
-      CTX.strokeStyle = "red";
-    }
-    const arrowSize = projectedYVelocity * 4;
-    CTX.translate(projectedXPosition - _width / 2, canvasHeight - _height);
-    CTX.rotate(projectedAngle + Math.PI);
-    CTX.beginPath();
-    CTX.moveTo(0, 0);
-    CTX.lineTo(0, _height);
-    CTX.lineTo(-arrowSize, _height);
-    CTX.lineTo(0, _height + arrowSize);
-    CTX.lineTo(arrowSize, _height);
-    CTX.lineTo(0, _height);
-    CTX.closePath();
-    CTX.stroke();
-    CTX.restore();
-  };
-
-  const _drawSpeed = () => {
-    CTX.save();
-    CTX.fillStyle =
-      _velocity.y > _crashVelocity || _velocity.x > _crashVelocity
-        ? "red"
-        : "green";
-    CTX.fillText(
-      `${Math.abs(Math.round(_velocity.y * 20))} MPH`,
-      _position.x + _width * 2,
-      _position.y
-    );
-    CTX.restore();
   };
 
   const _drawLandedMessage = () => {
@@ -211,9 +148,20 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   const draw = () => {
     _updateProps();
 
-    if (!_engineOn && !_rotatingLeft && !_rotatingRight) _drawTrajectory();
-
-    _drawSpeed();
+    if (!_engineOn && !_rotatingLeft && !_rotatingRight)
+      drawTrajectory(
+        CTX,
+        _position,
+        _angle,
+        _velocity,
+        _rotationVelocity,
+        _gravity,
+        _width,
+        _height,
+        canvasHeight,
+        _groundedHeight,
+        _crashAngle
+      );
 
     if (_landed) _drawLandedMessage();
 
@@ -294,7 +242,19 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
         CTX.fill();
       }
     }
+    CTX.restore();
 
+    // Draw speed text beside lander
+    CTX.save();
+    CTX.fillStyle =
+      _velocity.y > _crashVelocity || _velocity.x > _crashVelocity
+        ? "red"
+        : "green";
+    CTX.fillText(
+      `${Math.abs(Math.round(_velocity.y * 20))} MPH`,
+      _position.x + _width * 2,
+      _position.y
+    );
     CTX.restore();
   };
 
