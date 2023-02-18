@@ -51,9 +51,9 @@ export const drawTrajectory = (
 
   // Draw landing zone angle indicator
   if (Math.abs((projectedAngle * 180) / Math.PI - 360) < crashAngle) {
-    CTX.strokeStyle = "green";
+    CTX.strokeStyle = "rgb(0, 255, 0)";
   } else {
-    CTX.strokeStyle = "red";
+    CTX.strokeStyle = "rgb(255, 0, 0)";
   }
   const arrowSize = projectedYVelocity * 4;
   CTX.translate(

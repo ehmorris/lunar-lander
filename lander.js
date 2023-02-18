@@ -1,4 +1,5 @@
 import { makeExplosion } from "./explosion.js";
+import { makeConfetti } from "./confetti.js";
 import { randomBetween, randomBool } from "./helpers.js";
 import { drawTrajectory } from "./trajectory.js";
 
@@ -36,7 +37,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       y: randomBetween(0, _thrust * (canvasWidth / 10)),
     };
     _rotationVelocity = randomBetween(-0.1, 0.1);
-    _angle = randomBetween(Math.PI * 2, Math.PI);
+    _angle = randomBetween(Math.PI * 1.5, Math.PI * 2.5);
     _engineOn = false;
     _rotatingLeft = false;
     _rotatingRight = false;
@@ -83,14 +84,14 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     ) {
       _landed = { angle: _angle, velocity: _velocity };
       _confetti = [
-        makeExplosion(
+        makeConfetti(
           CTX,
           { x: canvasWidth / 2 - 100, y: canvasHeight / 2 },
           { x: -0.5, y: -1 },
           canvasWidth,
           canvasHeight
         ),
-        makeExplosion(
+        makeConfetti(
           CTX,
           { x: canvasWidth / 2 + 100, y: canvasHeight / 2 },
           { x: 0.5, y: -1 },
@@ -120,7 +121,11 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   };
 
   const _drawLandedMessage = () => {
-    const speedInMPH = Math.round(_landed.velocity.y * 20);
+    const speedInMPH = Math.round(
+      Math.sqrt(
+        Math.pow(_landed.velocity.x, 2) + Math.pow(_landed.velocity.y, 2)
+      ) * 20
+    );
     const angleInDeg = Math.round(
       Math.abs((_landed.angle * 180) / Math.PI - 360)
     );
@@ -246,12 +251,15 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
     // Draw speed text beside lander
     CTX.save();
+
     CTX.fillStyle =
       _velocity.y > _crashVelocity || _velocity.x > _crashVelocity
-        ? "red"
-        : "green";
+        ? "rgb(255, 0, 0)"
+        : "rgb(0, 255, 0)";
     CTX.fillText(
-      `${Math.abs(Math.round(_velocity.y * 20))} MPH`,
+      `${Math.round(
+        Math.sqrt(Math.pow(_velocity.x, 2) + Math.pow(_velocity.y, 2)) * 20
+      )} MPH`,
       _position.x + _width * 2,
       _position.y
     );
