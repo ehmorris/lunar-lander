@@ -29,6 +29,28 @@ export const animate = (drawFunc) => {
   window.requestAnimationFrame(drawFuncContainer);
 };
 
+export const textLayout = ({
+  CTX,
+  fontSize,
+  canvasWidth,
+  canvasHeight,
+  lines,
+}) => {
+  const lineHeight = 1.5 * fontSize;
+  const verticalCenterOffset = ((lines.length - 1) * lineHeight) / 2;
+  CTX.save();
+  CTX.textAlign = "center";
+  CTX.fillStyle = "rgba(255, 255, 255, .8)";
+  CTX.font = `${fontSize}px sans-serif`;
+  lines.forEach((line, index) => {
+    CTX.fillText(
+      line,
+      canvasWidth / 2,
+      canvasHeight / 2 - (index * lineHeight - verticalCenterOffset)
+    );
+  });
+  CTX.restore();
+};
 export const randomBool = (probability = 0.5) => Math.random() >= probability;
 
 export const randomBetween = (min, max) => Math.random() * (max - min) + min;

@@ -7,7 +7,35 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   attachNode: ".game",
 });
 
-const lander = makeLander(CTX, canvasWidth, canvasHeight);
+const lander = makeLander(CTX, canvasWidth, canvasHeight, onLand, onCrash);
+
+function onLand(type, speed, angle) {
+  document.querySelector(".buttons").classList.add("show");
+  document.querySelector("#share").href = `sms:?&body=${encodeURIComponent(
+    `I landed!
+${type} landing
+Speed: ${speed} MPH
+Angle: ${angle}°
+https://ehmorris.github.io/lunar-lander/`
+  )}`;
+}
+
+function onCrash(type, speed, angle) {
+  document.querySelector(".buttons").classList.add("show");
+  document.querySelector("#share").href = `sms:?&body=${encodeURIComponent(
+    `I crashed!
+${type} crash
+Speed: ${speed} MPH
+Angle: ${angle}°
+https://ehmorris.github.io/lunar-lander/`
+  )}`;
+}
+
+document.querySelector("#reset").addEventListener("click", () => {
+  lander.resetProps();
+  document.querySelector(".buttons").classList.remove("show");
+  document.querySelector("#share").href = "#";
+});
 
 document.addEventListener("keydown", ({ key }) => {
   if (key === "ArrowUp") lander.engineOn();

@@ -1,10 +1,15 @@
 import { makeExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
-import { randomBetween, randomBool, getVectorVelocity } from "./helpers.js";
+import {
+  randomBetween,
+  randomBool,
+  getVectorVelocity,
+  textLayout,
+} from "./helpers.js";
 import { drawTrajectory } from "./trajectory.js";
 import { GRAVITY, LANDER_WIDTH, LANDER_HEIGHT } from "./constants.js";
 
-export const makeLander = (CTX, canvasWidth, canvasHeight) => {
+export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
   const _thrust = 0.01;
   const _crashVelocity = 0.4;
   const _crashAngle = 10;
@@ -17,12 +22,12 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   let _engineOn;
   let _rotatingLeft;
   let _rotatingRight;
-  let _crashedTime;
+  let _crashed;
   let _landed;
   let _confetti;
   let _explosion;
 
-  const _resetProps = () => {
+  const resetProps = () => {
     _position = {
       x: randomBetween(canvasWidth * 0.33, canvasWidth * 0.66),
       y: LANDER_HEIGHT * 2,
@@ -41,10 +46,10 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     _rotatingRight = false;
     _landed = false;
     _confetti = false;
-    _crashedTime = false;
+    _crashed = false;
     _explosion = false;
   };
-  _resetProps();
+  resetProps();
 
   const _updateProps = () => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
@@ -80,6 +85,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
       _landed = { angle: _angle, velocity: _velocity };
+      onLand();
       _confetti = [
         makeConfetti(
           CTX,
@@ -101,7 +107,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       _rotationVelocity = 0;
     }
     // Just crashed
-    else if (!_landed && !_crashedTime) {
+    else if (!_landed && !_crashed) {
       _explosion = makeExplosion(
         CTX,
         _position,
@@ -109,11 +115,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
         canvasWidth,
         canvasHeight
       );
-      _crashedTime = Date.now();
-    }
-    // Crashed some time ago
-    else if (_crashedTime) {
-      if (Date.now() - _crashedTime > 4_000) _resetProps();
+      _crashed = true;
+      onCrash();
     }
   };
 
@@ -127,20 +130,20 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     else if (speedInMPH < 5 && angleInDeg < 5) landingType = "Decent";
     else if (speedInMPH < 7 && angleInDeg < 7) landingType = "OK";
     else landingType = "Bad";
-    const line1 = `${landingType} landing`;
-    const line2 = `Speed: ${speedInMPH} MPH`;
-    const line3 = `Angle: ${angleInDeg}°`;
 
     _confetti.forEach((c) => c.draw());
 
-    CTX.save();
-    CTX.textAlign = "center";
-    CTX.fillStyle = "rgba(255, 255, 255, .8)";
-    CTX.font = "normal 24px sans-serif";
-    CTX.fillText(line1, canvasWidth / 2, canvasHeight / 2 - 36);
-    CTX.fillText(line2, canvasWidth / 2, canvasHeight / 2);
-    CTX.fillText(line3, canvasWidth / 2, canvasHeight / 2 + 36);
-    CTX.restore();
+    textLayout({
+      CTX,
+      fontSize: 24,
+      canvasWidth,
+      canvasHeight,
+      lines: [
+        `${landingType} landing`,
+        `Speed: ${speedInMPH} MPH`,
+        `Angle: ${angleInDeg}°`,
+      ],
+    });
   };
 
   const _drawCrashedMessage = () => {
@@ -150,20 +153,18 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     else if (speedInMPH > 100) crashType = "Sick";
     else if (speedInMPH > 50) crashType = "Cool";
     else crashType = "Meh";
-    const line1 = `${crashType} crash`;
-    const line2 = `Speed: ${speedInMPH} MPH`;
-    const line3 = `Angle: ${Math.round(
-      Math.abs((_angle * 180) / Math.PI - 360)
-    )}°`;
 
-    CTX.save();
-    CTX.textAlign = "center";
-    CTX.fillStyle = "rgba(255, 255, 255, .8)";
-    CTX.font = "normal 24px sans-serif";
-    CTX.fillText(line1, canvasWidth / 2, canvasHeight / 2 - 36);
-    CTX.fillText(line2, canvasWidth / 2, canvasHeight / 2);
-    CTX.fillText(line3, canvasWidth / 2, canvasHeight / 2 + 36);
-    CTX.restore();
+    textLayout({
+      CTX,
+      fontSize: 24,
+      canvasWidth,
+      canvasHeight,
+      lines: [
+        `${crashType} crash`,
+        `Speed: ${speedInMPH} MPH`,
+        `Angle: ${Math.round(Math.abs((_angle * 180) / Math.PI - 360))}°`,
+      ],
+    });
   };
 
   const draw = () => {
@@ -226,7 +227,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       CTX.closePath();
       CTX.fill();
 
-      // Translate to the top-left corner of the lander for engine flames
+      // Translate to the top-left corner of the lander so engine and booster
+      // flames can be drawn from 0, 0
       CTX.translate(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
 
       if (_engineOn || _rotatingLeft || _rotatingRight) {
@@ -265,8 +267,9 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
         CTX.closePath();
         CTX.fill();
       }
+
+      CTX.restore();
     }
-    CTX.restore();
 
     // Draw speed text beside lander
     CTX.save();
@@ -284,6 +287,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
   return {
     draw,
+    resetProps,
     engineOn: () => (_engineOn = true),
     engineOff: () => (_engineOn = false),
     rotateLeft: () => (_rotatingLeft = true),
