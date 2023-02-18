@@ -84,8 +84,16 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
       getVectorVelocity(_velocity) < _crashVelocity &&
       Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
-      _landed = { angle: _angle, velocity: _velocity };
-      onLand();
+      const speedInMPH = Math.round(getVectorVelocity(_landed.velocity) * 20);
+      const angleInDeg = Math.round(
+        Math.abs((_landed.angle * 180) / Math.PI - 360)
+      );
+      let landingType;
+      if (speedInMPH < 3 && angleInDeg < 3) landingType = "Perfect";
+      else if (speedInMPH < 5 && angleInDeg < 5) landingType = "Decent";
+      else if (speedInMPH < 7 && angleInDeg < 7) landingType = "OK";
+      else landingType = "Bad";
+      _landed = { type: landingType, speed: speedInMPH, angle: angleInDeg };
       _confetti = [
         makeConfetti(
           CTX,
@@ -102,12 +110,22 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
           canvasHeight
         ),
       ];
+      onLand(landingType, speedInMPH, angleInDeg);
+
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
       _rotationVelocity = 0;
     }
     // Just crashed
     else if (!_landed && !_crashed) {
+      const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
+      const angleInDeg = Math.round(Math.abs((_angle * 180) / Math.PI - 360));
+      let crashType;
+      if (speedInMPH > 200) crashType = "Incredible";
+      else if (speedInMPH > 100) crashType = "Sick";
+      else if (speedInMPH > 50) crashType = "Cool";
+      else crashType = "Meh";
+      _crashed = { type: crashType, speed: speedInMPH, angle: angleInDeg };
       _explosion = makeExplosion(
         CTX,
         _position,
@@ -115,22 +133,11 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
         canvasWidth,
         canvasHeight
       );
-      _crashed = true;
-      onCrash();
+      onCrash(crashType, speedInMPH, angleInDeg);
     }
   };
 
   const _drawLandedMessage = () => {
-    const speedInMPH = Math.round(getVectorVelocity(_landed.velocity) * 20);
-    const angleInDeg = Math.round(
-      Math.abs((_landed.angle * 180) / Math.PI - 360)
-    );
-    let landingType;
-    if (speedInMPH < 3 && angleInDeg < 3) landingType = "Perfect";
-    else if (speedInMPH < 5 && angleInDeg < 5) landingType = "Decent";
-    else if (speedInMPH < 7 && angleInDeg < 7) landingType = "OK";
-    else landingType = "Bad";
-
     _confetti.forEach((c) => c.draw());
 
     textLayout({
@@ -139,30 +146,23 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
       canvasWidth,
       canvasHeight,
       lines: [
-        `${landingType} landing`,
-        `Speed: ${speedInMPH} MPH`,
-        `Angle: ${angleInDeg}°`,
+        `${_landing.type} landing`,
+        `Speed: ${_landing.speed} MPH`,
+        `Angle: ${_landing.angle}°`,
       ],
     });
   };
 
   const _drawCrashedMessage = () => {
-    const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
-    let crashType;
-    if (speedInMPH > 200) crashType = "Incredible";
-    else if (speedInMPH > 100) crashType = "Sick";
-    else if (speedInMPH > 50) crashType = "Cool";
-    else crashType = "Meh";
-
     textLayout({
       CTX,
       fontSize: 24,
       canvasWidth,
       canvasHeight,
       lines: [
-        `${crashType} crash`,
-        `Speed: ${speedInMPH} MPH`,
-        `Angle: ${Math.round(Math.abs((_angle * 180) / Math.PI - 360))}°`,
+        `${_crashed.type} crash`,
+        `Speed: ${_crashed.speed} MPH`,
+        `Angle: ${_crashed.angle}°`,
       ],
     });
   };
