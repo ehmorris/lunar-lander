@@ -1,12 +1,11 @@
+import { GRAVITY, LANDER_WIDTH, LANDER_HEIGHT } from "./constants.js";
+
 export const drawTrajectory = (
   CTX,
   currentPosition,
   currentAngle,
   currentVelocity,
   currentRotationVelocity,
-  gravity,
-  vehicleWidth,
-  vehicleHeight,
   canvasHeight,
   groundedHeight,
   crashAngle
@@ -19,11 +18,11 @@ export const drawTrajectory = (
 
   // Start trajectory line
   CTX.save();
-  CTX.translate(vehicleWidth / 2, vehicleHeight / 2);
+  CTX.translate(LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
   CTX.beginPath();
   CTX.moveTo(
-    projectedXPosition - vehicleWidth / 2,
-    projectedYPosition - vehicleHeight / 2
+    projectedXPosition - LANDER_WIDTH / 2,
+    projectedYPosition - LANDER_HEIGHT / 2
   );
 
   // Draw line
@@ -34,12 +33,12 @@ export const drawTrajectory = (
     );
     projectedXPosition += currentVelocity.x;
     projectedAngle += (Math.PI / 180) * currentRotationVelocity;
-    projectedYVelocity += gravity;
+    projectedYVelocity += GRAVITY;
 
     if (index % 2) {
       CTX.lineTo(
-        projectedXPosition - vehicleWidth / 2,
-        projectedYPosition - vehicleHeight / 2
+        projectedXPosition - LANDER_WIDTH / 2,
+        projectedYPosition - LANDER_HEIGHT / 2
       );
     }
 
@@ -57,17 +56,17 @@ export const drawTrajectory = (
   }
   const arrowSize = projectedYVelocity * 4;
   CTX.translate(
-    projectedXPosition - vehicleWidth / 2,
-    canvasHeight - vehicleHeight
+    projectedXPosition - LANDER_WIDTH / 2,
+    canvasHeight - LANDER_HEIGHT
   );
   CTX.rotate(projectedAngle + Math.PI);
   CTX.beginPath();
   CTX.moveTo(0, 0);
-  CTX.lineTo(0, vehicleHeight);
-  CTX.lineTo(-arrowSize, vehicleHeight);
-  CTX.lineTo(0, vehicleHeight + arrowSize);
-  CTX.lineTo(arrowSize, vehicleHeight);
-  CTX.lineTo(0, vehicleHeight);
+  CTX.lineTo(0, LANDER_HEIGHT);
+  CTX.lineTo(-arrowSize, LANDER_HEIGHT);
+  CTX.lineTo(0, LANDER_HEIGHT + arrowSize);
+  CTX.lineTo(arrowSize, LANDER_HEIGHT);
+  CTX.lineTo(0, LANDER_HEIGHT);
   CTX.closePath();
   CTX.stroke();
   CTX.restore();

@@ -1,4 +1,5 @@
 import { randomBool, randomBetween } from "./helpers.js";
+import { GRAVITY } from "./constants.js";
 
 export const makeConfetti = (
   CTX,
@@ -28,7 +29,6 @@ const _makeConfettiPiece = (
   canvasHeight
 ) => {
   const _size = randomBetween(1, 6);
-  const _gravity = 0.004;
   const _rotationDirection = randomBool();
   const _groundedHeight = canvasHeight - _size + _size / 2;
   const _color = `hsl(${randomBetween(0, 360)}, 100%, 50%)`;
@@ -56,7 +56,7 @@ const _makeConfettiPiece = (
         : (_rotationVelocity -= 0.01);
       _position.x += _velocity.x;
       _angle += (Math.PI / 180) * _rotationVelocity;
-      _velocity.y += _gravity;
+      _velocity.y += GRAVITY;
     } else {
       _velocity.x = _velocity.x / randomBetween(1.5, 3);
       _velocity.y = -_velocity.y / randomBetween(1.5, 3);

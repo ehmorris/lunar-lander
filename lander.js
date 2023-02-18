@@ -1,16 +1,14 @@
 import { makeExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
-import { randomBetween, randomBool } from "./helpers.js";
+import { randomBetween, randomBool, getVectorVelocity } from "./helpers.js";
 import { drawTrajectory } from "./trajectory.js";
+import { GRAVITY, LANDER_WIDTH, LANDER_HEIGHT } from "./constants.js";
 
 export const makeLander = (CTX, canvasWidth, canvasHeight) => {
-  const _width = 20;
-  const _height = 40;
-  const _gravity = 0.004;
   const _thrust = 0.01;
   const _crashVelocity = 0.4;
   const _crashAngle = 10;
-  const _groundedHeight = canvasHeight - _height + _height / 2;
+  const _groundedHeight = canvasHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
 
   let _position;
   let _velocity;
@@ -27,7 +25,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   const _resetProps = () => {
     _position = {
       x: randomBetween(canvasWidth * 0.33, canvasWidth * 0.66),
-      y: _height * 2,
+      y: LANDER_HEIGHT * 2,
     };
     _velocity = {
       x: randomBetween(
@@ -47,9 +45,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     _explosion = false;
   };
   _resetProps();
-
-  const getVelocityVector = (velocity) =>
-    Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
 
   const _updateProps = () => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
@@ -71,7 +66,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
       _position.x += _velocity.x;
       _angle += (Math.PI / 180) * _rotationVelocity;
-      _velocity.y += _gravity;
+      _velocity.y += GRAVITY;
 
       if (_engineOn) {
         _velocity.x += _thrust * Math.sin(_angle);
@@ -81,7 +76,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     // Just landed
     else if (
       !_landed &&
-      getVelocityVector(_velocity) < _crashVelocity &&
+      getVectorVelocity(_velocity) < _crashVelocity &&
       Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
       _landed = { angle: _angle, velocity: _velocity };
@@ -123,7 +118,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   };
 
   const _drawLandedMessage = () => {
-    const speedInMPH = Math.round(getVelocityVector(_landed.velocity) * 20);
+    const speedInMPH = Math.round(getVectorVelocity(_landed.velocity) * 20);
     const angleInDeg = Math.round(
       Math.abs((_landed.angle * 180) / Math.PI - 360)
     );
@@ -149,7 +144,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   };
 
   const _drawCrashedMessage = () => {
-    const speedInMPH = Math.round(getVelocityVector(_velocity) * 20);
+    const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
     let crashType;
     if (speedInMPH > 200) crashType = "Incredible";
     else if (speedInMPH > 100) crashType = "Sick";
@@ -181,9 +176,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
         _angle,
         _velocity,
         _rotationVelocity,
-        _gravity,
-        _width,
-        _height,
         canvasHeight,
         _groundedHeight,
         _crashAngle
@@ -196,15 +188,20 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       _drawCrashedMessage();
     } else {
       // Draw gradient for lander
-      const gradient = CTX.createLinearGradient(-_width / 2, 0, _width / 2, 0);
+      const gradient = CTX.createLinearGradient(
+        -LANDER_WIDTH / 2,
+        0,
+        LANDER_WIDTH / 2,
+        0
+      );
       gradient.addColorStop(0, "#DFE5E5");
       gradient.addColorStop(0.3, "#BDBCC3");
       gradient.addColorStop(0.6, "#4A4E6F");
       gradient.addColorStop(1, "#3D4264");
-      CTX.fillStyle = gradient;
 
       // Move to top left of the lander and then rotate at that origin
       CTX.save();
+      CTX.fillStyle = gradient;
       CTX.translate(_position.x, _position.y);
       CTX.rotate(_angle);
 
@@ -214,23 +211,23 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       // rectangle, excluding the tip of the lander. To accomplish this, the
       // lander is drawn offset to the top and left of _position.x and y.
       // The tip is also drawn offset to the top of that so that the lander
-      // is a bit taller than _height.
+      // is a bit taller than LANDER_HEIGHT.
       //
       //                                      /\
       //                                     /  \
       // Start at top left of this segment → |  |
       // and work clockwise.                 |__|
       CTX.beginPath();
-      CTX.moveTo(-_width / 2, -_height / 2);
-      CTX.lineTo(0, -_height);
-      CTX.lineTo(_width / 2, -_height / 2);
-      CTX.lineTo(_width / 2, _height / 2);
-      CTX.lineTo(-_width / 2, _height / 2);
+      CTX.moveTo(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
+      CTX.lineTo(0, -LANDER_HEIGHT);
+      CTX.lineTo(LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
+      CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
+      CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
       CTX.closePath();
       CTX.fill();
 
       // Translate to the top-left corner of the lander for engine flames
-      CTX.translate(-_width / 2, -_height / 2);
+      CTX.translate(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
 
       if (_engineOn || _rotatingLeft || _rotatingRight) {
         CTX.fillStyle = randomBool() ? "#415B8C" : "#F3AFA3";
@@ -238,22 +235,23 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
       // Main engine flame
       if (_engineOn) {
+        const _flameHeight = randomBetween(10, 50);
+        const _flameMargin = 3;
         CTX.beginPath();
-        CTX.moveTo(0, _height);
-        CTX.lineTo(_width, _height);
-        CTX.lineTo(_width / 2, _height + Math.random() * _height);
-        CTX.lineTo(0, _height);
+        CTX.moveTo(_flameMargin, LANDER_HEIGHT);
+        CTX.lineTo(LANDER_WIDTH - _flameMargin, LANDER_HEIGHT);
+        CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT + _flameHeight);
         CTX.closePath();
         CTX.fill();
       }
 
+      const _boosterLength = randomBetween(5, 25);
       // Right booster flame
       if (_rotatingLeft) {
         CTX.beginPath();
-        CTX.moveTo(_width, 0);
-        CTX.lineTo(_width + Math.random() * _width, _height * 0.05);
-        CTX.lineTo(_width, _height * 0.1);
-        CTX.lineTo(_width, 0);
+        CTX.moveTo(LANDER_WIDTH, 0);
+        CTX.lineTo(LANDER_WIDTH + _boosterLength, LANDER_HEIGHT * 0.05);
+        CTX.lineTo(LANDER_WIDTH, LANDER_HEIGHT * 0.1);
         CTX.closePath();
         CTX.fill();
       }
@@ -262,9 +260,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
       if (_rotatingRight) {
         CTX.beginPath();
         CTX.moveTo(0, 0);
-        CTX.lineTo(-Math.random() * _width, _height * 0.05);
-        CTX.lineTo(0, _height * 0.1);
-        CTX.lineTo(0, 0);
+        CTX.lineTo(-_boosterLength, LANDER_HEIGHT * 0.05);
+        CTX.lineTo(0, LANDER_HEIGHT * 0.1);
         CTX.closePath();
         CTX.fill();
       }
@@ -273,14 +270,13 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
     // Draw speed text beside lander
     CTX.save();
-
     CTX.fillStyle =
-      getVelocityVector(_velocity) > _crashVelocity
+      getVectorVelocity(_velocity) > _crashVelocity
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
     CTX.fillText(
-      `${Math.round(getVelocityVector(_velocity) * 20)} MPH`,
-      _position.x + _width * 2,
+      `${Math.round(getVectorVelocity(_velocity) * 20)} MPH`,
+      _position.x + LANDER_WIDTH * 2,
       _position.y
     );
     CTX.restore();
