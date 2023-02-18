@@ -1,7 +1,7 @@
-import { animate, generateCanvas, roundToNDigits } from "./helpers.js";
+import { animate, generateCanvas } from "./helpers.js";
 import { makeLander } from "./lander.js";
 
-const [CTX, canvasWidth, canvasHeight] = generateCanvas({
+const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   width: window.innerWidth,
   height: window.innerHeight,
   attachNode: ".game",
@@ -20,9 +20,9 @@ document.addEventListener("keyup", ({ key }) => {
   if (key === "ArrowLeft" || key === "ArrowRight") lander.stopRotating();
 });
 
-document.addEventListener("touchstart", ({ touches }) => {
-  for (let index = 0; index < touches.length; index++) {
-    const touchLocation = touches[index].clientX / canvasWidth;
+canvasElement.addEventListener("touchstart", (e) => {
+  for (let index = 0; index < e.touches.length; index++) {
+    const touchLocation = e.touches[index].clientX / canvasWidth;
 
     if (touchLocation > 0 && touchLocation < 0.33) {
       lander.rotateLeft();
@@ -32,11 +32,13 @@ document.addEventListener("touchstart", ({ touches }) => {
       lander.rotateRight();
     }
   }
+
+  e.preventDefault();
 });
 
-document.addEventListener("touchmove", ({ changedTouches }) => {
-  for (let index = 0; index < changedTouches.length; index++) {
-    const touchLocation = changedTouches[index].clientX / canvasWidth;
+canvasElement.addEventListener("touchmove", (e) => {
+  for (let index = 0; index < e.changedTouches.length; index++) {
+    const touchLocation = e.changedTouches[index].clientX / canvasWidth;
 
     if (touchLocation > 0 && touchLocation < 0.33) {
       lander.rotateLeft();
@@ -49,11 +51,13 @@ document.addEventListener("touchmove", ({ changedTouches }) => {
       lander.engineOff();
     }
   }
+
+  e.preventDefault();
 });
 
-document.addEventListener("touchend", ({ changedTouches }) => {
-  for (let index = 0; index < changedTouches.length; index++) {
-    const touchLocation = changedTouches[index].clientX / canvasWidth;
+canvasElement.addEventListener("touchend", (e) => {
+  for (let index = 0; index < e.changedTouches.length; index++) {
+    const touchLocation = e.changedTouches[index].clientX / canvasWidth;
 
     if (touchLocation >= 0.33 && touchLocation <= 0.66) {
       lander.engineOff();
@@ -61,6 +65,8 @@ document.addEventListener("touchend", ({ changedTouches }) => {
       lander.stopRotating();
     }
   }
+
+  e.preventDefault();
 });
 
 animate(() => {

@@ -48,6 +48,9 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   };
   _resetProps();
 
+  const getVelocityVector = (velocity) =>
+    Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
+
   const _updateProps = () => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
 
@@ -78,8 +81,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     // Just landed
     else if (
       !_landed &&
-      _velocity.y < _crashVelocity &&
-      _velocity.x < _crashVelocity &&
+      getVelocityVector(_velocity) < _crashVelocity &&
       Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
       _landed = { angle: _angle, velocity: _velocity };
@@ -121,11 +123,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
   };
 
   const _drawLandedMessage = () => {
-    const speedInMPH = Math.round(
-      Math.sqrt(
-        Math.pow(_landed.velocity.x, 2) + Math.pow(_landed.velocity.y, 2)
-      ) * 20
-    );
+    const speedInMPH = Math.round(getVelocityVector(_landed.velocity) * 20);
     const angleInDeg = Math.round(
       Math.abs((_landed.angle * 180) / Math.PI - 360)
     );
@@ -139,6 +137,29 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     const line3 = `Angle: ${angleInDeg}°`;
 
     _confetti.forEach((c) => c.draw());
+
+    CTX.save();
+    CTX.textAlign = "center";
+    CTX.fillStyle = "rgba(255, 255, 255, .8)";
+    CTX.font = "normal 24px sans-serif";
+    CTX.fillText(line1, canvasWidth / 2, canvasHeight / 2 - 36);
+    CTX.fillText(line2, canvasWidth / 2, canvasHeight / 2);
+    CTX.fillText(line3, canvasWidth / 2, canvasHeight / 2 + 36);
+    CTX.restore();
+  };
+
+  const _drawCrashedMessage = () => {
+    const speedInMPH = Math.round(getVelocityVector(_velocity) * 20);
+    let crashType;
+    if (speedInMPH > 200) crashType = "Incredible";
+    else if (speedInMPH > 100) crashType = "Sick";
+    else if (speedInMPH > 50) crashType = "Cool";
+    else crashType = "Meh";
+    const line1 = `${crashType} crash`;
+    const line2 = `Speed: ${speedInMPH} MPH`;
+    const line3 = `Angle: ${Math.round(
+      Math.abs((_angle * 180) / Math.PI - 360)
+    )}°`;
 
     CTX.save();
     CTX.textAlign = "center";
@@ -172,6 +193,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
     if (_explosion) {
       _explosion.draw();
+      _drawCrashedMessage();
     } else {
       // Draw gradient for lander
       const gradient = CTX.createLinearGradient(-_width / 2, 0, _width / 2, 0);
@@ -253,13 +275,11 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
     CTX.save();
 
     CTX.fillStyle =
-      _velocity.y > _crashVelocity || _velocity.x > _crashVelocity
+      getVelocityVector(_velocity) > _crashVelocity
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
     CTX.fillText(
-      `${Math.round(
-        Math.sqrt(Math.pow(_velocity.x, 2) + Math.pow(_velocity.y, 2)) * 20
-      )} MPH`,
+      `${Math.round(getVelocityVector(_velocity) * 20)} MPH`,
       _position.x + _width * 2,
       _position.y
     );
@@ -268,7 +288,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight) => {
 
   return {
     draw,
-    getVelocity: () => _velocity,
     engineOn: () => (_engineOn = true),
     engineOff: () => (_engineOn = false),
     rotateLeft: () => (_rotatingLeft = true),

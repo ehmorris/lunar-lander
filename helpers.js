@@ -12,7 +12,7 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 
   document.querySelector(attachNode).appendChild(element);
 
-  return [context, width, height];
+  return [context, width, height, element];
 };
 
 export const animate = (drawFunc) => {
