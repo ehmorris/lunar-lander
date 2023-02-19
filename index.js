@@ -76,33 +76,47 @@ canvasElement.addEventListener("touchend", (e) => {
 // End game controls
 const showDialogControls = (eventDesc, eventType, type, speed, angle) => {
   document.querySelector(".buttons").classList.add("show");
+
   if (hasKeyboard) {
     document.querySelector("#reset").textContent = "Reset (Spacebar)";
-    document.addEventListener("keydown", ({ code }) => {
-      if (code === "Space") resetGame();
-    });
+    document.addEventListener("keydown", resetOnSpace);
   }
+
   if (navigator.canShare) {
-    document.querySelector("#share").addEventListener(
-      "click",
-      () => {
-        navigator.share({
-          title: "Lunar Lander",
-          text: `I ${eventDesc}!
-${type} ${eventType}
-Speed: ${speed} MPH
-Angle: ${angle}°`,
-          url: "https://ehmorris.github.io/lunar-lander/",
-        });
-      },
-      { once: true }
-    );
+    document.querySelector("#share").addEventListener("click", shareSheet);
   } else if (document.querySelector("#share")) {
     document.querySelector("#share").remove();
   }
-};
 
-document.querySelector("#reset").addEventListener("click", resetGame);
+  document.querySelector("#reset").addEventListener("click", resetGame);
+
+  function shareSheet() {
+    navigator.share({
+      title: "Lunar Lander",
+      text: `I ${eventDesc}!
+${type} ${eventType}
+Speed: ${speed} MPH
+Angle: ${angle}°`,
+      url: "https://ehmorris.github.io/lunar-lander/",
+    });
+  }
+
+  function resetOnSpace({ code }) {
+    if (code === "Space") resetGame();
+  }
+
+  function resetGame() {
+    lander.resetProps();
+    document.querySelector(".buttons").classList.remove("show");
+    if (document.querySelector("#share")) {
+      document.querySelector("#share").href = "#";
+      document.querySelector("#share").removeEventListener("click", shareSheet);
+    }
+    if (hasKeyboard) {
+      document.removeEventListener("keydown", resetOnSpace);
+    }
+  }
+};
 
 function onLand(type, speed, angle) {
   showDialogControls("landed", "landing", type, speed, angle);
@@ -110,13 +124,6 @@ function onLand(type, speed, angle) {
 
 function onCrash(type, speed, angle) {
   showDialogControls("crashed", "crash", type, speed, angle);
-}
-
-function resetGame() {
-  lander.resetProps();
-  document.querySelector(".buttons").classList.remove("show");
-  if (document.querySelector("#share"))
-    document.querySelector("#share").href = "#";
 }
 
 animate(() => {
