@@ -27,6 +27,10 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
   let _landed;
   let _confetti;
   let _explosion;
+  let _flipConfetti;
+  let _lastRotation;
+  let _lastRotationAngle;
+  let _rotationCount;
 
   const resetProps = () => {
     _position = {
@@ -49,6 +53,10 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
     _confetti = false;
     _crashed = false;
     _explosion = false;
+    _flipConfetti = [];
+    _lastRotation = 1;
+    _lastRotationAngle = Math.PI * 2;
+    _rotationCount = 0;
   };
   resetProps();
 
@@ -105,7 +113,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
       onGameEnd(
         `${landingType} landing
 Speed: ${speedInMPH} MPH
-Angle: ${angleInDeg}°`
+Angle: ${angleInDeg}°
+Rotations: ${_rotationCount}`
       );
 
       _angle = Math.PI * 2;
@@ -135,7 +144,8 @@ Angle: ${angleInDeg}°`
       onGameEnd(
         `${crashType} crash
 Speed: ${speedInMPH} MPH
-Angle: ${angleInDeg}°`
+Angle: ${angleInDeg}°
+Rotations: ${_rotationCount}`
       );
     }
   };
@@ -152,6 +162,7 @@ Angle: ${angleInDeg}°`
         `${_landed.type} landing`,
         `Speed: ${_landed.speed} MPH`,
         `Angle: ${_landed.angle}°`,
+        `Rotations: ${_rotationCount}`,
       ],
     });
   };
@@ -166,6 +177,7 @@ Angle: ${angleInDeg}°`
         `${_crashed.type} crash`,
         `Speed: ${_crashed.speed} MPH`,
         `Angle: ${_crashed.angle}°`,
+        `Rotations: ${_rotationCount}`,
       ],
     });
   };
@@ -295,6 +307,24 @@ Angle: ${angleInDeg}°`
       _position.y + 8
     );
     CTX.restore();
+
+    // Draw rotation confetti
+    const rotations = Math.floor(_angle / (Math.PI * 2));
+    if (
+      Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
+      (rotations > _lastRotation || rotations < _lastRotation)
+    ) {
+      _rotationCount++;
+      _lastRotation = rotations;
+      _lastRotationAngle = _angle;
+      _flipConfetti.push(
+        makeConfetti(CTX, canvasWidth, canvasHeight, 10, _position)
+      );
+    }
+
+    if (_flipConfetti.length > 0) {
+      _flipConfetti.forEach((c) => c.draw());
+    }
   };
 
   return {

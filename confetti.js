@@ -1,13 +1,21 @@
 import { randomBool, randomBetween } from "./helpers.js";
 import { GRAVITY } from "./constants.js";
 
-export const makeConfetti = (CTX, canvasWidth, canvasHeight, magnitude) => {
+export const makeConfetti = (
+  CTX,
+  canvasWidth,
+  canvasHeight,
+  magnitude,
+  position
+) => {
   const confettiPieces = new Array(magnitude)
     .fill()
     .map((_, index) =>
       _makeConfettiPiece(
         CTX,
-        { x: canvasWidth / 2 + index - magnitude / 2, y: canvasHeight / 2 },
+        position
+          ? position
+          : { x: canvasWidth / 2 + index - magnitude / 2, y: canvasHeight / 2 },
         { x: index < magnitude / 2 ? -0.5 : 0.5, y: -1 },
         canvasWidth,
         canvasHeight
