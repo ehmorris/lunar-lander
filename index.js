@@ -7,40 +7,16 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   attachNode: ".game",
 });
 
+let hasKeyboard = false;
+
 const lander = makeLander(CTX, canvasWidth, canvasHeight, onLand, onCrash);
 
-function onLand(type, speed, angle) {
-  document.querySelector(".buttons").classList.add("show");
-  document.querySelector("#share").href = `sms:?&body=${encodeURIComponent(
-    `I landed!
-${type} landing
-Speed: ${speed} MPH
-Angle: ${angle}°
-https://ehmorris.github.io/lunar-lander/`
-  )}`;
-}
-
-function onCrash(type, speed, angle) {
-  document.querySelector(".buttons").classList.add("show");
-  document.querySelector("#share").href = `sms:?&body=${encodeURIComponent(
-    `I crashed!
-${type} crash
-Speed: ${speed} MPH
-Angle: ${angle}°
-https://ehmorris.github.io/lunar-lander/`
-  )}`;
-}
-
-document.querySelector("#reset").addEventListener("click", () => {
-  lander.resetProps();
-  document.querySelector(".buttons").classList.remove("show");
-  document.querySelector("#share").href = "#";
-});
-
+// Gameplay controls
 document.addEventListener("keydown", ({ key }) => {
   if (key === "ArrowUp") lander.engineOn();
   if (key === "ArrowLeft") lander.rotateLeft();
   if (key === "ArrowRight") lander.rotateRight();
+  hasKeyboard = true;
 });
 
 document.addEventListener("keyup", ({ key }) => {
@@ -96,6 +72,52 @@ canvasElement.addEventListener("touchend", (e) => {
 
   e.preventDefault();
 });
+
+// End game controls
+const showDialogControls = (eventDesc, eventType, type, speed, angle) => {
+  document.querySelector(".buttons").classList.add("show");
+  if (hasKeyboard) {
+    document.querySelector("#reset").textContent = "Reset (Spacebar)";
+    document.addEventListener("keydown", ({ code }) => {
+      if (code === "Space") resetGame();
+    });
+  }
+  if (navigator.canShare) {
+    document.querySelector("#share").addEventListener(
+      "click",
+      () => {
+        navigator.share({
+          title: "Lunar Lander",
+          text: `I ${eventDesc}!
+${type} ${eventType}
+Speed: ${speed} MPH
+Angle: ${angle}°`,
+          url: "https://ehmorris.github.io/lunar-lander/",
+        });
+      },
+      { once: true }
+    );
+  } else if (document.querySelector("#share")) {
+    document.querySelector("#share").remove();
+  }
+};
+
+document.querySelector("#reset").addEventListener("click", resetGame);
+
+function onLand(type, speed, angle) {
+  showDialogControls("landed", "landing", type, speed, angle);
+}
+
+function onCrash(type, speed, angle) {
+  showDialogControls("crashed", "crash", type, speed, angle);
+}
+
+function resetGame() {
+  lander.resetProps();
+  document.querySelector(".buttons").classList.remove("show");
+  if (document.querySelector("#share"))
+    document.querySelector("#share").href = "#";
+}
 
 animate(() => {
   CTX.fillStyle = "#02071E";
