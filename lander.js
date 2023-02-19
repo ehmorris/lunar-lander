@@ -10,7 +10,7 @@ import {
 import { drawTrajectory } from "./trajectory.js";
 import { GRAVITY, LANDER_WIDTH, LANDER_HEIGHT } from "./constants.js";
 
-export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
+export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
   const _thrust = 0.01;
   const _crashVelocity = 0.4;
   const _crashAngle = 10;
@@ -87,32 +87,26 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
     ) {
       const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
       const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
-      const landingType =
-        speedInMPH < 3 && angleInDeg < 3
-          ? "Perfect"
-          : speedInMPH < 5 && angleInDeg < 5
-          ? "Decent"
-          : speedInMPH < 7 && angleInDeg < 7
-          ? "OK"
-          : "Bad";
+      let landingType;
+      if (speedInMPH < 3 && angleInDeg < 3) {
+        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 100);
+        landingType = "Perfect";
+      } else if (speedInMPH < 5 && angleInDeg < 5) {
+        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 60);
+        landingType = "Decent";
+      } else if (speedInMPH < 7 && angleInDeg < 7) {
+        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 30);
+        landingType = "OK";
+      } else {
+        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 10);
+        landingType = "Bad";
+      }
       _landed = { type: landingType, speed: speedInMPH, angle: angleInDeg };
-      _confetti = [
-        makeConfetti(
-          CTX,
-          { x: canvasWidth / 2 - 100, y: canvasHeight / 2 },
-          { x: -0.5, y: -1 },
-          canvasWidth,
-          canvasHeight
-        ),
-        makeConfetti(
-          CTX,
-          { x: canvasWidth / 2 + 100, y: canvasHeight / 2 },
-          { x: 0.5, y: -1 },
-          canvasWidth,
-          canvasHeight
-        ),
-      ];
-      onLand(landingType, speedInMPH, angleInDeg);
+      onGameEnd(
+        `${landingType} landing
+        Speed: ${speedInMPH} MPH
+        Angle: ${angleInDeg}°`
+      );
 
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
@@ -138,12 +132,16 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
         canvasWidth,
         canvasHeight
       );
-      onCrash(crashType, speedInMPH, angleInDeg);
+      onGameEnd(
+        `${crashType} crash
+        Speed: ${speedInMPH} MPH
+        Angle: ${angleInDeg}°`
+      );
     }
   };
 
   const _drawLandedMessage = () => {
-    _confetti.forEach((c) => c.draw());
+    _confetti.draw();
 
     textLayout({
       CTX,
@@ -276,7 +274,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
       CTX.restore();
     }
 
-    // Draw speed text beside lander
+    // Draw speed and angle text beside lander
     CTX.save();
     CTX.fillStyle =
       getVectorVelocity(_velocity) > _crashVelocity
@@ -285,7 +283,16 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
     CTX.fillText(
       `${Math.round(getVectorVelocity(_velocity) * 20)} MPH`,
       _position.x + LANDER_WIDTH * 2,
-      _position.y
+      _position.y - 8
+    );
+    CTX.fillStyle =
+      getAngleDeltaUpright(_angle) > _crashAngle
+        ? "rgb(255, 0, 0)"
+        : "rgb(0, 255, 0)";
+    CTX.fillText(
+      `${Math.round(getAngleDeltaUpright(_angle))}°`,
+      _position.x + LANDER_WIDTH * 2,
+      _position.y + 8
     );
     CTX.restore();
   };

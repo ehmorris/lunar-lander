@@ -9,7 +9,7 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
 
 let hasKeyboard = false;
 
-const lander = makeLander(CTX, canvasWidth, canvasHeight, onLand, onCrash);
+const lander = makeLander(CTX, canvasWidth, canvasHeight, onGameEnd);
 
 // Gameplay controls
 document.addEventListener("keydown", ({ key }) => {
@@ -74,7 +74,7 @@ canvasElement.addEventListener("touchend", (e) => {
 });
 
 // End game controls
-const showDialogControls = (eventDesc, eventType, type, speed, angle) => {
+function onGameEnd(text) {
   document.querySelector(".buttons").classList.add("show");
 
   if (hasKeyboard) {
@@ -93,10 +93,7 @@ const showDialogControls = (eventDesc, eventType, type, speed, angle) => {
   function shareSheet() {
     navigator.share({
       title: "Lunar Lander",
-      text: `I ${eventDesc}!
-${type} ${eventType}
-Speed: ${speed} MPH
-Angle: ${angle}°`,
+      text: text,
       url: "https://ehmorris.github.io/lunar-lander/",
     });
   }
@@ -116,14 +113,6 @@ Angle: ${angle}°`,
       document.removeEventListener("keydown", resetOnSpace);
     }
   }
-};
-
-function onLand(type, speed, angle) {
-  showDialogControls("landed", "landing", type, speed, angle);
-}
-
-function onCrash(type, speed, angle) {
-  showDialogControls("crashed", "crash", type, speed, angle);
 }
 
 animate(() => {
