@@ -4,6 +4,7 @@ import {
   randomBetween,
   randomBool,
   getVectorVelocity,
+  getAngleDeltaUpright,
   textLayout,
 } from "./helpers.js";
 import { drawTrajectory } from "./trajectory.js";
@@ -85,7 +86,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
       Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
       const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
-      const angleInDeg = Math.round(Math.abs((_angle * 180) / Math.PI - 360));
+      const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
       const landingType =
         speedInMPH < 3 && angleInDeg < 3
           ? "Perfect"
@@ -120,7 +121,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
     // Just crashed
     else if (!_landed && !_crashed) {
       const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
-      const angleInDeg = Math.round(Math.abs((_angle * 180) / Math.PI - 360));
+      const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
       const crashType =
         speedInMPH > 200
           ? "Incredible"
