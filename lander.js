@@ -84,15 +84,16 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
       getVectorVelocity(_velocity) < _crashVelocity &&
       Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
     ) {
-      const speedInMPH = Math.round(getVectorVelocity(_landed.velocity) * 20);
-      const angleInDeg = Math.round(
-        Math.abs((_landed.angle * 180) / Math.PI - 360)
-      );
-      let landingType;
-      if (speedInMPH < 3 && angleInDeg < 3) landingType = "Perfect";
-      else if (speedInMPH < 5 && angleInDeg < 5) landingType = "Decent";
-      else if (speedInMPH < 7 && angleInDeg < 7) landingType = "OK";
-      else landingType = "Bad";
+      const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
+      const angleInDeg = Math.round(Math.abs((_angle * 180) / Math.PI - 360));
+      const landingType =
+        speedInMPH < 3 && angleInDeg < 3
+          ? "Perfect"
+          : speedInMPH < 5 && angleInDeg < 5
+          ? "Decent"
+          : speedInMPH < 7 && angleInDeg < 7
+          ? "OK"
+          : "Bad";
       _landed = { type: landingType, speed: speedInMPH, angle: angleInDeg };
       _confetti = [
         makeConfetti(
@@ -120,11 +121,14 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
     else if (!_landed && !_crashed) {
       const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
       const angleInDeg = Math.round(Math.abs((_angle * 180) / Math.PI - 360));
-      let crashType;
-      if (speedInMPH > 200) crashType = "Incredible";
-      else if (speedInMPH > 100) crashType = "Sick";
-      else if (speedInMPH > 50) crashType = "Cool";
-      else crashType = "Meh";
+      const crashType =
+        speedInMPH > 200
+          ? "Incredible"
+          : speedInMPH > 100
+          ? "Sick"
+          : speedInMPH > 50
+          ? "Cool"
+          : "Meh";
       _crashed = { type: crashType, speed: speedInMPH, angle: angleInDeg };
       _explosion = makeExplosion(
         CTX,
@@ -146,9 +150,9 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onLand, onCrash) => {
       canvasWidth,
       canvasHeight,
       lines: [
-        `${_landing.type} landing`,
-        `Speed: ${_landing.speed} MPH`,
-        `Angle: ${_landing.angle}°`,
+        `${_landed.type} landing`,
+        `Speed: ${_landed.speed} MPH`,
+        `Angle: ${_landed.angle}°`,
       ],
     });
   };
