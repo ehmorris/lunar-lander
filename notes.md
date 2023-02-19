@@ -20,3 +20,4 @@
 - [ ] "Mad dog" start with very high rotation rate
 - [ ] iOS safari "from" banner cuts off bottom of canvas
 - [ ] Extend ramp from lander on land
+- [ ] Rotating forces a crash
