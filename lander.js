@@ -52,7 +52,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
   };
   resetProps();
 
-  const _updateProps = () => {
+  const _updateProps = (timeSinceStart, timeSinceLastFrame) => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
 
     // Is above ground
@@ -170,8 +170,8 @@ Angle: ${angleInDeg}°`
     });
   };
 
-  const draw = () => {
-    _updateProps();
+  const draw = (timeSinceStart, timeSinceLastFrame) => {
+    _updateProps(timeSinceStart, timeSinceLastFrame);
 
     if (!_engineOn && !_rotatingLeft && !_rotatingRight)
       drawTrajectory(

@@ -16,12 +16,16 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 };
 
 export const animate = (drawFunc) => {
+  const startTime = Date.now();
   let previousFrameTime = Date.now();
   let currentFrameTime = Date.now();
 
   const drawFuncContainer = () => {
     currentFrameTime = Date.now();
-    drawFunc(currentFrameTime, previousFrameTime);
+    drawFunc(
+      currentFrameTime - startTime,
+      currentFrameTime - previousFrameTime
+    );
     previousFrameTime = Date.now();
     window.requestAnimationFrame(drawFuncContainer);
   };

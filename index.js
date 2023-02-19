@@ -115,8 +115,8 @@ function onGameEnd(text) {
   }
 }
 
-animate(() => {
+animate((timeSinceStart, timeSinceLastFrame) => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
-  lander.draw();
+  lander.draw(timeSinceStart, timeSinceLastFrame);
 });
