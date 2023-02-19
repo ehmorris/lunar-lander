@@ -104,8 +104,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
       _landed = { type: landingType, speed: speedInMPH, angle: angleInDeg };
       onGameEnd(
         `${landingType} landing
-        Speed: ${speedInMPH} MPH
-        Angle: ${angleInDeg}°`
+Speed: ${speedInMPH} MPH
+Angle: ${angleInDeg}°`
       );
 
       _angle = Math.PI * 2;
@@ -134,8 +134,8 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
       );
       onGameEnd(
         `${crashType} crash
-        Speed: ${speedInMPH} MPH
-        Angle: ${angleInDeg}°`
+Speed: ${speedInMPH} MPH
+Angle: ${angleInDeg}°`
       );
     }
   };
