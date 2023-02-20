@@ -4,16 +4,17 @@
     <title>Lunar Lander</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <style>
-      html { overflow: hidden; }
       body {
         margin: 0;
         text-align: center;
         -webkit-user-select: none;    
         overflow: hidden;
+        font: normal 24px sans-serif;
+        color: white;
       }
+
       canvas {
         display: block;
-        overflow: hidden;
       }
 
       .buttons {
@@ -28,10 +29,25 @@
       }
 
       .buttons a {
-        color: #fff;
-        font-family: sans-serif;
-        font-size: 24px;
+        color: inherit;
         padding: 1rem 1rem;
+      }
+
+      .stats {
+        position: absolute;
+        display: none;
+        width: 100%;
+        top: 20vh;
+        color: rgba(255, 255, 255, .75);
+      }
+
+      .stats h1 {
+        font-size: 32px;
+        color: white;
+      }
+
+      .stats.show {
+        display: block;
       }
     </style>
   </head>
@@ -40,6 +56,16 @@
     <div class="buttons">
       <a id="reset" href="#">Reset</a>
       <a id="share" href="#">Share</a>
+    </div>
+    <div class="stats">
+      <h1>
+        <span class="grade"></span>
+        <span class="type"></span>
+        (<span class="percent"></span>%)
+      </h1>
+      <p>Speed: <span class="speed"></span> MPH</p>
+      <p>Angle: <span class="angle"></span>&#176;</p>
+      <p>Rotations: <span class="rotations"></span></p>
     </div>
     <script src="index.js" type="module"></script>
   </body>

@@ -73,9 +73,24 @@ canvasElement.addEventListener("touchend", (e) => {
   e.preventDefault();
 });
 
+const fillInStats = (data) => {
+  document.querySelector(".stats .grade").textContent = scoreToLetterGrade(
+    data.score
+  );
+  document.querySelector(".stats .type").textContent = data.type;
+  document.querySelector(".stats .percent").textContent = data.score;
+  document.querySelector(".stats .speed").textContent = data.speed;
+  document.querySelector(".stats .angle").textContent = data.angle;
+  document.querySelector(".stats .rotations").textContent = data.rotations;
+};
+
 // End game controls
 function onGameEnd(data) {
   document.querySelector(".buttons").classList.add("show");
+  document.querySelector(".stats").classList.add("show");
+  fillInStats(data);
+
+  document.querySelector("#reset").addEventListener("click", resetGame);
 
   if (hasKeyboard) {
     document.querySelector("#reset").textContent = "Reset (Spacebar)";
@@ -87,8 +102,6 @@ function onGameEnd(data) {
   } else if (document.querySelector("#share")) {
     document.querySelector("#share").remove();
   }
-
-  document.querySelector("#reset").addEventListener("click", resetGame);
 
   function shareSheet() {
     navigator.share({
@@ -108,8 +121,8 @@ Rotations: ${data.rotations}`,
   function resetGame() {
     lander.resetProps();
     document.querySelector(".buttons").classList.remove("show");
+    document.querySelector(".stats").classList.remove("show");
     if (document.querySelector("#share")) {
-      document.querySelector("#share").href = "#";
       document.querySelector("#share").removeEventListener("click", shareSheet);
     }
     if (hasKeyboard) {

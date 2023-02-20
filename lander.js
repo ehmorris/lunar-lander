@@ -6,10 +6,8 @@ import {
   getVectorVelocity,
   getDisplayVelocity,
   getAngleDeltaUpright,
-  textLayout,
   scoreLanding,
   scoreCrash,
-  scoreToLetterGrade,
 } from "./helpers.js";
 import { drawTrajectory } from "./trajectory.js";
 import {
@@ -90,6 +88,20 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
         _velocity.x += _thrust * Math.sin(_angle);
         _velocity.y -= _thrust * Math.cos(_angle);
       }
+
+      // Count rotations and update state
+      const rotations = Math.floor(_angle / (Math.PI * 2));
+      if (
+        Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
+        (rotations > _lastRotation || rotations < _lastRotation)
+      ) {
+        _rotationCount++;
+        _lastRotation = rotations;
+        _lastRotationAngle = _angle;
+        _flipConfetti.push(
+          makeConfetti(CTX, canvasWidth, canvasHeight, 10, _position)
+        );
+      }
     }
     // Just landed
     else if (
@@ -142,25 +154,10 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
     }
   };
 
-  const _drawGameEnd = (data) => {
-    textLayout({
-      CTX,
-      fontSize: 24,
-      canvasWidth,
-      canvasHeight,
-      lines: [
-        `${scoreToLetterGrade(data.score)} ${data.type} (${data.score}%)`,
-        `Speed: ${data.speed} MPH`,
-        `Angle: ${data.angle}°`,
-        `Rotations: ${data.rotations}`,
-      ],
-    });
-  };
-
   const draw = (timeSinceStart, timeSinceLastFrame) => {
     _updateProps(timeSinceStart, timeSinceLastFrame);
 
-    if (!_engineOn && !_rotatingLeft && !_rotatingRight)
+    if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
       drawTrajectory(
         CTX,
         _position,
@@ -170,15 +167,19 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
         canvasHeight,
         _groundedHeight
       );
+    }
+
+    if (_flipConfetti.length > 0) {
+      _flipConfetti.forEach((c) => c.draw());
+    }
 
     if (_landed) {
       _landed.confetti.draw();
-      _drawGameEnd(_landed);
     }
 
+    // Draw the lander when it hasn't crashed
     if (_crashed) {
       _crashed.explosion.draw();
-      _drawGameEnd(_crashed);
     } else {
       // Draw gradient for lander
       const gradient = CTX.createLinearGradient(
@@ -263,7 +264,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
       CTX.restore();
     }
 
-    // Draw speed and angle text beside lander
+    // Draw speed and angle text beside lander, even after crashing
     CTX.save();
     CTX.fillStyle =
       getVectorVelocity(_velocity) > CRASH_VELOCITY
@@ -284,24 +285,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
       _position.y + 8
     );
     CTX.restore();
-
-    // Draw rotation confetti
-    const rotations = Math.floor(_angle / (Math.PI * 2));
-    if (
-      Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
-      (rotations > _lastRotation || rotations < _lastRotation)
-    ) {
-      _rotationCount++;
-      _lastRotation = rotations;
-      _lastRotationAngle = _angle;
-      _flipConfetti.push(
-        makeConfetti(CTX, canvasWidth, canvasHeight, 10, _position)
-      );
-    }
-
-    if (_flipConfetti.length > 0) {
-      _flipConfetti.forEach((c) => c.draw());
-    }
   };
 
   return {
