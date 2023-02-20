@@ -52,8 +52,8 @@ export const getVectorVelocity = (velocity) =>
 export const getAngleDeltaUpright = (angle) => {
   const angleInDeg = (angle * 180) / Math.PI;
   return angle % (Math.PI * 2) > Math.PI
-    ? 360 - (angleInDeg % 360)
-    : angleInDeg % 360;
+    ? Math.abs(360 - (angleInDeg % 360))
+    : Math.abs(angleInDeg % 360);
 };
 
 export const getDisplayVelocity = (velocity) =>
