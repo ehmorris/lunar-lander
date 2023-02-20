@@ -122,7 +122,7 @@ function onGameEnd(data) {
 
   function shareSheet() {
     navigator.share({
-      title: "Lunar Lander",
+      title: "Lander",
       text: `${scoreToLetterGrade(data.score)} ${data.type} (${data.score}%)
 Speed: ${data.speed} MPH
 Angle: ${data.angle}°
