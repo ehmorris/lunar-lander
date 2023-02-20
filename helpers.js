@@ -60,29 +60,29 @@ export const getDisplayVelocity = (velocity) =>
   Math.round(getVectorVelocity(velocity) * VELOCITY_MULTIPLIER);
 
 export const scoreToLetterGrade = (score) =>
-  score > 97
+  score >= 97
     ? "A+"
-    : score > 93
+    : score >= 93
     ? "A"
-    : score > 90
+    : score >= 90
     ? "A-"
-    : score > 87
+    : score >= 87
     ? "B+"
-    : score > 83
+    : score >= 83
     ? "B"
-    : score > 80
+    : score >= 80
     ? "B-"
-    : score > 77
+    : score >= 77
     ? "C+"
-    : score > 73
+    : score >= 73
     ? "C"
-    : score > 70
+    : score >= 70
     ? "C-"
-    : score > 67
+    : score >= 67
     ? "D+"
-    : score > 63
+    : score >= 63
     ? "D"
-    : score > 60
+    : score >= 60
     ? "D-"
     : "F";
 

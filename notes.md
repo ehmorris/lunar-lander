@@ -24,4 +24,3 @@
   - The gameplay target is the experience on a MacBook with a 120hz refresh rate. Phones could possibly be slower, or shorter screens in general - but this should be controlled and not incidental
 - [ ] iOS safari "from" banner cuts off bottom of canvas
 - [ ] Handle multiple touches on touchmove
-- [ ] Grades are off by 1 due to > instead or >=
