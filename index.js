@@ -159,7 +159,7 @@ animate((timeSinceStart, timeSinceLastFrame) => {
     CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
   }
   if (showCenterOverlay) {
-    CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.55, canvasHeight);
+    CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.5, canvasHeight);
   }
   if (showRightOverlay) {
     CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
