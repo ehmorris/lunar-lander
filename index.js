@@ -127,7 +127,7 @@ function onGameEnd(data) {
 Speed: ${data.speed} MPH
 Angle: ${data.angle}°
 Rotations: ${data.rotations}`,
-      url: "https://ehmorris.github.io/lunar-lander/",
+      url: "https://ehmorris.com/lander/",
     });
   }
 
