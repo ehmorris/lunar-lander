@@ -7,6 +7,7 @@
 
 # Gameplay TODO
 
+- [ ] Stars that change when x is reset
 - [ ] Add fuel
 - [ ] Add altimeter
 - [ ] Add terrain
