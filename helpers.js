@@ -116,12 +116,12 @@ export const scoreLanding = (angle, speed, rotations) => {
 // rotations: bonus, higher better
 //
 // Expected best possible crash
-// speed: 700
+// speed: 500
 // angle: 180
 // rotations: bonus, higher better
 export const scoreCrash = (angle, speed, rotations) => {
   const worstPossibleCombo = Math.min(CRASH_VELOCITY, CRASH_ANGLE);
-  const bestPossibleCombo = 880;
+  const bestPossibleCombo = 600;
   const combinedStats = angle + speed;
   const score = Math.round(
     ((combinedStats - worstPossibleCombo) /
