@@ -11,6 +11,10 @@ let hasKeyboard = false;
 
 const lander = makeLander(CTX, canvasWidth, canvasHeight, onGameEnd);
 
+let showCenterOverlay = false;
+let showRightOverlay = false;
+let showLeftOverlay = false;
+
 // Gameplay controls
 document.addEventListener("keydown", ({ key }) => {
   if (key === "ArrowUp") lander.engineOn();
@@ -30,10 +34,13 @@ canvasElement.addEventListener("touchstart", (e) => {
 
     if (touchLocation > 0 && touchLocation < 0.25) {
       lander.rotateLeft();
+      showLeftOverlay = true;
     } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
       lander.engineOn();
+      showCenterOverlay = true;
     } else {
       lander.rotateRight();
+      showRightOverlay = true;
     }
   }
 
@@ -47,12 +54,19 @@ canvasElement.addEventListener("touchmove", (e) => {
     if (touchLocation > 0 && touchLocation < 0.25) {
       lander.rotateLeft();
       lander.engineOff();
+      showLeftOverlay = true;
+      showCenterOverlay = false;
     } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
       lander.engineOn();
       lander.stopRotating();
+      showCenterOverlay = true;
+      showLeftOverlay = false;
+      showRightOverlay = false;
     } else {
       lander.rotateRight();
       lander.engineOff();
+      showRightOverlay = true;
+      showCenterOverlay = false;
     }
   }
 
@@ -65,8 +79,11 @@ canvasElement.addEventListener("touchend", (e) => {
 
     if (touchLocation >= 0.25 && touchLocation <= 0.75) {
       lander.engineOff();
+      showCenterOverlay = false;
     } else {
       lander.stopRotating();
+      showLeftOverlay = false;
+      showRightOverlay = false;
     }
   }
 
@@ -135,4 +152,17 @@ animate((timeSinceStart, timeSinceLastFrame) => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
   lander.draw(timeSinceStart, timeSinceLastFrame);
+
+  CTX.save();
+  CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
+  if (showLeftOverlay) {
+    CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
+  }
+  if (showCenterOverlay) {
+    CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.55, canvasHeight);
+  }
+  if (showRightOverlay) {
+    CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
+  }
+  CTX.restore();
 });
