@@ -1,13 +1,9 @@
 # Other TODO
 
 - [ ] Add instructions for controls and store whether the user has seen them
-- [ ] Detect and count flips, include this data in the end-of-game readout and share text
 - [ ] Add time-to-land as a stat
 - [ ] Add more crash and landing categories like "sidewinder" and "drunk astronaut"
-- [ ] Add overall grade, letter-style
-- [ ] Move all text rendering to HTML
 - [ ] Generate image from canvas for sharing
-- [ ] Combos that effect score, like landing after a flip
 
 # Gameplay TODO
 
