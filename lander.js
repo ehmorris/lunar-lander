@@ -294,9 +294,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
     engineOff: () => (_engineOn = false),
     rotateLeft: () => (_rotatingLeft = true),
     rotateRight: () => (_rotatingRight = true),
-    stopRotating: () => {
-      _rotatingLeft = false;
-      _rotatingRight = false;
-    },
+    stopLeftRotation: () => (_rotatingLeft = false),
+    stopRightRotation: () => (_rotatingRight = false),
   };
 };

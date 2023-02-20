@@ -25,49 +25,44 @@ document.addEventListener("keydown", ({ key }) => {
 
 document.addEventListener("keyup", ({ key }) => {
   if (key === "ArrowUp") lander.engineOff();
-  if (key === "ArrowLeft" || key === "ArrowRight") lander.stopRotating();
+  if (key === "ArrowLeft") lander.stopLeftRotation();
+  if (key === "ArrowRight") lander.stopRightRotation();
 });
+
+const activateTouchZone = (touch) => {
+  const touchLocation = touch.clientX / canvasWidth;
+
+  if (touchLocation > 0 && touchLocation < 0.25) {
+    lander.rotateLeft();
+    showLeftOverlay = true;
+  } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
+    lander.engineOn();
+    showCenterOverlay = true;
+  } else {
+    lander.rotateRight();
+    showRightOverlay = true;
+  }
+};
 
 canvasElement.addEventListener("touchstart", (e) => {
   for (let index = 0; index < e.touches.length; index++) {
     const touchLocation = e.touches[index].clientX / canvasWidth;
-
-    if (touchLocation > 0 && touchLocation < 0.25) {
-      lander.rotateLeft();
-      showLeftOverlay = true;
-    } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
-      lander.engineOn();
-      showCenterOverlay = true;
-    } else {
-      lander.rotateRight();
-      showRightOverlay = true;
-    }
+    activateTouchZone(e.touches[index]);
   }
 
   e.preventDefault();
 });
 
 canvasElement.addEventListener("touchmove", (e) => {
-  for (let index = 0; index < e.changedTouches.length; index++) {
-    const touchLocation = e.changedTouches[index].clientX / canvasWidth;
+  lander.engineOff();
+  lander.stopLeftRotation();
+  lander.stopRightRotation();
+  showCenterOverlay = false;
+  showLeftOverlay = false;
+  showRightOverlay = false;
 
-    if (touchLocation > 0 && touchLocation < 0.25) {
-      lander.rotateLeft();
-      lander.engineOff();
-      showLeftOverlay = true;
-      showCenterOverlay = false;
-    } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
-      lander.engineOn();
-      lander.stopRotating();
-      showCenterOverlay = true;
-      showLeftOverlay = false;
-      showRightOverlay = false;
-    } else {
-      lander.rotateRight();
-      lander.engineOff();
-      showRightOverlay = true;
-      showCenterOverlay = false;
-    }
+  for (let index = 0; index < e.touches.length; index++) {
+    activateTouchZone(e.touches[index]);
   }
 
   e.preventDefault();
@@ -77,12 +72,14 @@ canvasElement.addEventListener("touchend", (e) => {
   for (let index = 0; index < e.changedTouches.length; index++) {
     const touchLocation = e.changedTouches[index].clientX / canvasWidth;
 
-    if (touchLocation >= 0.25 && touchLocation <= 0.75) {
+    if (touchLocation > 0 && touchLocation < 0.25) {
+      lander.stopLeftRotation();
+      showLeftOverlay = false;
+    } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
       lander.engineOff();
       showCenterOverlay = false;
     } else {
-      lander.stopRotating();
-      showLeftOverlay = false;
+      lander.stopRightRotation();
       showRightOverlay = false;
     }
   }
