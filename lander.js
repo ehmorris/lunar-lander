@@ -18,7 +18,13 @@ import {
   CRASH_ANGLE,
 } from "./constants.js";
 
-export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
+export const makeLander = (
+  CTX,
+  canvasWidth,
+  canvasHeight,
+  onGameEnd,
+  onResetXPos
+) => {
   const _thrust = 0.01;
   const _groundedHeight = canvasHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
 
@@ -75,9 +81,11 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
       }
       if (_position.x < 0) {
         _position.x = canvasWidth;
+        onResetXPos();
       }
       if (_position.x > canvasWidth) {
         _position.x = 0;
+        onResetXPos();
       }
 
       _position.x += _velocity.x;

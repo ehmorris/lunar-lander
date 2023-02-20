@@ -1,5 +1,6 @@
 import { animate, generateCanvas, scoreToLetterGrade } from "./helpers.js";
 import { makeLander } from "./lander.js";
+import { makeStarfield } from "./starfield.js";
 
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   width: window.innerWidth,
@@ -9,7 +10,14 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
 
 let hasKeyboard = false;
 
-const lander = makeLander(CTX, canvasWidth, canvasHeight, onGameEnd);
+const lander = makeLander(
+  CTX,
+  canvasWidth,
+  canvasHeight,
+  onGameEnd,
+  onResetXPos
+);
+const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
 
 let showCenterOverlay = false;
 let showRightOverlay = false;
@@ -145,9 +153,15 @@ Rotations: ${data.rotations}`,
   }
 }
 
+function onResetXPos() {
+  stars.reGenerate();
+}
+
 animate((timeSinceStart, timeSinceLastFrame) => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
+  stars.draw();
+
   lander.draw(timeSinceStart, timeSinceLastFrame);
 
   CTX.save();
