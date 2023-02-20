@@ -65,5 +65,9 @@ export const roundToNDigits = (number, digits = 0) =>
 export const getVectorVelocity = (velocity) =>
   Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
 
-export const getAngleDeltaUpright = (angle) =>
-  Math.abs((angle * 180) / Math.PI - 360) % 360;
+export const getAngleDeltaUpright = (angle) => {
+  const angleInDeg = (angle * 180) / Math.PI;
+  return angle % (Math.PI * 2) > Math.PI
+    ? 360 - (angleInDeg % 360)
+    : angleInDeg % 360;
+};

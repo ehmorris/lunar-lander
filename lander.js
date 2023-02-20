@@ -91,7 +91,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
     else if (
       !_landed &&
       getVectorVelocity(_velocity) < _crashVelocity &&
-      Math.abs((_angle * 180) / Math.PI - 360) < _crashAngle
+      getAngleDeltaUpright(_angle) < _crashAngle
     ) {
       const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
       const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
