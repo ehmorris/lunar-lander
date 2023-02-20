@@ -14,6 +14,7 @@
 - [ ] Confetti when grazing the bottom, or exceeding certain speeds
 - [ ] "Mad dog" mode: start with very high rotation rate
 - [ ] Extend ramp from lander on land
+- [ ] Go back to labels instead of letter grades
 
 # Bugs
 
