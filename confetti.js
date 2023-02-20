@@ -5,18 +5,18 @@ export const makeConfetti = (
   CTX,
   canvasWidth,
   canvasHeight,
-  magnitude,
+  amount,
   position
 ) => {
-  const confettiPieces = new Array(magnitude)
+  const confettiPieces = new Array(amount)
     .fill()
     .map((_, index) =>
       _makeConfettiPiece(
         CTX,
         position
           ? position
-          : { x: canvasWidth / 2 + index - magnitude / 2, y: canvasHeight / 2 },
-        { x: index < magnitude / 2 ? -0.5 : 0.5, y: -1 },
+          : { x: canvasWidth / 2 + index - amount / 2, y: canvasHeight / 2 },
+        { x: index < amount / 2 ? -0.5 : 0.5, y: -1 },
         canvasWidth,
         canvasHeight
       )

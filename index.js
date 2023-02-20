@@ -1,4 +1,4 @@
-import { animate, generateCanvas } from "./helpers.js";
+import { animate, generateCanvas, scoreToLetterGrade } from "./helpers.js";
 import { makeLander } from "./lander.js";
 
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
@@ -74,7 +74,7 @@ canvasElement.addEventListener("touchend", (e) => {
 });
 
 // End game controls
-function onGameEnd(text) {
+function onGameEnd(data) {
   document.querySelector(".buttons").classList.add("show");
 
   if (hasKeyboard) {
@@ -93,7 +93,10 @@ function onGameEnd(text) {
   function shareSheet() {
     navigator.share({
       title: "Lunar Lander",
-      text: text,
+      text: `${scoreToLetterGrade(data.score)} ${data.type} (${data.score}%)
+Speed: ${data.speed} MPH
+Angle: ${data.angle}°
+Rotations: ${data.rotations}`,
       url: "https://ehmorris.github.io/lunar-lander/",
     });
   }

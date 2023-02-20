@@ -4,16 +4,24 @@ import {
   randomBetween,
   randomBool,
   getVectorVelocity,
+  getDisplayVelocity,
   getAngleDeltaUpright,
   textLayout,
+  scoreLanding,
+  scoreCrash,
+  scoreToLetterGrade,
 } from "./helpers.js";
 import { drawTrajectory } from "./trajectory.js";
-import { GRAVITY, LANDER_WIDTH, LANDER_HEIGHT } from "./constants.js";
+import {
+  GRAVITY,
+  LANDER_WIDTH,
+  LANDER_HEIGHT,
+  CRASH_VELOCITY,
+  CRASH_ANGLE,
+} from "./constants.js";
 
 export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
   const _thrust = 0.01;
-  const _crashVelocity = 0.4;
-  const _crashAngle = 10;
   const _groundedHeight = canvasHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
 
   let _position;
@@ -25,8 +33,6 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
   let _rotatingRight;
   let _crashed;
   let _landed;
-  let _confetti;
-  let _explosion;
   let _flipConfetti;
   let _lastRotation;
   let _lastRotationAngle;
@@ -50,9 +56,7 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
     _rotatingLeft = false;
     _rotatingRight = false;
     _landed = false;
-    _confetti = false;
     _crashed = false;
-    _explosion = false;
     _flipConfetti = [];
     _lastRotation = 1;
     _lastRotationAngle = Math.PI * 2;
@@ -90,32 +94,27 @@ export const makeLander = (CTX, canvasWidth, canvasHeight, onGameEnd) => {
     // Just landed
     else if (
       !_landed &&
-      getVectorVelocity(_velocity) < _crashVelocity &&
-      getAngleDeltaUpright(_angle) < _crashAngle
+      getVectorVelocity(_velocity) < CRASH_VELOCITY &&
+      getAngleDeltaUpright(_angle) < CRASH_ANGLE
     ) {
-      const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
+      const speedInMPH = getDisplayVelocity(_velocity);
       const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
-      let landingType;
-      if (speedInMPH < 3 && angleInDeg < 3) {
-        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 100);
-        landingType = "Perfect";
-      } else if (speedInMPH < 5 && angleInDeg < 5) {
-        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 60);
-        landingType = "Decent";
-      } else if (speedInMPH < 7 && angleInDeg < 7) {
-        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 30);
-        landingType = "OK";
-      } else {
-        _confetti = makeConfetti(CTX, canvasWidth, canvasHeight, 10);
-        landingType = "Bad";
-      }
-      _landed = { type: landingType, speed: speedInMPH, angle: angleInDeg };
-      onGameEnd(
-        `${landingType} landing
-Speed: ${speedInMPH} MPH
-Angle: ${angleInDeg}°
-Rotations: ${_rotationCount}`
-      );
+      const score = scoreLanding(speedInMPH, angleInDeg, _rotationCount);
+      _landed = {
+        type: "landing",
+        score,
+        speed: speedInMPH,
+        angle: angleInDeg,
+        rotations: _rotationCount,
+        confetti: makeConfetti(
+          CTX,
+          canvasWidth,
+          canvasHeight,
+          Math.round(score)
+        ),
+      };
+
+      onGameEnd(_landed);
 
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
@@ -123,61 +122,37 @@ Rotations: ${_rotationCount}`
     }
     // Just crashed
     else if (!_landed && !_crashed) {
-      const speedInMPH = Math.round(getVectorVelocity(_velocity) * 20);
+      const speedInMPH = getDisplayVelocity(_velocity);
       const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
-      const crashType =
-        speedInMPH > 200
-          ? "Incredible"
-          : speedInMPH > 100
-          ? "Sick"
-          : speedInMPH > 50
-          ? "Cool"
-          : "Meh";
-      _crashed = { type: crashType, speed: speedInMPH, angle: angleInDeg };
-      _explosion = makeExplosion(
-        CTX,
-        _position,
-        _velocity,
-        canvasWidth,
-        canvasHeight
-      );
-      onGameEnd(
-        `${crashType} crash
-Speed: ${speedInMPH} MPH
-Angle: ${angleInDeg}°
-Rotations: ${_rotationCount}`
-      );
+      _crashed = {
+        type: "crash",
+        score: scoreCrash(speedInMPH, angleInDeg, _rotationCount),
+        speed: speedInMPH,
+        angle: angleInDeg,
+        rotations: _rotationCount,
+        explosion: makeExplosion(
+          CTX,
+          _position,
+          _velocity,
+          canvasWidth,
+          canvasHeight
+        ),
+      };
+      onGameEnd(_crashed);
     }
   };
 
-  const _drawLandedMessage = () => {
-    _confetti.draw();
-
+  const _drawGameEnd = (data) => {
     textLayout({
       CTX,
       fontSize: 24,
       canvasWidth,
       canvasHeight,
       lines: [
-        `${_landed.type} landing`,
-        `Speed: ${_landed.speed} MPH`,
-        `Angle: ${_landed.angle}°`,
-        `Rotations: ${_rotationCount}`,
-      ],
-    });
-  };
-
-  const _drawCrashedMessage = () => {
-    textLayout({
-      CTX,
-      fontSize: 24,
-      canvasWidth,
-      canvasHeight,
-      lines: [
-        `${_crashed.type} crash`,
-        `Speed: ${_crashed.speed} MPH`,
-        `Angle: ${_crashed.angle}°`,
-        `Rotations: ${_rotationCount}`,
+        `${scoreToLetterGrade(data.score)} ${data.type} (${data.score}%)`,
+        `Speed: ${data.speed} MPH`,
+        `Angle: ${data.angle}°`,
+        `Rotations: ${data.rotations}`,
       ],
     });
   };
@@ -193,15 +168,17 @@ Rotations: ${_rotationCount}`
         _velocity,
         _rotationVelocity,
         canvasHeight,
-        _groundedHeight,
-        _crashAngle
+        _groundedHeight
       );
 
-    if (_landed) _drawLandedMessage();
+    if (_landed) {
+      _landed.confetti.draw();
+      _drawGameEnd(_landed);
+    }
 
-    if (_explosion) {
-      _explosion.draw();
-      _drawCrashedMessage();
+    if (_crashed) {
+      _crashed.explosion.draw();
+      _drawGameEnd(_crashed);
     } else {
       // Draw gradient for lander
       const gradient = CTX.createLinearGradient(
@@ -289,16 +266,16 @@ Rotations: ${_rotationCount}`
     // Draw speed and angle text beside lander
     CTX.save();
     CTX.fillStyle =
-      getVectorVelocity(_velocity) > _crashVelocity
+      getVectorVelocity(_velocity) > CRASH_VELOCITY
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
     CTX.fillText(
-      `${Math.round(getVectorVelocity(_velocity) * 20)} MPH`,
+      `${getDisplayVelocity(_velocity)} MPH`,
       _position.x + LANDER_WIDTH * 2,
       _position.y - 8
     );
     CTX.fillStyle =
-      getAngleDeltaUpright(_angle) > _crashAngle
+      getAngleDeltaUpright(_angle) > CRASH_ANGLE
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
     CTX.fillText(

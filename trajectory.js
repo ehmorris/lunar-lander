@@ -1,4 +1,9 @@
-import { GRAVITY, LANDER_WIDTH, LANDER_HEIGHT } from "./constants.js";
+import {
+  GRAVITY,
+  LANDER_WIDTH,
+  LANDER_HEIGHT,
+  CRASH_ANGLE,
+} from "./constants.js";
 
 export const drawTrajectory = (
   CTX,
@@ -7,8 +12,7 @@ export const drawTrajectory = (
   currentVelocity,
   currentRotationVelocity,
   canvasHeight,
-  groundedHeight,
-  crashAngle
+  groundedHeight
 ) => {
   let projectedXPosition = currentPosition.x;
   let projectedYPosition = currentPosition.y;
@@ -49,7 +53,7 @@ export const drawTrajectory = (
   CTX.stroke();
 
   // Draw landing zone angle indicator
-  if (Math.abs((projectedAngle * 180) / Math.PI - 360) < crashAngle) {
+  if (Math.abs((projectedAngle * 180) / Math.PI - 360) < CRASH_ANGLE) {
     CTX.strokeStyle = "rgb(0, 255, 0)";
   } else {
     CTX.strokeStyle = "rgb(255, 0, 0)";

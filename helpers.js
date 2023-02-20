@@ -1,3 +1,9 @@
+import {
+  CRASH_ANGLE,
+  CRASH_VELOCITY,
+  VELOCITY_MULTIPLIER,
+} from "./constants.js";
+
 export const generateCanvas = ({ width, height, attachNode }) => {
   const element = document.createElement("canvas");
   const context = element.getContext("2d");
@@ -70,4 +76,80 @@ export const getAngleDeltaUpright = (angle) => {
   return angle % (Math.PI * 2) > Math.PI
     ? 360 - (angleInDeg % 360)
     : angleInDeg % 360;
+};
+
+export const getDisplayVelocity = (velocity) =>
+  Math.round(getVectorVelocity(velocity) * VELOCITY_MULTIPLIER);
+
+export const scoreToLetterGrade = (score) =>
+  score > 97
+    ? "A+"
+    : score > 93
+    ? "A"
+    : score > 90
+    ? "A-"
+    : score > 87
+    ? "B+"
+    : score > 83
+    ? "B"
+    : score > 80
+    ? "B-"
+    : score > 77
+    ? "C+"
+    : score > 73
+    ? "C"
+    : score > 70
+    ? "C-"
+    : score > 67
+    ? "D+"
+    : score > 63
+    ? "D"
+    : score > 60
+    ? "D-"
+    : "F";
+
+// Near perfect land:
+// angle: 0
+// speed: 1
+// rotations: bonus, higher better
+//
+// Worst possible land:
+// angle: 10
+// speed: 8
+// rotations: bonus, higher better
+export const scoreLanding = (angle, speed, rotations) => {
+  const worstPossibleCombo = CRASH_ANGLE + CRASH_VELOCITY * VELOCITY_MULTIPLIER;
+  const combinedStats = angle + speed;
+  const score = Math.round(
+    ((combinedStats - worstPossibleCombo) / -worstPossibleCombo) * 100 +
+      rotations
+  );
+  return score;
+};
+
+// Least bad possible crash:
+// angle: 0
+// speed: 9
+// rotations: bonus, higher better
+//
+// Also least bad possible crash:
+// angle: 11
+// speed: 1
+// rotations: bonus, higher better
+//
+// Expected best possible crash
+// speed: 700
+// angle: 180
+// rotations: bonus, higher better
+export const scoreCrash = (angle, speed, rotations) => {
+  const worstPossibleCombo = Math.min(CRASH_VELOCITY, CRASH_ANGLE);
+  const bestPossibleCombo = 880;
+  const combinedStats = angle + speed;
+  const score = Math.round(
+    ((combinedStats - worstPossibleCombo) /
+      (bestPossibleCombo - worstPossibleCombo)) *
+      100 +
+      rotations
+  );
+  return score;
 };
