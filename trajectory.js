@@ -58,7 +58,7 @@ export const drawTrajectory = (
   } else {
     CTX.strokeStyle = "rgb(255, 0, 0)";
   }
-  const arrowSize = projectedYVelocity * 4;
+  const arrowSize = Math.min(projectedYVelocity * 4, 20);
   CTX.translate(
     projectedXPosition - LANDER_WIDTH / 2,
     canvasHeight - LANDER_HEIGHT

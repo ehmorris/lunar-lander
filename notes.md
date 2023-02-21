@@ -23,4 +23,3 @@
 - [ ] iOS safari "from" banner cuts off bottom of canvas
 - Some scores are probabaly not reachable due to rounding. Pass in the non rounded figures.
 - Too easy to accidentally reset, wiping score. Show buttons on a delay. Move button to top.
-- Max size for trajectory arrow
