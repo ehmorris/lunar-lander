@@ -22,15 +22,18 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 };
 
 export const animate = (drawFunc) => {
-  const startTime = Date.now();
+  let startTime = Date.now();
   let previousFrameTime = Date.now();
   let currentFrameTime = Date.now();
+
+  const resetStartTime = () => (startTime = Date.now());
 
   const drawFuncContainer = () => {
     currentFrameTime = Date.now();
     drawFunc(
       currentFrameTime - startTime,
-      currentFrameTime - previousFrameTime
+      currentFrameTime - previousFrameTime,
+      resetStartTime
     );
     previousFrameTime = Date.now();
     window.requestAnimationFrame(drawFuncContainer);

@@ -154,12 +154,12 @@ function onResetXPos() {
   stars.reGenerate();
 }
 
-animate((timeSinceStart, timeSinceLastFrame) => {
+animate((timeSinceStart, timeSinceLastFrame, resetStartTime) => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
-  stars.draw();
 
-  lander.draw(timeSinceStart, timeSinceLastFrame);
+  stars.draw();
+  lander.draw(timeSinceStart, timeSinceLastFrame, resetStartTime);
 
   CTX.save();
   CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
