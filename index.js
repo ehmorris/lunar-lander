@@ -36,9 +36,14 @@ const animationObject = animate((timeSinceStart) => {
 
 function onGameEnd(data) {
   // Show game-end UI
-  document.querySelector(".buttons").classList.add("show");
   document.querySelector(".stats").classList.add("show");
   document.querySelector("#reset").addEventListener("click", resetGame);
+
+  // Delay showing the reset button in case the user is actively tapping
+  // in that area for thrust
+  setTimeout(() => {
+    document.querySelector(".buttons").classList.add("show");
+  }, 1000);
 
   // Fill in game-end data
   document.querySelector(".stats .description").textContent = data.description;
