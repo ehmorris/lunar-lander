@@ -287,7 +287,7 @@ export const makeLander = (
     CTX.fillText(
       `${getDisplayVelocity(_velocity)} MPH`,
       _position.x + LANDER_WIDTH * 2,
-      _position.y - 8
+      Math.max(_position.y - 14, 16)
     );
     CTX.fillStyle =
       getAngleDeltaUpright(_angle) > CRASH_ANGLE
@@ -296,7 +296,13 @@ export const makeLander = (
     CTX.fillText(
       `${Math.round(getAngleDeltaUpright(_angle))}°`,
       _position.x + LANDER_WIDTH * 2,
-      _position.y + 8
+      Math.max(_position.y, 30)
+    );
+    CTX.fillStyle = "#ffffff";
+    CTX.fillText(
+      `${Math.abs(Math.round((_position.y - _groundedHeight) / 3.5))}ft`,
+      _position.x + LANDER_WIDTH * 2,
+      Math.max(_position.y + 14, 44)
     );
     CTX.restore();
   };
