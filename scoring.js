@@ -4,25 +4,25 @@ import { CRASH_VELOCITY, CRASH_ANGLE } from "./constants.js";
 export const landingScoreDescription = (score) =>
   score >= 100
     ? "Perfect landing, incredible, you can't get better than this"
-    : score >= 97
-    ? "Super smooth, soft landing - almost perfect"
     : score >= 95
-    ? "Very nice landing"
-    : score >= 93
-    ? "Pretty good landing, could be better"
+    ? "Super smooth, soft landing - almost perfect"
     : score >= 90
-    ? "A good landing, keep trying"
+    ? "Very nice landing"
     : score >= 85
-    ? "You were so close to a great landing"
+    ? "Pretty good landing, could be better"
     : score >= 80
-    ? "A solid “B” landing, as-in “be better”"
+    ? "A good landing, keep trying"
     : score >= 75
-    ? "You landed but it wasn’t pretty"
+    ? "You were so close to a great landing"
     : score >= 70
-    ? "Not the worst landing, but not very good either"
+    ? "A solid “B” landing, as-in “be better”"
+    : score >= 65
+    ? "You landed but it wasn’t pretty"
     : score >= 60
+    ? "Not the worst landing, but not very good either"
+    : score >= 55
     ? "How did you make it through astronaut school?"
-    : score >= 50
+    : score >= 55
     ? "Pretty bad landing, but it could be worse"
     : score >= 40
     ? "Basically a fender bender, but you landed"
@@ -33,29 +33,29 @@ export const landingScoreDescription = (score) =>
 export const crashScoreDescription = (score) =>
   score >= 100
     ? "Ludicrous crash - the debris has entered orbit"
-    : score >= 97
-    ? "Incredible crash, the lander has vaporized"
     : score >= 95
-    ? "Impressive speed, impressive angle - you crashed with style"
-    : score >= 93
-    ? "A fast crash, but it could be faster"
+    ? "Incredible crash, the lander has vaporized"
     : score >= 90
-    ? "You obviously meant to crash, so crash *harder* next time"
+    ? "Impressive speed, impressive angle - you crashed with style"
     : score >= 85
-    ? "Why don’t you apply these crashing skills to landing instead?"
+    ? "A fast crash, but it could be faster"
     : score >= 80
-    ? "You definitely did not land…"
+    ? "You obviously meant to crash, so crash *harder* next time"
     : score >= 75
-    ? "I think there’s a problem with the lander"
+    ? "Why don’t you apply these crashing skills to landing instead?"
     : score >= 70
-    ? "Sick crash"
+    ? "You definitely did not land…"
+    : score >= 65
+    ? "I think there’s a problem with the lander"
     : score >= 60
-    ? "Were you trying to land, or…"
+    ? "Sick crash"
     : score >= 50
-    ? "A bad crash, but it could be worse - why don’t you try for worse"
+    ? "Were you trying to land, or…"
     : score >= 40
-    ? "It isn’t pretty"
+    ? "A bad crash, but it could be worse - why don’t you try for worse"
     : score >= 30
+    ? "It isn’t pretty"
+    : score >= 20
     ? "A smooth… wait… you crashed"
     : "So, so close to a landing - but still a crash";
 
@@ -72,12 +72,11 @@ export const scoreLanding = (angle, speed, rotations) => {
   const bestPossibleCombo = 1;
   const worstPossibleCombo = CRASH_ANGLE + CRASH_VELOCITY * VELOCITY_MULTIPLIER;
   const combinedStats = angle + speed;
-  const score = Math.round(
+  const score =
     ((combinedStats - worstPossibleCombo) /
       (bestPossibleCombo - worstPossibleCombo)) *
       100 +
-      rotations
-  );
+    rotations;
   return score;
 };
 
@@ -99,11 +98,10 @@ export const scoreCrash = (angle, speed, rotations) => {
   const worstPossibleCombo = Math.min(CRASH_VELOCITY, CRASH_ANGLE);
   const bestPossibleCombo = 900;
   const combinedStats = angle + speed;
-  const score = Math.round(
+  const score =
     ((combinedStats - worstPossibleCombo) /
       (bestPossibleCombo - worstPossibleCombo)) *
       100 +
-      rotations
-  );
+    rotations;
   return score;
 };

@@ -52,4 +52,4 @@ export const getAngleDeltaUpright = (angle) => {
 };
 
 export const getDisplayVelocity = (velocity) =>
-  Math.round(getVectorVelocity(velocity) * VELOCITY_MULTIPLIER);
+  getVectorVelocity(velocity) * VELOCITY_MULTIPLIER;

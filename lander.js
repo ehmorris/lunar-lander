@@ -122,12 +122,12 @@ export const makeLander = (
       getAngleDeltaUpright(_angle) < CRASH_ANGLE
     ) {
       const speedInMPH = getDisplayVelocity(_velocity);
-      const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
-      const score = scoreLanding(speedInMPH, angleInDeg, _rotationCount);
+      const angleInDeg = getAngleDeltaUpright(_angle);
+      const score = scoreLanding(angleInDeg, speedInMPH, _rotationCount);
       _landed = {
         description: landingScoreDescription(score),
-        speed: speedInMPH,
-        angle: angleInDeg,
+        speed: speedInMPH.toFixed(1),
+        angle: angleInDeg.toFixed(1),
         durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
         confetti: makeConfetti(
@@ -147,13 +147,13 @@ export const makeLander = (
     // Just crashed
     else if (!_landed && !_crashed) {
       const speedInMPH = getDisplayVelocity(_velocity);
-      const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
+      const angleInDeg = getAngleDeltaUpright(_angle);
       _crashed = {
         description: crashScoreDescription(
-          scoreCrash(speedInMPH, angleInDeg, _rotationCount)
+          scoreCrash(angleInDeg, speedInMPH, _rotationCount)
         ),
-        speed: speedInMPH,
-        angle: angleInDeg,
+        speed: speedInMPH.toFixed(1),
+        angle: angleInDeg.toFixed(1),
         durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
         explosion: makeExplosion(
@@ -285,7 +285,7 @@ export const makeLander = (
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
     CTX.fillText(
-      `${getDisplayVelocity(_velocity)} MPH`,
+      `${getDisplayVelocity(_velocity).toFixed(1)} MPH`,
       _position.x + LANDER_WIDTH * 2,
       Math.max(_position.y - 14, 16)
     );
@@ -294,7 +294,7 @@ export const makeLander = (
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
     CTX.fillText(
-      `${Math.round(getAngleDeltaUpright(_angle))}°`,
+      `${getAngleDeltaUpright(_angle).toFixed(1)}°`,
       _position.x + LANDER_WIDTH * 2,
       Math.max(_position.y, 30)
     );
