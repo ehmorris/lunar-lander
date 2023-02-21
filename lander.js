@@ -70,7 +70,7 @@ export const makeLander = (
   };
   resetProps();
 
-  const _updateProps = (timeSinceStart, timeSinceLastFrame, resetStartTime) => {
+  const _updateProps = (timeSinceStart) => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
 
     // Is above ground
@@ -137,7 +137,6 @@ export const makeLander = (
       };
 
       onGameEnd(_landed);
-      resetStartTime();
 
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
@@ -164,12 +163,11 @@ export const makeLander = (
         ),
       };
       onGameEnd(_crashed);
-      resetStartTime();
     }
   };
 
-  const draw = (timeSinceStart, timeSinceLastFrame, resetStartTime) => {
-    _updateProps(timeSinceStart, timeSinceLastFrame, resetStartTime);
+  const draw = (timeSinceStart) => {
+    _updateProps(timeSinceStart);
 
     if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
       drawTrajectory(

@@ -19,6 +19,27 @@ const lander = makeLander(
 const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
 const controls = makeControls(lander, canvasWidth, canvasElement);
 
+const animationObject = animate((timeSinceStart) => {
+  CTX.fillStyle = "#02071E";
+  CTX.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  stars.draw();
+  lander.draw(timeSinceStart);
+
+  CTX.save();
+  CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
+  if (controls.getShowLeftOverlay()) {
+    CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
+  }
+  if (controls.getShowCenterOverlay()) {
+    CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.5, canvasHeight);
+  }
+  if (controls.getShowRightOverlay()) {
+    CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
+  }
+  CTX.restore();
+});
+
 function onGameEnd(data) {
   // Show game-end UI
   document.querySelector(".buttons").classList.add("show");
@@ -60,6 +81,7 @@ https://ehmorris.com/lander/`,
 
   function resetGame() {
     lander.resetProps();
+    animationObject.resetStartTime();
     document.querySelector(".buttons").classList.remove("show");
     document.querySelector(".stats").classList.remove("show");
     if (document.querySelector("#share")) {
@@ -74,24 +96,3 @@ https://ehmorris.com/lander/`,
 function onResetXPos() {
   stars.reGenerate();
 }
-
-animate((timeSinceStart, timeSinceLastFrame, resetStartTime) => {
-  CTX.fillStyle = "#02071E";
-  CTX.fillRect(0, 0, canvasWidth, canvasHeight);
-
-  stars.draw();
-  lander.draw(timeSinceStart, timeSinceLastFrame, resetStartTime);
-
-  CTX.save();
-  CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
-  if (controls.getShowLeftOverlay()) {
-    CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
-  }
-  if (controls.getShowCenterOverlay()) {
-    CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.5, canvasHeight);
-  }
-  if (controls.getShowRightOverlay()) {
-    CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
-  }
-  CTX.restore();
-});

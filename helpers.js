@@ -23,23 +23,19 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 
 export const animate = (drawFunc) => {
   let startTime = Date.now();
-  let previousFrameTime = Date.now();
   let currentFrameTime = Date.now();
 
   const resetStartTime = () => (startTime = Date.now());
 
   const drawFuncContainer = () => {
     currentFrameTime = Date.now();
-    drawFunc(
-      currentFrameTime - startTime,
-      currentFrameTime - previousFrameTime,
-      resetStartTime
-    );
-    previousFrameTime = Date.now();
+    drawFunc(currentFrameTime - startTime);
     window.requestAnimationFrame(drawFuncContainer);
   };
 
   window.requestAnimationFrame(drawFuncContainer);
+
+  return { resetStartTime };
 };
 
 export const randomBool = (probability = 0.5) => Math.random() >= probability;
