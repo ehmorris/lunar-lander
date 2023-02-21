@@ -74,7 +74,7 @@ export const landingScoreDescription = (score) =>
     : score >= 90
     ? "A good landing, keep trying"
     : score >= 85
-    ? "You were so close to a good landing"
+    ? "You were so close to a great landing"
     : score >= 80
     ? "A solid “B” landing, as-in “be better”"
     : score >= 75
@@ -155,7 +155,7 @@ export const scoreLanding = (angle, speed, rotations) => {
 // rotations: bonus, higher better
 export const scoreCrash = (angle, speed, rotations) => {
   const worstPossibleCombo = Math.min(CRASH_VELOCITY, CRASH_ANGLE);
-  const bestPossibleCombo = 800;
+  const bestPossibleCombo = 900;
   const combinedStats = angle + speed;
   const score = Math.round(
     ((combinedStats - worstPossibleCombo) /
