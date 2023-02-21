@@ -22,4 +22,4 @@
   - The gameplay target is the experience on a MacBook with a 120hz refresh rate. Phones could possibly be slower, or shorter screens in general - but this should be controlled and not incidental
 - [ ] iOS safari "from" banner cuts off bottom of canvas
 - Some scores are probabaly not reachable due to rounding. Pass in the non rounded figures.
-- Too easy to accidentally reset, wiping score 
+- Too easy to accidentally reset, wiping score. Show buttons on a delay.
