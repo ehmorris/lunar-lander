@@ -6,11 +6,13 @@ import {
   getVectorVelocity,
   getDisplayVelocity,
   getAngleDeltaUpright,
+} from "./helpers.js";
+import {
   scoreLanding,
   scoreCrash,
   landingScoreDescription,
   crashScoreDescription,
-} from "./helpers.js";
+} from "./scoring.js";
 import { drawTrajectory } from "./trajectory.js";
 import {
   GRAVITY,
@@ -298,7 +300,7 @@ export const makeLander = (
     );
     CTX.fillStyle = "#ffffff";
     CTX.fillText(
-      `${Math.abs(Math.round((_position.y - _groundedHeight) / 3.5))}ft`,
+      `${Math.abs(Math.round((_position.y - _groundedHeight) / 3.5))} FT`,
       _position.x + LANDER_WIDTH * 2,
       Math.max(_position.y + 14, 44)
     );
