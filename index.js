@@ -1,14 +1,13 @@
 import { animate, generateCanvas } from "./helpers.js";
 import { makeLander } from "./lander.js";
 import { makeStarfield } from "./starfield.js";
+import { makeControls } from "./controls.js";
 
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   width: window.innerWidth,
   height: window.innerHeight,
   attachNode: ".game",
 });
-
-let hasKeyboard = false;
 
 const lander = makeLander(
   CTX,
@@ -18,101 +17,23 @@ const lander = makeLander(
   onResetXPos
 );
 const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
+const controls = makeControls(lander, canvasWidth, canvasElement);
 
-let showCenterOverlay = false;
-let showRightOverlay = false;
-let showLeftOverlay = false;
+function onGameEnd(data) {
+  // Show game-end UI
+  document.querySelector(".buttons").classList.add("show");
+  document.querySelector(".stats").classList.add("show");
+  document.querySelector("#reset").addEventListener("click", resetGame);
 
-// Gameplay controls
-document.addEventListener("keydown", ({ key }) => {
-  if (key === "ArrowUp") lander.engineOn();
-  if (key === "ArrowLeft") lander.rotateLeft();
-  if (key === "ArrowRight") lander.rotateRight();
-  hasKeyboard = true;
-});
-
-document.addEventListener("keyup", ({ key }) => {
-  if (key === "ArrowUp") lander.engineOff();
-  if (key === "ArrowLeft") lander.stopLeftRotation();
-  if (key === "ArrowRight") lander.stopRightRotation();
-});
-
-const activateTouchZone = (touch) => {
-  const touchLocation = touch.clientX / canvasWidth;
-
-  if (touchLocation > 0 && touchLocation < 0.25) {
-    lander.rotateLeft();
-    showLeftOverlay = true;
-  } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
-    lander.engineOn();
-    showCenterOverlay = true;
-  } else {
-    lander.rotateRight();
-    showRightOverlay = true;
-  }
-};
-
-canvasElement.addEventListener("touchstart", (e) => {
-  for (let index = 0; index < e.touches.length; index++) {
-    const touchLocation = e.touches[index].clientX / canvasWidth;
-    activateTouchZone(e.touches[index]);
-  }
-
-  e.preventDefault();
-});
-
-canvasElement.addEventListener("touchmove", (e) => {
-  lander.engineOff();
-  lander.stopLeftRotation();
-  lander.stopRightRotation();
-  showCenterOverlay = false;
-  showLeftOverlay = false;
-  showRightOverlay = false;
-
-  for (let index = 0; index < e.touches.length; index++) {
-    activateTouchZone(e.touches[index]);
-  }
-
-  e.preventDefault();
-});
-
-canvasElement.addEventListener("touchend", (e) => {
-  for (let index = 0; index < e.changedTouches.length; index++) {
-    const touchLocation = e.changedTouches[index].clientX / canvasWidth;
-
-    if (touchLocation > 0 && touchLocation < 0.25) {
-      lander.stopLeftRotation();
-      showLeftOverlay = false;
-    } else if (touchLocation >= 0.25 && touchLocation <= 0.75) {
-      lander.engineOff();
-      showCenterOverlay = false;
-    } else {
-      lander.stopRightRotation();
-      showRightOverlay = false;
-    }
-  }
-
-  e.preventDefault();
-});
-
-const fillInStats = (data) => {
+  // Fill in game-end data
   document.querySelector(".stats .description").textContent = data.description;
   document.querySelector(".stats .speed").textContent = data.speed;
   document.querySelector(".stats .angle").textContent = data.angle;
   document.querySelector(".stats .duration").textContent =
     data.durationInSeconds;
   document.querySelector(".stats .rotations").textContent = data.rotations;
-};
 
-// End game controls
-function onGameEnd(data) {
-  document.querySelector(".buttons").classList.add("show");
-  document.querySelector(".stats").classList.add("show");
-  fillInStats(data);
-
-  document.querySelector("#reset").addEventListener("click", resetGame);
-
-  if (hasKeyboard) {
+  if (controls.getHasKeyboard()) {
     document.querySelector("#reset").textContent = "Reset (Spacebar)";
     document.addEventListener("keydown", resetOnSpace);
   }
@@ -144,7 +65,7 @@ https://ehmorris.com/lander/`,
     if (document.querySelector("#share")) {
       document.querySelector("#share").removeEventListener("click", shareSheet);
     }
-    if (hasKeyboard) {
+    if (controls.getHasKeyboard()) {
       document.removeEventListener("keydown", resetOnSpace);
     }
   }
@@ -163,13 +84,13 @@ animate((timeSinceStart, timeSinceLastFrame, resetStartTime) => {
 
   CTX.save();
   CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
-  if (showLeftOverlay) {
+  if (controls.getShowLeftOverlay()) {
     CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
   }
-  if (showCenterOverlay) {
+  if (controls.getShowCenterOverlay()) {
     CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.5, canvasHeight);
   }
-  if (showRightOverlay) {
+  if (controls.getShowRightOverlay()) {
     CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
   }
   CTX.restore();
