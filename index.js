@@ -124,13 +124,19 @@ function onGameEnd(data) {
   }
 
   function shareSheet() {
-    navigator.share({
-      title: "Lander",
-      text: `Speed: ${data.speed} MPH
+    canvasElement.toBlob((blob) => {
+      navigator.share({
+        files: [
+          new File([blob], "image.png", {
+            type: "image/png",
+          }),
+        ],
+        text: `Speed: ${data.speed} MPH
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds}s
-Rotations: ${data.rotations}`,
-      url: "https://ehmorris.com/lander/",
+Rotations: ${data.rotations}
+https://ehmorris.com/lander/`,
+      });
     });
   }
 
