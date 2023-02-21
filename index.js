@@ -128,7 +128,7 @@ function onGameEnd(data) {
       title: "Lander",
       text: `Speed: ${data.speed} MPH
 Angle: ${data.angle}°
-Duration: ${data.durationInSeconds}°
+Time: ${data.durationInSeconds}s
 Rotations: ${data.rotations}`,
       url: "https://ehmorris.com/lander/",
     });
