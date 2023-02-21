@@ -17,27 +17,21 @@ const lander = makeLander(
   onResetXPos
 );
 const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
-const controls = makeControls(lander, canvasWidth, canvasElement);
+const controls = makeControls(
+  CTX,
+  lander,
+  canvasWidth,
+  canvasHeight,
+  canvasElement
+);
 
 const animationObject = animate((timeSinceStart) => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
 
   stars.draw();
+  controls.drawTouchOverlay();
   lander.draw(timeSinceStart);
-
-  CTX.save();
-  CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
-  if (controls.getShowLeftOverlay()) {
-    CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
-  }
-  if (controls.getShowCenterOverlay()) {
-    CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.5, canvasHeight);
-  }
-  if (controls.getShowRightOverlay()) {
-    CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
-  }
-  CTX.restore();
 });
 
 function onGameEnd(data) {

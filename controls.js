@@ -1,4 +1,10 @@
-export const makeControls = (lander, canvasWidth, canvasElement) => {
+export const makeControls = (
+  CTX,
+  lander,
+  canvasWidth,
+  canvasHeight,
+  canvasElement
+) => {
   let showCenterOverlay = false;
   let showRightOverlay = false;
   let showLeftOverlay = false;
@@ -75,10 +81,23 @@ export const makeControls = (lander, canvasWidth, canvasElement) => {
     e.preventDefault();
   });
 
+  const drawTouchOverlay = () => {
+    CTX.save();
+    CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
+    if (showLeftOverlay) {
+      CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
+    }
+    if (showCenterOverlay) {
+      CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.5, canvasHeight);
+    }
+    if (showRightOverlay) {
+      CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
+    }
+    CTX.restore();
+  };
+
   return {
-    getShowCenterOverlay: () => showCenterOverlay,
-    getShowLeftOverlay: () => showLeftOverlay,
-    getShowRightOverlay: () => showRightOverlay,
+    drawTouchOverlay,
     getHasKeyboard: () => hasKeyboard,
   };
 };
