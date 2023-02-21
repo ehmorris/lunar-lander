@@ -1,4 +1,4 @@
-import { animate, generateCanvas, scoreToLetterGrade } from "./helpers.js";
+import { animate, generateCanvas } from "./helpers.js";
 import { makeLander } from "./lander.js";
 import { makeStarfield } from "./starfield.js";
 
@@ -96,13 +96,11 @@ canvasElement.addEventListener("touchend", (e) => {
 });
 
 const fillInStats = (data) => {
-  document.querySelector(".stats .grade").textContent = scoreToLetterGrade(
-    data.score
-  );
-  document.querySelector(".stats .type").textContent = data.type;
-  document.querySelector(".stats .percent").textContent = data.score;
+  document.querySelector(".stats .description").textContent = data.description;
   document.querySelector(".stats .speed").textContent = data.speed;
   document.querySelector(".stats .angle").textContent = data.angle;
+  document.querySelector(".stats .duration").textContent =
+    data.durationInSeconds;
   document.querySelector(".stats .rotations").textContent = data.rotations;
 };
 
@@ -128,9 +126,9 @@ function onGameEnd(data) {
   function shareSheet() {
     navigator.share({
       title: "Lander",
-      text: `${scoreToLetterGrade(data.score)} ${data.type} (${data.score}%)
-Speed: ${data.speed} MPH
+      text: `Speed: ${data.speed} MPH
 Angle: ${data.angle}°
+Duration: ${data.durationInSeconds}°
 Rotations: ${data.rotations}`,
       url: "https://ehmorris.com/lander/",
     });

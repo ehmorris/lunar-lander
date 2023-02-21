@@ -59,32 +59,63 @@ export const getAngleDeltaUpright = (angle) => {
 export const getDisplayVelocity = (velocity) =>
   Math.round(getVectorVelocity(velocity) * VELOCITY_MULTIPLIER);
 
-export const scoreToLetterGrade = (score) =>
-  score >= 97
-    ? "A+"
+export const landingScoreDescription = (score) =>
+  score >= 100
+    ? "Perfect landing, incredible, you can't get better than this"
+    : score >= 97
+    ? "Super smooth, soft landing - almost perfect"
+    : score >= 95
+    ? "Very nice landing"
     : score >= 93
-    ? "A"
+    ? "Pretty good landing, could be better"
     : score >= 90
-    ? "A-"
-    : score >= 87
-    ? "B+"
-    : score >= 83
-    ? "B"
+    ? "A good landing, keep trying"
+    : score >= 85
+    ? "You were so close to a good landing"
     : score >= 80
-    ? "B-"
-    : score >= 77
-    ? "C+"
-    : score >= 73
-    ? "C"
+    ? "A solid “B” landing, as-in “be better”"
+    : score >= 75
+    ? "You landed but it wasn’t pretty"
     : score >= 70
-    ? "C-"
-    : score >= 67
-    ? "D+"
-    : score >= 63
-    ? "D"
+    ? "Not the worst landing, but not very good either"
     : score >= 60
-    ? "D-"
-    : "F";
+    ? "How did you make it through astronaut school?"
+    : score >= 50
+    ? "Pretty bad landing, but it could be worse"
+    : score >= 40
+    ? "Basically a fender bender, but you landed"
+    : score >= 30
+    ? "Barely a landing"
+    : "That was a terrible landing, try harder";
+
+export const crashScoreDescription = (score) =>
+  score >= 100
+    ? "Ludicrous crash - the debris has entered orbit"
+    : score >= 97
+    ? "Incredible crash, the lander has vaporized"
+    : score >= 95
+    ? "Impressive speed, impressive angle - you crashed with style"
+    : score >= 93
+    ? "A fast crash, but it could be faster"
+    : score >= 90
+    ? "You obviously meant to crash, so crash *harder* next time"
+    : score >= 85
+    ? "Why don’t you apply these crashing skills to landing instead?"
+    : score >= 80
+    ? "You definitely did not land…"
+    : score >= 75
+    ? "I think there’s a problem with the lander"
+    : score >= 70
+    ? "Sick crash"
+    : score >= 60
+    ? "Were you trying to land, or…"
+    : score >= 50
+    ? "A bad crash, but it could be worse - why don’t you try for worse"
+    : score >= 40
+    ? "It isn’t pretty"
+    : score >= 30
+    ? "A smooth… wait… you crashed"
+    : "So, so close to a landing - but still a crash";
 
 // Near perfect land:
 // angle: 0
@@ -121,7 +152,7 @@ export const scoreLanding = (angle, speed, rotations) => {
 // rotations: bonus, higher better
 export const scoreCrash = (angle, speed, rotations) => {
   const worstPossibleCombo = Math.min(CRASH_VELOCITY, CRASH_ANGLE);
-  const bestPossibleCombo = 600;
+  const bestPossibleCombo = 800;
   const combinedStats = angle + speed;
   const score = Math.round(
     ((combinedStats - worstPossibleCombo) /

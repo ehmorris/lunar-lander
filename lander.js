@@ -8,6 +8,8 @@ import {
   getAngleDeltaUpright,
   scoreLanding,
   scoreCrash,
+  landingScoreDescription,
+  crashScoreDescription,
 } from "./helpers.js";
 import { drawTrajectory } from "./trajectory.js";
 import {
@@ -121,10 +123,10 @@ export const makeLander = (
       const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
       const score = scoreLanding(speedInMPH, angleInDeg, _rotationCount);
       _landed = {
-        type: "landing",
-        score,
+        description: landingScoreDescription(score),
         speed: speedInMPH,
         angle: angleInDeg,
+        durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
         confetti: makeConfetti(
           CTX,
@@ -145,10 +147,12 @@ export const makeLander = (
       const speedInMPH = getDisplayVelocity(_velocity);
       const angleInDeg = Math.round(getAngleDeltaUpright(_angle));
       _crashed = {
-        type: "crash",
-        score: scoreCrash(speedInMPH, angleInDeg, _rotationCount),
+        description: crashScoreDescription(
+          scoreCrash(speedInMPH, angleInDeg, _rotationCount)
+        ),
         speed: speedInMPH,
         angle: angleInDeg,
+        durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
         explosion: makeExplosion(
           CTX,

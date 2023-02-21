@@ -9,7 +9,7 @@
         text-align: center;
         -webkit-user-select: none;    
         overflow: hidden;
-        font: normal 24px sans-serif;
+        font: 400 22px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
         color: white;
       }
 
@@ -21,29 +21,51 @@
         position: absolute;
         display: none;
         width: 100%;
+        box-sizing: border-box;
         bottom: 3rem;
+        padding: 0 1rem;
+        justify-content: center;
+        grid-gap: 1rem;
       }
 
       .buttons.show {
-        display: block;
+        display: flex;
       }
 
       .buttons a {
-        color: inherit;
-        padding: 1rem 1rem;
+        background: rgba(255, 255, 255, .22);
+        color: white;
+        flex: 1;
+        border-radius: 12px;
+        padding: 1rem;
+        max-width: 400px;
+        backdrop-filter: blur(4px);
       }
 
       .stats {
         position: absolute;
+        padding: 0 12vw;
+        box-sizing: border-box;
+        text-align: left;
         display: none;
         width: 100%;
-        top: 20vh;
+        top: min(16vh, 120px);
         color: rgba(255, 255, 255, .75);
       }
 
       .stats h1 {
-        font-size: 32px;
+        font-size: 5vw;
+        font-weight: 900;
+        line-height: 1.1;
         color: white;
+      }
+
+      @media screen and (max-width: 640px) {
+        .stats h1 {
+          font-size: 32px;
+          font-weight: 800;
+          line-height: 1.2;
+        }
       }
 
       .stats.show {
@@ -58,13 +80,10 @@
       <a id="share" href="#">Share</a>
     </div>
     <div class="stats">
-      <h1>
-        <span class="grade"></span>
-        <span class="type"></span>
-        (<span class="percent"></span>%)
-      </h1>
+      <h1 class="description"></h1>
       <p>Speed: <span class="speed"></span> MPH</p>
       <p>Angle: <span class="angle"></span>&#176;</p>
+      <p>Time: <span class="duration"></span>s</p>
       <p>Rotations: <span class="rotations"></span></p>
     </div>
     <script src="index.js" type="module"></script>
