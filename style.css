@@ -10,7 +10,7 @@ canvas {
   display: block;
 }
 
-.stats {
+.fullSizeContainer {
   display: none;
   position: absolute;
   top: 0;
@@ -24,11 +24,11 @@ canvas {
   color: rgba(255, 255, 255, 0.75);
 }
 
-.stats.show {
+.fullSizeContainer.show {
   display: flex;
 }
 
-.stats h1 {
+.fullSizeContainer h1 {
   font-size: 5vw;
   font-weight: 900;
   line-height: 1.1;
@@ -44,11 +44,11 @@ canvas {
   }
 }
 
-.stats p {
+.fullSizeContainer p {
   margin: 0;
 }
 
-.buttons {
+.buttonContainer {
   display: flex;
   visibility: hidden;
   width: 100%;
@@ -59,11 +59,11 @@ canvas {
   margin-top: 1rem;
 }
 
-.buttons.show {
+.buttonContainer.show {
   visibility: visible;
 }
 
-.buttons a {
+.button {
   background: rgba(255, 255, 255, 0.22);
   text-align: center;
   color: white;
@@ -78,7 +78,7 @@ canvas {
 }
 
 @media (hover: hover) {
-  .buttons a:hover {
+  .button:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 14px #000;
     background: rgba(255, 255, 255, 0.3);

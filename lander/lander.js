@@ -7,13 +7,13 @@ import {
   getDisplayVelocity,
   getAngleDeltaUpright,
   getDisplayHeight,
-} from "./helpers.js";
+} from "../helpers.js";
 import {
   scoreLanding,
   scoreCrash,
   landingScoreDescription,
   crashScoreDescription,
-} from "./scoring.js";
+} from "../scoring.js";
 import { drawTrajectory } from "./trajectory.js";
 import {
   GRAVITY,
@@ -22,7 +22,7 @@ import {
   CRASH_VELOCITY,
   CRASH_ANGLE,
   VELOCITY_MULTIPLIER,
-} from "./constants.js";
+} from "../constants.js";
 
 export const makeLander = (
   CTX,

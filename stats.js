@@ -6,30 +6,32 @@ export const showStatsAndResetControl = (
 ) => {
   const canShowShareSheet = navigator.canShare;
   const showStats = () => {
-    document.querySelector(".stats").classList.add("show");
+    document.querySelector("#endGameStats").classList.add("show");
 
     // Delay showing the reset button in case the user is actively tapping
     // in that area for thrust
     setTimeout(() => {
-      document.querySelector(".buttons").classList.add("show");
+      document
+        .querySelector("#endGameStats .buttonContainer")
+        .classList.add("show");
     }, 1000);
   };
 
   const hideStats = () => {
-    document.querySelector(".buttons").classList.remove("show");
-    document.querySelector(".stats").classList.remove("show");
+    document
+      .querySelector("#endGameStats .buttonContainer")
+      .classList.remove("show");
+    document.querySelector("#endGameStats").classList.remove("show");
   };
 
   const populateStats = (data) => {
-    document.querySelector(".stats .description").textContent =
-      data.description;
-    document.querySelector(".stats .speed").textContent = data.speed;
-    document.querySelector(".stats .angle").textContent = data.angle;
-    document.querySelector(".stats .duration").textContent =
-      data.durationInSeconds;
-    document.querySelector(".stats .rotations").textContent = data.rotations;
-    document.querySelector(".stats .maxspeed").textContent = data.maxSpeed;
-    document.querySelector(".stats .maxheight").textContent = data.maxHeight;
+    document.querySelector("#description").textContent = data.description;
+    document.querySelector("#speed").textContent = data.speed;
+    document.querySelector("#angle").textContent = data.angle;
+    document.querySelector("#duration").textContent = data.durationInSeconds;
+    document.querySelector("#rotations").textContent = data.rotations;
+    document.querySelector("#maxspeed").textContent = data.maxSpeed;
+    document.querySelector("#maxheight").textContent = data.maxHeight;
 
     if (hasKeyboard) {
       document.querySelector("#reset").textContent = "Reset (Spacebar)";

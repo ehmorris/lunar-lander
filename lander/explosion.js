@@ -1,5 +1,5 @@
-import { randomBool, randomBetween } from "./helpers.js";
-import { GRAVITY } from "./constants.js";
+import { randomBool, randomBetween } from "../helpers.js";
+import { GRAVITY } from "../constants.js";
 
 export const makeExplosion = (
   CTX,

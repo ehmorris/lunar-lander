@@ -3,7 +3,7 @@ import {
   LANDER_WIDTH,
   LANDER_HEIGHT,
   CRASH_ANGLE,
-} from "./constants.js";
+} from "../constants.js";
 
 export const drawTrajectory = (
   CTX,

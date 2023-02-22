@@ -1,7 +1,7 @@
 import { animate, generateCanvas } from "./helpers.js";
-import { makeLander } from "./lander.js";
+import { makeLander } from "./lander/lander.js";
 import { makeStarfield } from "./starfield.js";
-import { makeControls } from "./controls.js";
+import { makeControls } from "./lander/controls.js";
 import { makeTerrain } from "./terrain.js";
 import { showStatsAndResetControl } from "./stats.js";
 
