@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+  -webkit-user-select: none;
+  overflow: hidden;
+  font: 400 22px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
+  color: white;
+}
+
+canvas {
+  display: block;
+}
+
+.stats {
+  display: none;
+  position: absolute;
+  top: 0;
+  flex-direction: column;
+  justify-content: center;
+  height: 100svh;
+  grid-gap: 1rem;
+  padding: 0 12vw;
+  box-sizing: border-box;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stats.show {
+  display: flex;
+}
+
+.stats h1 {
+  font-size: 5vw;
+  font-weight: 900;
+  line-height: 1.1;
+  color: white;
+}
+
+@media screen and (max-width: 640px) {
+  .stats h1 {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+  }
+}
+
+.stats p {
+  margin: 0;
+}
+
+.buttons {
+  display: flex;
+  visibility: hidden;
+  width: 100%;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  justify-content: center;
+  grid-gap: 1rem;
+  margin-top: 1rem;
+}
+
+.buttons.show {
+  visibility: visible;
+}
+
+.buttons a {
+  background: rgba(255, 255, 255, 0.22);
+  text-align: center;
+  color: white;
+  flex: 1;
+  border-radius: 12px;
+  padding: 1rem;
+  max-width: 400px;
+  min-width: 200px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.4s ease-out;
+}
+
+@media (hover: hover) {
+  .buttons a:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 14px #000;
+    background: rgba(255, 255, 255, 0.3);
+  }
+}

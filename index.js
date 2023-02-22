@@ -9,13 +9,13 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   attachNode: ".game",
 });
 
-const lander = makeLander(
+const lander = makeLander({
   CTX,
   canvasWidth,
   canvasHeight,
   onGameEnd,
-  onResetXPos
-);
+  onResetXPos: () => stars.reGenerate(),
+});
 const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
 const controls = makeControls(
   CTX,
@@ -90,8 +90,4 @@ https://ehmorris.com/lander/`,
       document.removeEventListener("keydown", resetOnSpace);
     }
   }
-}
-
-function onResetXPos() {
-  stars.reGenerate();
 }
