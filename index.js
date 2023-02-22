@@ -2,6 +2,7 @@ import { animate, generateCanvas } from "./helpers.js";
 import { makeLander } from "./lander.js";
 import { makeStarfield } from "./starfield.js";
 import { makeControls } from "./controls.js";
+import { makeTerrain } from "./terrain.js";
 import { showStatsAndResetControl } from "./stats.js";
 
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
@@ -25,12 +26,13 @@ const controls = makeControls(
   canvasHeight,
   canvasElement
 );
+const terrain = makeTerrain(CTX, canvasWidth, canvasHeight);
 
 const animationObject = animate((timeSinceStart) => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
-
   stars.draw();
+  terrain.draw();
   controls.drawTouchOverlay();
   lander.draw(timeSinceStart);
 });
@@ -46,4 +48,5 @@ function onGameEnd(data) {
 
 function onResetXPos() {
   stars.reGenerate();
+  terrain.reGenerate();
 }
