@@ -53,3 +53,6 @@ export const getAngleDeltaUpright = (angle) => {
 
 export const getDisplayVelocity = (velocity) =>
   getVectorVelocity(velocity) * VELOCITY_MULTIPLIER;
+
+export const getDisplayHeight = (yPos, groundedHeight) =>
+  Math.abs(Math.round((yPos - groundedHeight) / 3.5));

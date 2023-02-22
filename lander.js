@@ -6,6 +6,7 @@ import {
   getVectorVelocity,
   getDisplayVelocity,
   getAngleDeltaUpright,
+  getDisplayHeight,
 } from "./helpers.js";
 import {
   scoreLanding,
@@ -20,6 +21,7 @@ import {
   LANDER_HEIGHT,
   CRASH_VELOCITY,
   CRASH_ANGLE,
+  VELOCITY_MULTIPLIER,
 } from "./constants.js";
 
 export const makeLander = (
@@ -45,6 +47,8 @@ export const makeLander = (
   let _lastRotation;
   let _lastRotationAngle;
   let _rotationCount;
+  let _maxSpeed;
+  let _maxHeight;
 
   const resetProps = () => {
     _position = {
@@ -69,6 +73,8 @@ export const makeLander = (
     _lastRotation = 1;
     _lastRotationAngle = Math.PI * 2;
     _rotationCount = 0;
+    _maxSpeed = 0;
+    _maxHeight = _position.y;
   };
   resetProps();
 
@@ -77,12 +83,9 @@ export const makeLander = (
 
     // Is above ground
     if (_position.y < _groundedHeight) {
-      if (_rotatingRight) {
-        _rotationVelocity += 0.01;
-      }
-      if (_rotatingLeft) {
-        _rotationVelocity -= 0.01;
-      }
+      if (_rotatingRight) _rotationVelocity += 0.01;
+      if (_rotatingLeft) _rotationVelocity -= 0.01;
+
       if (_position.x < 0) {
         _position.x = canvasWidth;
         onResetXPos();
@@ -101,7 +104,7 @@ export const makeLander = (
         _velocity.y -= _thrust * Math.cos(_angle);
       }
 
-      // Count rotations and update state
+      // Log new rotations
       const rotations = Math.floor(_angle / (Math.PI * 2));
       if (
         Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
@@ -113,6 +116,13 @@ export const makeLander = (
         _flipConfetti.push(
           makeConfetti(CTX, canvasWidth, canvasHeight, 10, _position)
         );
+      }
+
+      // Log new max speed and height
+      if (_position.y < _maxHeight) _maxHeight = _position.y;
+
+      if (getDisplayVelocity(_velocity) > _maxSpeed) {
+        _maxSpeed = getDisplayVelocity(_velocity);
       }
     }
     // Just landed
@@ -130,6 +140,8 @@ export const makeLander = (
         angle: angleInDeg.toFixed(1),
         durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
+        maxSpeed: _maxSpeed.toFixed(1),
+        maxHeight: getDisplayHeight(_maxHeight, _groundedHeight),
         confetti: makeConfetti(
           CTX,
           canvasWidth,
@@ -156,6 +168,8 @@ export const makeLander = (
         angle: angleInDeg.toFixed(1),
         durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
+        maxSpeed: _maxSpeed.toFixed(1),
+        maxHeight: getDisplayHeight(_maxHeight, _groundedHeight),
         explosion: makeExplosion(
           CTX,
           _position,
@@ -300,7 +314,7 @@ export const makeLander = (
     );
     CTX.fillStyle = "#ffffff";
     CTX.fillText(
-      `${Math.abs(Math.round((_position.y - _groundedHeight) / 3.5))} FT`,
+      `${getDisplayHeight(_position.y, _groundedHeight)} FT`,
       _position.x + LANDER_WIDTH * 2,
       Math.max(_position.y + 14, 44)
     );

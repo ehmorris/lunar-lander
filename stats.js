@@ -28,6 +28,8 @@ export const showStatsAndResetControl = (
     document.querySelector(".stats .duration").textContent =
       data.durationInSeconds;
     document.querySelector(".stats .rotations").textContent = data.rotations;
+    document.querySelector(".stats .maxspeed").textContent = data.maxSpeed;
+    document.querySelector(".stats .maxheight").textContent = data.maxHeight;
 
     if (hasKeyboard) {
       document.querySelector("#reset").textContent = "Reset (Spacebar)";
@@ -44,6 +46,8 @@ export const showStatsAndResetControl = (
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds}s
 Rotations: ${data.rotations}
+Max speed: ${data.maxSpeed} MPH
+Max height: ${data.maxHeight} FT
 https://ehmorris.com/lander/`,
     });
   }
