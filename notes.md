@@ -15,6 +15,8 @@
 - "Mad dog" mode: start with very high rotation rate
 - Extend ramp from lander on land
 - Show meters for each score-related stat and the rest at a smaller size
+- Use broadcast channel to make a second screen a big dashboard of controls and graphs
+
 
 # Bugs
 
