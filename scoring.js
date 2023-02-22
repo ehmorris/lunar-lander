@@ -2,28 +2,28 @@ import { VELOCITY_MULTIPLIER } from "./constants.js";
 import { CRASH_VELOCITY, CRASH_ANGLE } from "./constants.js";
 
 export const landingScoreDescription = (score) =>
-  score >= 100
+  score >= 99
     ? "Perfect landing, incredible, you can't get better than this"
     : score >= 95
     ? "Super smooth, soft landing - almost perfect"
     : score >= 90
-    ? "Very nice landing"
+    ? "Very nice landing, amazing"
     : score >= 85
     ? "Pretty good landing, could be better"
     : score >= 80
     ? "A good landing, keep trying"
     : score >= 75
-    ? "You were so close to a great landing"
+    ? "Just shy of a good landing"
     : score >= 70
-    ? "A solid “B” landing, as-in “be better”"
+    ? "A solid “C” landing"
     : score >= 65
     ? "You landed but it wasn’t pretty"
     : score >= 60
     ? "Not the worst landing, but not very good either"
     : score >= 55
-    ? "How did you make it through astronaut school?"
-    : score >= 55
     ? "Pretty bad landing, but it could be worse"
+    : score >= 55
+    ? "How did you make it through astronaut school?"
     : score >= 40
     ? "Basically a fender bender, but you landed"
     : score >= 30
@@ -48,13 +48,13 @@ export const crashScoreDescription = (score) =>
     : score >= 65
     ? "I think there’s a problem with the lander"
     : score >= 60
-    ? "Sick crash"
+    ? "Sick crash!"
     : score >= 50
     ? "Were you trying to land, or…"
     : score >= 40
     ? "A bad crash, but it could be worse - why don’t you try for worse"
     : score >= 30
-    ? "It isn’t pretty"
+    ? "I don’t think we’re getting back to Earth"
     : score >= 20
     ? "A smooth… wait… you crashed"
     : "So, so close to a landing - but still a crash";
