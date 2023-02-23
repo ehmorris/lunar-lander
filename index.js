@@ -4,6 +4,7 @@ import { makeStarfield } from "./starfield.js";
 import { makeControls } from "./lander/controls.js";
 import { makeTerrain } from "./terrain.js";
 import { showStatsAndResetControl } from "./stats.js";
+import { manageInstructions } from "./instructions.js";
 
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   width: window.innerWidth,
@@ -27,15 +28,29 @@ const controls = makeControls(
   canvasElement
 );
 const terrain = makeTerrain(CTX, canvasWidth, canvasHeight);
+const instructions = manageInstructions(onCloseInstructions);
+
+if (!instructions.hasClosedInstructions()) {
+  instructions.show();
+} else {
+  controls.attachEventListeners();
+}
 
 const animationObject = animate((timeSinceStart) => {
   CTX.fillStyle = "#02071E";
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
   stars.draw();
   terrain.draw();
-  controls.drawTouchOverlay();
-  lander.draw(timeSinceStart);
+
+  if (instructions.hasClosedInstructions()) {
+    controls.drawTouchOverlay();
+    lander.draw(timeSinceStart);
+  }
 });
+
+function onCloseInstructions() {
+  controls.attachEventListeners();
+}
 
 function onGameEnd(data) {
   showStatsAndResetControl(

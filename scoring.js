@@ -3,7 +3,7 @@ import { CRASH_VELOCITY, CRASH_ANGLE } from "./constants.js";
 
 export const landingScoreDescription = (score) =>
   score >= 99
-    ? "Perfect landing, incredible, you can't get better than this"
+    ? "Perfect landing, incredible, you can’t get better than this"
     : score >= 95
     ? "Super smooth, soft landing - almost perfect"
     : score >= 90

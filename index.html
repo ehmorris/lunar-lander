@@ -15,12 +15,30 @@
       <p>Speed: <span id="speed"></span>mph</p>
       <p>Angle: <span id="angle"></span>&#176;</p>
       <p>Time: <span id="duration"></span>s</p>
-      <p>Rotations: <span id="rotations"></span></p>
+      <p>Flips: <span id="rotations"></span></p>
       <p>Max Speed: <span id="maxspeed"></span>mph</p>
       <p>Max Height: <span id="maxheight"></span>ft</p>
       <div class="buttonContainer">
         <a class="button" id="reset" href="#">Reset</a>
         <a class="button" id="share" href="#">Share</a>
+      </div>
+    </div>
+    <div id="instructions" class="fullSizeContainer">
+      <h1>Your goal: land!</h1>
+      <p>
+        The slower and straighter, the better your score. Do some flips for
+        bonus points. If you’re feeling rebellious, try crashing with style.
+      </p>
+      <p id="forKeyboard">
+        Use your arrow keys to pilot the lander: left and right arrows to
+        rotate, up arrow for the main engine.
+      </p>
+      <p id="forTouch">
+        Tap to pilot the lander: in the center of the screen for the main
+        engine, and on the sides to rotate.
+      </p>
+      <div class="buttonContainer">
+        <a class="button" id="closeInstructions" href="#">Play</a>
       </div>
     </div>
     <script src="index.js" type="module"></script>

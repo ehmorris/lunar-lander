@@ -47,7 +47,7 @@ export const showStatsAndResetControl = (
       text: `Speed: ${data.speed} MPH
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds}s
-Rotations: ${data.rotations}
+Flips: ${data.rotations}
 Max speed: ${data.maxSpeed} MPH
 Max height: ${data.maxHeight} FT
 https://ehmorris.com/lander/`,

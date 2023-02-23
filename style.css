@@ -18,10 +18,16 @@ canvas {
   justify-content: center;
   height: 100svh;
   grid-gap: 0.8rem;
-  padding: 0 12vw;
+  padding: 0 10vw;
   box-sizing: border-box;
   width: 100%;
   color: rgba(255, 255, 255, 0.75);
+}
+
+@media screen and (min-width: 1280px) {
+  .fullSizeContainer {
+    padding: 0 14vw;
+  }
 }
 
 .fullSizeContainer.show {
@@ -33,10 +39,11 @@ canvas {
   font-weight: 900;
   line-height: 1.1;
   color: white;
+  margin-top: 0;
 }
 
 @media screen and (max-width: 640px) {
-  .stats h1 {
+  .fullSizeContainer h1 {
     font-size: 32px;
     font-weight: 800;
     line-height: 1.2;
