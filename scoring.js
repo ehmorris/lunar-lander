@@ -9,7 +9,7 @@ export const landingScoreDescription = (score) =>
     : score >= 90
     ? "Very nice landing, amazing"
     : score >= 85
-    ? "Pretty good landing, could be better"
+    ? "Pretty good landing, keep going!"
     : score >= 80
     ? "A good landing, keep trying"
     : score >= 75
@@ -17,18 +17,18 @@ export const landingScoreDescription = (score) =>
     : score >= 70
     ? "A solid “C” landing"
     : score >= 65
-    ? "You landed but it wasn’t pretty"
+    ? "You landed but it could have been slower and straighter"
     : score >= 60
     ? "Not the worst landing, but not very good either"
     : score >= 55
     ? "Pretty bad landing, but it could be worse"
     : score >= 55
-    ? "How did you make it through astronaut school?"
+    ? "Not great - are you using boosters and the engine simultaneously?"
     : score >= 40
     ? "Basically a fender bender, but you landed"
     : score >= 30
-    ? "Barely a landing"
-    : "That was a terrible landing, try harder";
+    ? "A near-crash - way too fast"
+    : "Terrible landing, you need to land slow and straight";
 
 export const crashScoreDescription = (score) =>
   score >= 100
