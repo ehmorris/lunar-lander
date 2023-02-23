@@ -16,7 +16,6 @@
 
 # Bugs
 
-- Angle during end game is sometimes still appearing as >180 after multiple rotations
 - Make play speed consistent regardless of frame rate
   - On some screens the refresh rate is 120, on others 60. This changes the speed of play. The game is twice as fast on a new MacBook as on an iPhone. The animations are procedural, so to accomplish this, forces like thrust and gravity will have to be modified based on time elpased between frames. Unsure how to do this.
   - The gameplay target is the experience on a MacBook with a 120hz refresh rate. Phones could possibly be slower, or shorter screens in general - but this should be controlled and not incidental
