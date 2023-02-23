@@ -89,6 +89,14 @@ export const makeControls = (
     canvasElement.addEventListener("touchend", _onTouchEnd);
   };
 
+  const detachEventListeners = () => {
+    document.removeEventListener("keydown", _onKeyDown);
+    document.removeEventListener("keyup", _onKeyUp);
+    canvasElement.removeEventListener("touchstart", _onTouchStart);
+    canvasElement.removeEventListener("touchmove", _onTouchMove);
+    canvasElement.removeEventListener("touchend", _onTouchEnd);
+  };
+
   const drawTouchOverlay = () => {
     CTX.save();
     CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
@@ -107,6 +115,7 @@ export const makeControls = (
   return {
     drawTouchOverlay,
     attachEventListeners,
+    detachEventListeners,
     getHasKeyboard: () => hasKeyboard,
   };
 };

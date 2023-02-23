@@ -1,6 +1,5 @@
 # TODO
 
-- Make instructions into a mini game with a toy lander that reacts when you press the right engine keys. Only close instructions once all keys / tap areas have been activated.
 - Show meters for each score-related stat and the rest at a smaller size
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
 - Add fuel

@@ -1,4 +1,16 @@
+import {
+  CRASH_ANGLE,
+  CRASH_VELOCITY,
+  VELOCITY_MULTIPLIER,
+} from "./constants.js";
+import { getDisplayVelocity } from "./helpers.js";
+
 export const manageInstructions = (onCloseInstructions) => {
+  let _engineDone = false;
+  let _leftRotationDone = false;
+  let _rightRotationDone = false;
+  let _engineAndRotationDone = false;
+
   // Save this to a variable so that when we access it in a loop, we're
   // not calling localStorage.getItem 60 times per second
   let _hasClosedInstructionsVar = localStorage.getItem("closedInstructions");
@@ -12,13 +24,10 @@ export const manageInstructions = (onCloseInstructions) => {
 
   const show = () => {
     document.querySelector("#instructions").classList.add("show");
-    document
-      .querySelector("#instructions .buttonContainer")
-      .classList.add("show");
-    document
-      .querySelector("#closeInstructions")
-      .addEventListener("click", close);
-
+    document.querySelector("#crashSpeed").textContent = `${
+      CRASH_VELOCITY * VELOCITY_MULTIPLIER
+    } MPH`;
+    document.querySelector("#crashAngle").textContent = `${CRASH_ANGLE}°`;
     if (likelyTouchDevice) {
       document.querySelector("#forKeyboard").remove();
     } else {
@@ -28,20 +37,72 @@ export const manageInstructions = (onCloseInstructions) => {
 
   function close() {
     document.querySelector("#instructions").classList.remove("show");
-    document
-      .querySelector("#instructions .buttonContainer")
-      .classList.remove("show");
-    document
-      .querySelector("#closeInstructions")
-      .removeEventListener("click", close);
-
     localStorage.setItem("closedInstructions", true);
     _hasClosedInstructionsVar = true;
     onCloseInstructions();
   }
 
+  const checkDone = () => {
+    if (
+      _engineDone &&
+      _leftRotationDone &&
+      _rightRotationDone &&
+      _engineAndRotationDone
+    ) {
+      if (likelyTouchDevice) {
+        document.addEventListener(
+          "touchend",
+          () => {
+            setTimeout(close, 1000);
+          },
+          { once: true }
+        );
+      } else {
+        document.addEventListener(
+          "keyup",
+          () => {
+            setTimeout(close, 1000);
+          },
+          { once: true }
+        );
+      }
+    }
+  };
+
+  const setEngineDone = () => {
+    _engineDone = true;
+    document.querySelector("#engineCheck").classList.add("strikethrough");
+    checkDone();
+  };
+
+  const setLeftRotationDone = () => {
+    _leftRotationDone = true;
+    document
+      .querySelector("#rightRotationCheck")
+      .classList.add("strikethrough");
+    checkDone();
+  };
+
+  const setRightRotationDone = () => {
+    _rightRotationDone = true;
+    document.querySelector("#leftRotationCheck").classList.add("strikethrough");
+    checkDone();
+  };
+
+  const setEngineAndRotationDone = () => {
+    _engineAndRotationDone = true;
+    document
+      .querySelector("#engineAndRotationCheck")
+      .classList.add("strikethrough");
+    checkDone();
+  };
+
   return {
     show,
     hasClosedInstructions,
+    setEngineDone,
+    setLeftRotationDone,
+    setRightRotationDone,
+    setEngineAndRotationDone,
   };
 };

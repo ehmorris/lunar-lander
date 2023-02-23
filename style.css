@@ -1,13 +1,28 @@
 body {
   margin: 0;
+  background: #02071e;
   -webkit-user-select: none;
   overflow: hidden;
-  font: 400 20px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
-  color: white;
+  font: 400 18px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 canvas {
   display: block;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+li.strikethrough {
+  text-decoration: line-through;
+  color: rgba(75, 255, 91, 0.35);
 }
 
 .fullSizeContainer {
@@ -18,15 +33,23 @@ canvas {
   justify-content: center;
   height: 100svh;
   grid-gap: 0.8rem;
-  padding: 0 10vw;
+  padding: 8vw;
   box-sizing: border-box;
   width: 100%;
-  color: rgba(255, 255, 255, 0.75);
+}
+
+.fullSizeContainer.instructions {
+  justify-content: space-between;
+  text-align: center;
+  pointer-events: none;
 }
 
 @media screen and (min-width: 1280px) {
   .fullSizeContainer {
-    padding: 0 14vw;
+    padding: 0 25vw;
+  }
+  .fullSizeContainer.instructions {
+    padding: 8vh 25vw;
   }
 }
 
@@ -39,7 +62,15 @@ canvas {
   font-weight: 900;
   line-height: 1.1;
   color: white;
-  margin-top: 0;
+  margin: 0 0 0.2em;
+}
+
+.fullSizeContainer h2 {
+  font-size: 4vw;
+  font-weight: 700;
+  line-height: 1.2;
+  color: white;
+  margin: 0 0 0.2em;
 }
 
 @media screen and (max-width: 640px) {
@@ -47,7 +78,14 @@ canvas {
     font-size: 32px;
     font-weight: 800;
     line-height: 1.2;
-    margin: 0;
+    margin-bottom: 0;
+  }
+
+  .fullSizeContainer h2 {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0;
   }
 }
 

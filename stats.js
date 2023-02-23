@@ -30,8 +30,8 @@ export const showStatsAndResetControl = (
     document.querySelector("#angle").textContent = data.angle;
     document.querySelector("#duration").textContent = data.durationInSeconds;
     document.querySelector("#rotations").textContent = data.rotations;
-    document.querySelector("#maxspeed").textContent = data.maxSpeed;
-    document.querySelector("#maxheight").textContent = data.maxHeight;
+    document.querySelector("#maxSpeed").textContent = data.maxSpeed;
+    document.querySelector("#maxHeight").textContent = data.maxHeight;
 
     if (hasKeyboard) {
       document.querySelector("#reset").textContent = "Reset (Spacebar)";
@@ -46,7 +46,7 @@ export const showStatsAndResetControl = (
     navigator.share({
       text: `Speed: ${data.speed} MPH
 Angle: ${data.angle}°
-Time: ${data.durationInSeconds}s
+Time: ${data.durationInSeconds} S
 Flips: ${data.rotations}
 Max speed: ${data.maxSpeed} MPH
 Max height: ${data.maxHeight} FT
@@ -68,7 +68,11 @@ https://ehmorris.com/lander/`,
     }
 
     if (hasKeyboard) {
-      document.addEventListener("keydown", resetOnSpace);
+      // Delay showing the reset button in case the user is actively tapping
+      // in that area for thrust
+      setTimeout(() => {
+        document.addEventListener("keydown", resetOnSpace);
+      }, 1000);
     }
   };
 

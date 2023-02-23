@@ -1,5 +1,6 @@
 import { animate, generateCanvas } from "./helpers.js";
 import { makeLander } from "./lander/lander.js";
+import { makeToyLander } from "./lander/toylander.js";
 import { makeStarfield } from "./starfield.js";
 import { makeControls } from "./lander/controls.js";
 import { makeTerrain } from "./terrain.js";
@@ -12,6 +13,23 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   attachNode: ".game",
 });
 
+const instructions = manageInstructions(onCloseInstructions);
+const toyLander = makeToyLander(
+  CTX,
+  canvasWidth,
+  canvasHeight,
+  () => instructions.setEngineDone(),
+  () => instructions.setLeftRotationDone(),
+  () => instructions.setRightRotationDone(),
+  () => instructions.setEngineAndRotationDone()
+);
+const toyLanderControls = makeControls(
+  CTX,
+  toyLander,
+  canvasWidth,
+  canvasHeight,
+  canvasElement
+);
 const lander = makeLander(
   CTX,
   canvasWidth,
@@ -19,21 +37,21 @@ const lander = makeLander(
   onGameEnd,
   onResetXPos
 );
-const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
-const controls = makeControls(
+const landerControls = makeControls(
   CTX,
   lander,
   canvasWidth,
   canvasHeight,
   canvasElement
 );
+const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
 const terrain = makeTerrain(CTX, canvasWidth, canvasHeight);
-const instructions = manageInstructions(onCloseInstructions);
 
 if (!instructions.hasClosedInstructions()) {
   instructions.show();
+  toyLanderControls.attachEventListeners();
 } else {
-  controls.attachEventListeners();
+  landerControls.attachEventListeners();
 }
 
 const animationObject = animate((timeSinceStart) => {
@@ -43,13 +61,16 @@ const animationObject = animate((timeSinceStart) => {
   terrain.draw();
 
   if (instructions.hasClosedInstructions()) {
-    controls.drawTouchOverlay();
+    landerControls.drawTouchOverlay();
     lander.draw(timeSinceStart);
+  } else {
+    toyLander.draw();
   }
 });
 
 function onCloseInstructions() {
-  controls.attachEventListeners();
+  toyLanderControls.detachEventListeners();
+  landerControls.attachEventListeners();
 }
 
 function onGameEnd(data) {
@@ -57,7 +78,7 @@ function onGameEnd(data) {
     lander,
     animationObject,
     data,
-    controls.getHasKeyboard()
+    landerControls.getHasKeyboard()
   );
 }
 
