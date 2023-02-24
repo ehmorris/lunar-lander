@@ -9,7 +9,6 @@
 - Sound effects
 - Confetti when grazing the bottom, or exceeding certain speeds
 - "Mad dog" mode: start with very high rotation rate
-- Add more crash and landing categories like "sidewinder" and "drunk astronaut"
 - Generate image from canvas for sharing with all stats
 - Add "copy stats" button on platforms that don't have navigator access
 
