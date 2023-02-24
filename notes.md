@@ -1,5 +1,6 @@
 # TODO
 
+- Animate score meter cursor
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
 - Add fuel
 - Make terrain land-able
@@ -18,4 +19,4 @@
   - The gameplay target is the experience on a MacBook with a 120hz refresh rate. Phones could possibly be slower, or shorter screens in general - but this should be controlled and not incidental
 - iOS safari "from" banner cuts off bottom of canvas
 - Try touch-action: manipulation to prevent double taps from zooming stats
-- Force https somehow. Cloudflare? 
+- Force https somehow. Cloudflare?
