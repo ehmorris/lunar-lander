@@ -119,6 +119,7 @@ li.strikethrough {
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: 500;
+  position: relative;
 }
 
 .button.loading {
@@ -164,6 +165,7 @@ li.strikethrough {
   animation: 1.5s buttonAnimatedBorder ease;
   animation-delay: 0.5s;
   animation-fill-mode: backwards;
+  pointer-events: none;
 }
 
 .buttonBorder {
