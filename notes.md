@@ -1,5 +1,6 @@
 # TODO
 
+- Show score number and that flips are part of it
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
 - Add fuel
 - Make terrain land-able
