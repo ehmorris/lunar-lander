@@ -23,7 +23,7 @@ li {
 
 li.strikethrough {
   text-decoration: line-through;
-  color: rgba(75, 255, 91, 0.35);
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .fullSizeContainer {

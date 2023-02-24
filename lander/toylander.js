@@ -9,7 +9,7 @@ export const makeToyLander = (
   onRightRotation,
   onEngineAndRotation
 ) => {
-  const _toyLanderWidth = Math.min(canvasWidth, canvasHeight) / 6;
+  const _toyLanderWidth = Math.min(canvasWidth, canvasHeight) / 7;
   const _toyLanderHeight = _toyLanderWidth * 2;
   const _toyLanderBoosterLengthMin = _toyLanderWidth / 4;
   const _toyLanderBoosterLengthMax = _toyLanderWidth * 1.25;
