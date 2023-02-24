@@ -20,10 +20,22 @@ export const showStatsAndResetControl = (
 
   const populateMeter = (name, percentPosition, textValue) => {
     const meter = document.querySelector(`[data-stat-name="${name}"]`);
-    meter.querySelector(
-      "[data-percent-position]"
-    ).style.left = `${percentPosition}%`;
     meter.querySelector("[data-value]").textContent = textValue;
+
+    // This timeout enables a CSS transition to play from left: 0 to the
+    // override we're applying
+    setTimeout(() => {
+      meter.querySelector(
+        "[data-percent-position]"
+      ).style.left = `${percentPosition}%`;
+    }, 0);
+  };
+
+  const resetMeter = (name) => {
+    const meter = document.querySelector(`[data-stat-name="${name}"]`);
+    meter.querySelector("[data-value]").textContent = "";
+
+    meter.querySelector("[data-percent-position]").style.left = `0`;
   };
 
   const populateStats = (data) => {
@@ -100,6 +112,8 @@ https://ehmorris.com/lander/`,
   function resetGame() {
     lander.resetProps();
     animationObject.resetStartTime();
+    resetMeter("speed");
+    resetMeter("angle");
     hideStats();
     detachEventListeners();
   }

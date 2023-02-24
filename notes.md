@@ -1,6 +1,5 @@
 # TODO
 
-- Animate score meter cursor
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
 - Add fuel
 - Make terrain land-able
