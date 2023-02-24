@@ -4,17 +4,11 @@ export const showStatsAndResetControl = (
   data,
   hasKeyboard
 ) => {
+  const resetButtonDelay = 2000;
   const canShowShareSheet = navigator.canShare;
   const showStats = () => {
     document.querySelector("#endGameStats").classList.add("show");
-
-    // Delay showing the reset button in case the user is actively tapping
-    // in that area for thrust
-    setTimeout(() => {
-      document
-        .querySelector("#endGameStats .buttonContainer")
-        .classList.add("show");
-    }, 1000);
+    document.querySelector("#reset").classList.add("loading");
   };
 
   const hideStats = () => {
@@ -34,7 +28,7 @@ export const showStatsAndResetControl = (
     document.querySelector("#maxHeight").textContent = data.maxHeight;
 
     if (hasKeyboard) {
-      document.querySelector("#reset").textContent = "Reset (Spacebar)";
+      document.querySelector("#resetText").textContent = "Reset (Spacebar)";
     }
 
     if (!canShowShareSheet && document.querySelector("#share")) {
@@ -59,7 +53,12 @@ https://ehmorris.com/lander/`,
   }
 
   const attachEventListeners = () => {
-    document.querySelector("#reset").addEventListener("click", resetGame);
+    // Delay showing the reset button in case the user is actively tapping
+    // in that area for thrust
+    setTimeout(() => {
+      document.querySelector("#reset").classList.remove("loading");
+      document.querySelector("#reset").addEventListener("click", resetGame);
+    }, resetButtonDelay);
 
     if (canShowShareSheet) {
       document
@@ -72,7 +71,7 @@ https://ehmorris.com/lander/`,
       // in that area for thrust
       setTimeout(() => {
         document.addEventListener("keydown", resetOnSpace);
-      }, 1000);
+      }, resetButtonDelay);
     }
   };
 
