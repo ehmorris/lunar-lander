@@ -82,7 +82,7 @@ export const makeToyLander = (
     // and work clockwise.                 |__|
     CTX.beginPath();
     CTX.moveTo(-_toyLanderWidth / 2, -_toyLanderHeight / 2);
-    CTX.lineTo(0, -_toyLanderHeight);
+    CTX.lineTo(0, -(_toyLanderHeight * 0.9));
     CTX.lineTo(_toyLanderWidth / 2, -_toyLanderHeight / 2);
     CTX.lineTo(_toyLanderWidth / 2, _toyLanderHeight / 2);
     CTX.lineTo(-_toyLanderWidth / 2, _toyLanderHeight / 2);
