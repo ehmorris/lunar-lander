@@ -129,7 +129,7 @@ li.strikethrough {
 }
 
 .statsTable {
-  margin: 1rem 0;
+  margin: 1rem 0 1.6rem;
   font-size: var(--stats-font-size);
   text-transform: uppercase;
   row-gap: 0.35em;
