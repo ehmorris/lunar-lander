@@ -1,6 +1,7 @@
 body {
   margin: 0;
   background: #02071e;
+  user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
   font: 400 18px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;

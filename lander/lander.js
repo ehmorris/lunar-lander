@@ -182,6 +182,43 @@ export const makeLander = (
     }
   };
 
+  const _drawSideBySideStats = () => {
+    const textWidth = CTX.measureText("100.0 MPH").width + 2;
+    const xPosBasis = Math.min(
+      _position.x + LANDER_WIDTH * 2,
+      canvasWidth - textWidth
+    );
+    const yPosBasis = Math.max(_position.y, 30);
+    const lineHeight = 14;
+
+    CTX.save();
+    CTX.fillStyle =
+      getVectorVelocity(_velocity) > CRASH_VELOCITY
+        ? "rgb(255, 0, 0)"
+        : "rgb(0, 255, 0)";
+    CTX.fillText(
+      `${getDisplayVelocity(_velocity).toFixed(1)} MPH`,
+      xPosBasis,
+      yPosBasis - lineHeight
+    );
+    CTX.fillStyle =
+      getAngleDeltaUpright(_angle) > CRASH_ANGLE
+        ? "rgb(255, 0, 0)"
+        : "rgb(0, 255, 0)";
+    CTX.fillText(
+      `${getAngleDeltaUpright(_angle).toFixed(1)}°`,
+      xPosBasis,
+      yPosBasis
+    );
+    CTX.fillStyle = "#ffffff";
+    CTX.fillText(
+      `${getDisplayHeight(_position.y, _groundedHeight)} FT`,
+      xPosBasis,
+      yPosBasis + lineHeight
+    );
+    CTX.restore();
+  };
+
   const draw = (timeSinceStart) => {
     _updateProps(timeSinceStart);
 
@@ -293,32 +330,7 @@ export const makeLander = (
     }
 
     // Draw speed and angle text beside lander, even after crashing
-    CTX.save();
-    CTX.fillStyle =
-      getVectorVelocity(_velocity) > CRASH_VELOCITY
-        ? "rgb(255, 0, 0)"
-        : "rgb(0, 255, 0)";
-    CTX.fillText(
-      `${getDisplayVelocity(_velocity).toFixed(1)} MPH`,
-      _position.x + LANDER_WIDTH * 2,
-      Math.max(_position.y - 14, 16)
-    );
-    CTX.fillStyle =
-      getAngleDeltaUpright(_angle) > CRASH_ANGLE
-        ? "rgb(255, 0, 0)"
-        : "rgb(0, 255, 0)";
-    CTX.fillText(
-      `${getAngleDeltaUpright(_angle).toFixed(1)}°`,
-      _position.x + LANDER_WIDTH * 2,
-      Math.max(_position.y, 30)
-    );
-    CTX.fillStyle = "#ffffff";
-    CTX.fillText(
-      `${getDisplayHeight(_position.y, _groundedHeight)} FT`,
-      _position.x + LANDER_WIDTH * 2,
-      Math.max(_position.y + 14, 44)
-    );
-    CTX.restore();
+    _drawSideBySideStats();
   };
 
   return {
