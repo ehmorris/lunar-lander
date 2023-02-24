@@ -1,6 +1,8 @@
 body {
+  --stats-font-size: 12px;
+  --background-color: #02071e;
   margin: 0;
-  background: #02071e;
+  background: var(--background-color);
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
@@ -94,6 +96,75 @@ li.strikethrough {
   margin: 0;
 }
 
+.meterAndLabel {
+  font-size: var(--stats-font-size);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: var(--stats-font-size);
+}
+
+.meter {
+  position: relative;
+  height: 18px;
+  background: linear-gradient(90deg, rgb(0, 255, 0), rgb(255, 0, 0));
+}
+
+.cursor {
+  position: absolute;
+  top: 100%;
+  display: flex;
+  transform: translateX(-50%);
+}
+
+.cursor::before {
+  --cursor-size: 14px;
+  content: "";
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  background: white;
+  top: -16px;
+  left: calc(50% - 7px);
+  position: absolute;
+  border-radius: var(--cursor-size);
+}
+
+.statsTable {
+  margin: 1rem 0;
+  font-size: var(--stats-font-size);
+  text-transform: uppercase;
+  row-gap: 0.35em;
+  column-gap: 4em;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.tableRow {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.tableRow::before {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  height: 1px;
+  top: 50%;
+  width: 100%;
+}
+
+.tableLabel {
+  background: var(--background-color);
+  z-index: 1;
+  padding-right: 8px;
+}
+
+.tableValue {
+  background: var(--background-color);
+  z-index: 1;
+  padding-left: 8px;
+}
+
 .buttonContainer {
   display: flex;
   width: 100%;
@@ -101,7 +172,6 @@ li.strikethrough {
   box-sizing: border-box;
   justify-content: center;
   grid-gap: 1rem;
-  margin-top: 1rem;
 }
 
 .button {
@@ -117,7 +187,7 @@ li.strikethrough {
   transition: all 0.6s ease-out;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0.05em;
   font-weight: 500;
   position: relative;
 }

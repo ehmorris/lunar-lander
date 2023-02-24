@@ -55,7 +55,9 @@ if (!instructions.hasClosedInstructions()) {
 }
 
 const animationObject = animate((timeSinceStart) => {
-  CTX.fillStyle = "#02071E";
+  CTX.fillStyle = getComputedStyle(document.body).getPropertyValue(
+    "--background-color"
+  );
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
   stars.draw();
   terrain.draw();

@@ -7,6 +7,7 @@ import {
   getDisplayVelocity,
   getAngleDeltaUpright,
   getDisplayHeight,
+  percentProgress,
 } from "../helpers.js";
 import {
   scoreLanding,
@@ -21,7 +22,6 @@ import {
   LANDER_HEIGHT,
   CRASH_VELOCITY,
   CRASH_ANGLE,
-  VELOCITY_MULTIPLIER,
 } from "../constants.js";
 
 export const makeLander = (
@@ -137,7 +137,13 @@ export const makeLander = (
       _landed = {
         description: landingScoreDescription(score),
         speed: speedInMPH.toFixed(1),
+        speedPercent: percentProgress(
+          0,
+          CRASH_VELOCITY,
+          getVectorVelocity(_velocity)
+        ),
         angle: angleInDeg.toFixed(1),
+        anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
         durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
         maxSpeed: _maxSpeed.toFixed(1),
@@ -165,7 +171,13 @@ export const makeLander = (
           scoreCrash(angleInDeg, speedInMPH, _rotationCount)
         ),
         speed: speedInMPH.toFixed(1),
+        speedPercent: percentProgress(
+          0,
+          CRASH_VELOCITY,
+          getVectorVelocity(_velocity)
+        ),
         angle: angleInDeg.toFixed(1),
+        anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
         durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
         maxSpeed: _maxSpeed.toFixed(1),

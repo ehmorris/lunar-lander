@@ -55,3 +55,16 @@ export const getDisplayVelocity = (velocity) =>
 
 export const getDisplayHeight = (yPos, groundedHeight) =>
   Math.abs(Math.round((yPos - groundedHeight) / 3.5));
+
+// Progress
+// Transforms any number range into a range of 0–1
+//
+// Expected behavior:
+// progress(5, 30, 17.5) -> .5
+// progress(30, 5, 17.5) -> .5
+// progress(5, 30, 30)   -> 1
+export const progress = (start, end, current) =>
+  (current - start) / (end - start);
+
+export const percentProgress = (start, end, current) =>
+  Math.max(0, Math.min(((current - start) / (end - start)) * 100, 100));

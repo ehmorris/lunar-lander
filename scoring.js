@@ -1,5 +1,9 @@
-import { VELOCITY_MULTIPLIER } from "./constants.js";
-import { CRASH_VELOCITY, CRASH_ANGLE } from "./constants.js";
+import {
+  CRASH_VELOCITY,
+  CRASH_ANGLE,
+  VELOCITY_MULTIPLIER,
+} from "./constants.js";
+import { progress } from "./helpers.js";
 
 export const landingScoreDescription = (score) =>
   score >= 99
@@ -73,9 +77,7 @@ export const scoreLanding = (angle, speed, rotations) => {
   const worstPossibleCombo = CRASH_ANGLE + CRASH_VELOCITY * VELOCITY_MULTIPLIER;
   const combinedStats = angle + speed;
   const score =
-    ((combinedStats - worstPossibleCombo) /
-      (bestPossibleCombo - worstPossibleCombo)) *
-      100 +
+    progress(worstPossibleCombo, bestPossibleCombo, combinedStats) * 100 +
     rotations;
   return score;
 };
@@ -99,9 +101,8 @@ export const scoreCrash = (angle, speed, rotations) => {
   const bestPossibleCombo = 900;
   const combinedStats = angle + speed;
   const score =
-    ((combinedStats - worstPossibleCombo) /
-      (bestPossibleCombo - worstPossibleCombo)) *
-      100 +
+    progress(worstPossibleCombo, bestPossibleCombo, combinedStats) * 100 +
     rotations;
+
   return score;
 };

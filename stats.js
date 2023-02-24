@@ -18,10 +18,18 @@ export const showStatsAndResetControl = (
     document.querySelector("#endGameStats").classList.remove("show");
   };
 
+  const populateMeter = (name, percentPosition, textValue) => {
+    const meter = document.querySelector(`[data-stat-name="${name}"]`);
+    meter.querySelector(
+      "[data-percent-position]"
+    ).style.left = `${percentPosition}%`;
+    meter.querySelector("[data-value]").textContent = textValue;
+  };
+
   const populateStats = (data) => {
     document.querySelector("#description").textContent = data.description;
-    document.querySelector("#speed").textContent = data.speed;
-    document.querySelector("#angle").textContent = data.angle;
+    populateMeter("speed", data.speedPercent, data.speed);
+    populateMeter("angle", data.anglePercent, data.angle);
     document.querySelector("#duration").textContent = data.durationInSeconds;
     document.querySelector("#rotations").textContent = data.rotations;
     document.querySelector("#maxSpeed").textContent = data.maxSpeed;

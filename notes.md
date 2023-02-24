@@ -1,6 +1,5 @@
 # TODO
 
-- Show meters for each score-related stat and the rest at a smaller size
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
 - Add fuel
 - Make terrain land-able
