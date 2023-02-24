@@ -1,5 +1,6 @@
 # TODO
 
+- Refactor instructions, extract updateprops for all files that use it
 - Show score number and that flips are part of it
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
 - Add fuel
