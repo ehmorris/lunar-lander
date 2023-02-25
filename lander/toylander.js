@@ -1,4 +1,5 @@
 import { randomBetween, randomBool } from "../helpers.js";
+import { drawLanderGradient } from "./gradient.js";
 
 export const makeToyLander = (
   CTX,
@@ -50,21 +51,9 @@ export const makeToyLander = (
     if (_rotatingLeft) _rotationVelocity -= 0.01;
     _angle += (Math.PI / 180) * _rotationVelocity;
 
-    // Draw gradient for lander
-    const gradient = CTX.createLinearGradient(
-      -_toyLanderWidth / 2,
-      0,
-      _toyLanderWidth / 2,
-      0
-    );
-    gradient.addColorStop(0, "#DFE5E5");
-    gradient.addColorStop(0.3, "#BDBCC3");
-    gradient.addColorStop(0.6, "#4A4E6F");
-    gradient.addColorStop(1, "#3D4264");
-
     // Move to top left of the lander and then rotate at that origin
     CTX.save();
-    CTX.fillStyle = gradient;
+    CTX.fillStyle = drawLanderGradient(CTX, _toyLanderWidth);
     CTX.translate(_position.x, _position.y);
     CTX.rotate(_angle);
 

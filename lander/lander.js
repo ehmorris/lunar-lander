@@ -23,6 +23,7 @@ import {
   CRASH_VELOCITY,
   CRASH_ANGLE,
 } from "../constants.js";
+import { drawLanderGradient } from "./gradient.js";
 
 export const makeLander = (
   CTX,
@@ -186,6 +187,7 @@ export const makeLander = (
           CTX,
           _position,
           _velocity,
+          _angle,
           canvasWidth,
           canvasHeight
         ),
@@ -258,21 +260,9 @@ export const makeLander = (
     if (_crashed) {
       _crashed.explosion.draw();
     } else {
-      // Draw gradient for lander
-      const gradient = CTX.createLinearGradient(
-        -LANDER_WIDTH / 2,
-        0,
-        LANDER_WIDTH / 2,
-        0
-      );
-      gradient.addColorStop(0, "#DFE5E5");
-      gradient.addColorStop(0.3, "#BDBCC3");
-      gradient.addColorStop(0.6, "#4A4E6F");
-      gradient.addColorStop(1, "#3D4264");
-
       // Move to top left of the lander and then rotate at that origin
       CTX.save();
-      CTX.fillStyle = gradient;
+      CTX.fillStyle = drawLanderGradient(CTX);
       CTX.translate(_position.x, _position.y);
       CTX.rotate(_angle);
 

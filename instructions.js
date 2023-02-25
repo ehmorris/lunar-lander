@@ -3,7 +3,6 @@ import {
   CRASH_VELOCITY,
   VELOCITY_MULTIPLIER,
 } from "./constants.js";
-import { getDisplayVelocity } from "./helpers.js";
 
 export const manageInstructions = (onCloseInstructions) => {
   let _engineDone = false;
@@ -19,8 +18,6 @@ export const manageInstructions = (onCloseInstructions) => {
   // because the user is unlikely to have used the keyboard when the page has
   // just loaded and is showing instructions
   const likelyTouchDevice = window.matchMedia("(any-pointer: coarse)").matches;
-
-  const hasClosedInstructions = () => _hasClosedInstructionsVar;
 
   const show = () => {
     document.querySelector("#instructions").classList.add("show");
@@ -99,7 +96,7 @@ export const manageInstructions = (onCloseInstructions) => {
 
   return {
     show,
-    hasClosedInstructions,
+    hasClosedInstructions: () => _hasClosedInstructionsVar,
     setEngineDone,
     setLeftRotationDone,
     setRightRotationDone,
