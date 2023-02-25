@@ -5,22 +5,45 @@ export const makeControls = (
   canvasHeight,
   canvasElement
 ) => {
+  const engineAudio = new Audio("./audio/engine.mp3");
+  const boosterAudio = new Audio("./audio/booster.mp3");
+  engineAudio.loop = true;
+  boosterAudio.loop = true;
+
   let _showCenterOverlay = false;
   let _showRightOverlay = false;
   let _showLeftOverlay = false;
   let hasKeyboard = false;
 
   function _onKeyDown({ key }) {
-    if (key === "ArrowUp") lander.engineOn();
-    if (key === "ArrowLeft") lander.rotateLeft();
-    if (key === "ArrowRight") lander.rotateRight();
+    if (key === "ArrowUp") {
+      engineAudio.play();
+      lander.engineOn();
+    }
+    if (key === "ArrowLeft") {
+      boosterAudio.play();
+      lander.rotateLeft();
+    }
+    if (key === "ArrowRight") {
+      boosterAudio.play();
+      lander.rotateRight();
+    }
     hasKeyboard = true;
   }
 
   function _onKeyUp({ key }) {
-    if (key === "ArrowUp") lander.engineOff();
-    if (key === "ArrowLeft") lander.stopLeftRotation();
-    if (key === "ArrowRight") lander.stopRightRotation();
+    if (key === "ArrowUp") {
+      engineAudio.pause();
+      lander.engineOff();
+    }
+    if (key === "ArrowLeft") {
+      boosterAudio.pause();
+      lander.stopLeftRotation();
+    }
+    if (key === "ArrowRight") {
+      boosterAudio.pause();
+      lander.stopRightRotation();
+    }
   }
 
   const _leftTouch = (touch) =>
@@ -30,12 +53,15 @@ export const makeControls = (
 
   const _activateTouchZone = (touch) => {
     if (_leftTouch(touch)) {
+      boosterAudio.play();
       lander.rotateLeft();
       _showLeftOverlay = true;
     } else if (_centerTouch(touch)) {
+      engineAudio.play();
       lander.engineOn();
       _showCenterOverlay = true;
     } else {
+      boosterAudio.play();
       lander.rotateRight();
       _showRightOverlay = true;
     }
@@ -67,12 +93,15 @@ export const makeControls = (
   function _onTouchEnd(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
       if (_leftTouch(e.changedTouches[index])) {
+        boosterAudio.pause();
         lander.stopLeftRotation();
         _showLeftOverlay = false;
       } else if (_centerTouch(e.changedTouches[index])) {
+        engineAudio.pause();
         lander.engineOff();
         _showCenterOverlay = false;
       } else {
+        boosterAudio.pause();
         lander.stopRightRotation();
         _showRightOverlay = false;
       }

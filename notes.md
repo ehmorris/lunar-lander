@@ -1,13 +1,11 @@
 # TODO
 
-- Refactor instructions, extract updateprops for all files that use it
 - Show score number and that flips are part of it
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
 - Add fuel
 - Make terrain land-able
 - When the lander explodes, show the nose cone as debris
 - Extend ramp from lander on land
-- Sound effects
 - Confetti when grazing the bottom, or exceeding certain speeds
 - "Mad dog" mode: start with very high rotation rate
 - Generate image from canvas for sharing with all stats
