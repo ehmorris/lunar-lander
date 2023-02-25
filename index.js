@@ -88,20 +88,3 @@ function onResetXPos() {
   stars.reGenerate();
   terrain.reGenerate();
 }
-
-const backgroundAudio = new Audio("./audio/theme.mp3");
-backgroundAudio.loop = true;
-document.addEventListener(
-  "keydown",
-  () => {
-    backgroundAudio.play();
-  },
-  { once: true }
-);
-document.addEventListener(
-  "touchstart",
-  () => {
-    backgroundAudio.play();
-  },
-  { once: true }
-);

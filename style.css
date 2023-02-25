@@ -65,7 +65,7 @@ li.strikethrough {
   font-weight: 900;
   line-height: 1.1;
   color: white;
-  margin: 0 0 1rem;
+  margin: 0 0 0.2em;
 }
 
 .fullSizeContainer h2 {
@@ -81,6 +81,7 @@ li.strikethrough {
     font-size: 32px;
     font-weight: 800;
     line-height: 1.2;
+    margin-bottom: 0;
   }
 
   .fullSizeContainer h2 {
