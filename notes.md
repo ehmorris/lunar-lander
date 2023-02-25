@@ -1,5 +1,6 @@
 # TODO
 
+- Use vmin instead of vw for headline size
 - Make rest button svg border animation longer than the loading state timeout. This way the animations won't feel "stepped"
 - Show score number and that flips are part of it
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
