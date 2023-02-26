@@ -1,5 +1,6 @@
 # TODO
 
+- confetti pieces that don't rotate, but "flip" in 3-D. Maybe diamond shaped, and flipping horizontally.
 - Ticks on top to show how the control surfaces are divided on mobile
 - Konami code on desktop?
 - Use vmin instead of vw for headline size
