@@ -1,5 +1,6 @@
 # TODO
 
+- Ticks on top to show how the control surfaces are divided on mobile
 - Konami code on desktop?
 - Use vmin instead of vw for headline size
 - Make rest button svg border animation longer than the loading state timeout. This way the animations won't feel "stepped"
