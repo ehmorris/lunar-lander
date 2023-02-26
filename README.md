@@ -1,6 +1,6 @@
 # About
 
-A plain JavaScript, HTML, and CSS game with no dependancies.
+A plain JavaScript, HTML, and CSS game with no dependencies.
 
 Code and design: Edwin Morris
 
