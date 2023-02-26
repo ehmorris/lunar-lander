@@ -15,6 +15,7 @@
 - "Mad dog" mode: start with very high rotation rate
 - Generate image from canvas for sharing with all stats
 - Add "copy stats" button on platforms that don't have navigator access
+- Tracking?
 
 # Bugs
 
