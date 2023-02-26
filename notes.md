@@ -17,6 +17,7 @@
 
 # Bugs
 
+- Close path in trajectory file
 - Rapid play/pause of audio causes game to stutter
 - Make play speed consistent regardless of frame rate
   - On some screens the refresh rate is 120, on others 60. This changes the speed of play. The game is twice as fast on a new MacBook as on an iPhone. The animations are procedural, so to accomplish this, forces like thrust and gravity will have to be modified based on time elpased between frames. Unsure how to do this.
