@@ -3,6 +3,7 @@
 A plain JavaScript, HTML, and CSS game with no dependancies.
 
 Code and design: Edwin Morris
+
 Music and sound: Max Kotelchuck
 
 # Running
