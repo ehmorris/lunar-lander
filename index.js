@@ -6,6 +6,7 @@ import { makeControls } from "./lander/controls.js";
 import { makeTerrain } from "./terrain.js";
 import { showStatsAndResetControl } from "./stats.js";
 import { manageInstructions } from "./instructions.js";
+import { makeAudioManager } from "./audio.js";
 
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   width: window.innerWidth,
@@ -13,6 +14,7 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   attachNode: ".game",
 });
 
+const audioManager = makeAudioManager();
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
   CTX,
@@ -28,7 +30,8 @@ const toyLanderControls = makeControls(
   toyLander,
   canvasWidth,
   canvasHeight,
-  canvasElement
+  canvasElement,
+  audioManager
 );
 const lander = makeLander(
   CTX,
@@ -42,7 +45,8 @@ const landerControls = makeControls(
   lander,
   canvasWidth,
   canvasHeight,
-  canvasElement
+  canvasElement,
+  audioManager
 );
 const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
 const terrain = makeTerrain(CTX, canvasWidth, canvasHeight);
@@ -88,3 +92,5 @@ function onResetXPos() {
   stars.reGenerate();
   terrain.reGenerate();
 }
+
+audioManager.playTheme();

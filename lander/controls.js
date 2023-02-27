@@ -3,7 +3,8 @@ export const makeControls = (
   lander,
   canvasWidth,
   canvasHeight,
-  canvasElement
+  canvasElement,
+  audioManager
 ) => {
   let _showCenterOverlay = false;
   let _showRightOverlay = false;
@@ -11,16 +12,34 @@ export const makeControls = (
   let hasKeyboard = false;
 
   function _onKeyDown({ key }) {
-    if (key === "ArrowUp") lander.engineOn();
-    if (key === "ArrowLeft") lander.rotateLeft();
-    if (key === "ArrowRight") lander.rotateRight();
+    if (key === "ArrowUp") {
+      lander.engineOn();
+      audioManager.playEngineSound();
+    }
+    if (key === "ArrowLeft") {
+      lander.rotateLeft();
+      audioManager.playBoosterSound();
+    }
+    if (key === "ArrowRight") {
+      lander.rotateRight();
+      audioManager.playBoosterSound();
+    }
     hasKeyboard = true;
   }
 
   function _onKeyUp({ key }) {
-    if (key === "ArrowUp") lander.engineOff();
-    if (key === "ArrowLeft") lander.stopLeftRotation();
-    if (key === "ArrowRight") lander.stopRightRotation();
+    if (key === "ArrowUp") {
+      lander.engineOff();
+      audioManager.stopEngineSound();
+    }
+    if (key === "ArrowLeft") {
+      lander.stopLeftRotation();
+      audioManager.stopBoosterSound();
+    }
+    if (key === "ArrowRight") {
+      lander.stopRightRotation();
+      audioManager.stopBoosterSound();
+    }
   }
 
   const _leftTouch = (touch) =>
@@ -31,12 +50,15 @@ export const makeControls = (
   const _activateTouchZone = (touch) => {
     if (_leftTouch(touch)) {
       lander.rotateLeft();
+      audioManager.playBoosterSound();
       _showLeftOverlay = true;
     } else if (_centerTouch(touch)) {
       lander.engineOn();
+      audioManager.playEngineSound();
       _showCenterOverlay = true;
     } else {
       lander.rotateRight();
+      audioManager.playBoosterSound();
       _showRightOverlay = true;
     }
   };
@@ -53,6 +75,8 @@ export const makeControls = (
     lander.engineOff();
     lander.stopLeftRotation();
     lander.stopRightRotation();
+    audioManager.stopEngineSound();
+    audioManager.stopBoosterSound();
     _showCenterOverlay = false;
     _showLeftOverlay = false;
     _showRightOverlay = false;
@@ -68,12 +92,15 @@ export const makeControls = (
     for (let index = 0; index < e.changedTouches.length; index++) {
       if (_leftTouch(e.changedTouches[index])) {
         lander.stopLeftRotation();
+        audioManager.stopBoosterSound();
         _showLeftOverlay = false;
       } else if (_centerTouch(e.changedTouches[index])) {
         lander.engineOff();
+        audioManager.stopEngineSound();
         _showCenterOverlay = false;
       } else {
         lander.stopRightRotation();
+        audioManager.stopBoosterSound();
         _showRightOverlay = false;
       }
     }

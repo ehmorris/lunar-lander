@@ -1,14 +1,13 @@
 # TODO
 
 - Show score number and that flips are part of it
+- When the lander explodes, show the nose cone as debris
+- Tracking?
 - Add fuel
 - Make terrain land-able
-- When the lander explodes, show the nose cone as debris
 - Extend ramp from lander on land
-- Sound effects
 - Generate image from canvas for sharing with all stats
 - Add "copy stats" button on platforms that don't have navigator access
-- Tracking?
 
 # Extras
 
