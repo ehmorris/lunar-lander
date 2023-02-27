@@ -39,6 +39,7 @@ li.strikethrough {
   padding: 8vw;
   box-sizing: border-box;
   width: 100%;
+  touch-action: manipulation;
 }
 
 .fullSizeContainer.instructions {
@@ -61,7 +62,7 @@ li.strikethrough {
 }
 
 .fullSizeContainer h1 {
-  font-size: 5vw;
+  font-size: 8vmin;
   font-weight: 900;
   line-height: 1.1;
   color: white;
@@ -69,7 +70,7 @@ li.strikethrough {
 }
 
 .fullSizeContainer h2 {
-  font-size: 4vw;
+  font-size: 6vmin;
   font-weight: 700;
   line-height: 1.2;
   color: white;
@@ -233,8 +234,8 @@ li.strikethrough {
   stroke-width: 4px;
   stroke: white;
   stroke-linecap: round;
-  animation: 1.5s buttonAnimatedBorder ease;
-  animation-delay: 0.5s;
+  animation: 2s buttonAnimatedBorder ease;
+  animation-delay: 0.3s;
   animation-fill-mode: backwards;
   pointer-events: none;
 }
