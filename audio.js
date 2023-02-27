@@ -5,7 +5,8 @@ export const makeAudioManager = () => {
   const boosterFileBuffer = _loadFile(audioCTX, "./audio/booster.mp3");
 
   let engineFileBufferSource = false;
-  let boosterFileBufferSource = false;
+  let leftBoosterFileBufferSource = false;
+  let rightBoosterFileBufferSource = false;
 
   async function _loadFile(context, filePath) {
     const response = await fetch(filePath);
@@ -27,19 +28,25 @@ export const makeAudioManager = () => {
     });
   }
 
-  async function playEngineSound() {
+  function playEngineSound() {
     if (!engineFileBufferSource) {
       engineFileBufferSource = _playTrack(engineFileBuffer);
     }
   }
 
-  async function playBoosterSound() {
-    if (!boosterFileBufferSource) {
-      boosterFileBufferSource = _playTrack(boosterFileBuffer);
+  function playLeftBoosterSound() {
+    if (!leftBoosterFileBufferSource) {
+      leftBoosterFileBufferSource = _playTrack(boosterFileBuffer);
     }
   }
 
-  async function stopEngineSound() {
+  function playRightBoosterSound() {
+    if (!rightBoosterFileBufferSource) {
+      rightBoosterFileBufferSource = _playTrack(boosterFileBuffer);
+    }
+  }
+
+  function stopEngineSound() {
     if (engineFileBufferSource) {
       engineFileBufferSource.then((e) => {
         e.stop();
@@ -48,24 +55,35 @@ export const makeAudioManager = () => {
     }
   }
 
-  async function stopBoosterSound() {
-    if (boosterFileBufferSource) {
-      boosterFileBufferSource.then((e) => {
+  function stopLeftBoosterSound() {
+    if (leftBoosterFileBufferSource) {
+      leftBoosterFileBufferSource.then((e) => {
         e.stop();
-        boosterFileBufferSource = false;
+        leftBoosterFileBufferSource = false;
       });
     }
   }
 
-  async function playTheme() {
+  function stopRightBoosterSound() {
+    if (rightBoosterFileBufferSource) {
+      rightBoosterFileBufferSource.then((e) => {
+        e.stop();
+        rightBoosterFileBufferSource = false;
+      });
+    }
+  }
+
+  function playTheme() {
     _playTrack(themeFileBuffer);
   }
 
   return {
     playEngineSound,
-    playBoosterSound,
+    playLeftBoosterSound,
+    playRightBoosterSound,
     stopEngineSound,
-    stopBoosterSound,
+    stopLeftBoosterSound,
+    stopRightBoosterSound,
     playTheme,
   };
 };
