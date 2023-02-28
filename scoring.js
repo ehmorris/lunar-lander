@@ -10,7 +10,7 @@ export const landingScoreDescription = (score) => {
     score >= 99
       ? "perfect landing, incredible, you can’t get better than this"
       : score >= 95
-      ? "super smooth, soft landing - almost perfect"
+      ? "near-perfect landing, super smooth"
       : score >= 90
       ? "very nice landing, amazing"
       : score >= 85
@@ -28,11 +28,11 @@ export const landingScoreDescription = (score) => {
       : score >= 55
       ? "pretty bad landing, but it could be worse"
       : score >= 55
-      ? "not great - are you using boosters and the engine simultaneously?"
+      ? "not great"
       : score >= 40
       ? "basically a fender bender, but you landed"
       : score >= 30
-      ? "a near-crash - way too fast"
+      ? "a near-crash, way too fast"
       : "terrible landing, you need to land slow and straight";
 
   return `${score.toFixed(1)}: ${description}`;
