@@ -93,5 +93,35 @@
       </div>
     </div>
     <script src="index.js" type="module"></script>
+    <script>
+      (function (h, o, u, n, d) {
+        h = h[d] = h[d] || {
+          q: [],
+          onReady: function (c) {
+            h.q.push(c);
+          },
+        };
+        d = o.createElement(u);
+        d.async = 1;
+        d.src = n;
+        n = o.getElementsByTagName(u)[0];
+        n.parentNode.insertBefore(d, n);
+      })(
+        window,
+        document,
+        "script",
+        "https://www.datadoghq-browser-agent.com/datadog-rum-v4.js",
+        "DD_RUM"
+      );
+      DD_RUM.onReady(function () {
+        DD_RUM.init({
+          clientToken: "pub29b4ec61338ff64383116ae4bf1b2e48",
+          applicationId: "4c09e9e3-7012-4576-bbeb-9a81a5c7b9e7",
+          site: "datadoghq.com",
+          sessionSampleRate: 100,
+          trackUserInteractions: true,
+        });
+      });
+    </script>
   </body>
 </html>
