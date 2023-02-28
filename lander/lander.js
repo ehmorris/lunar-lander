@@ -168,7 +168,6 @@ export const makeLander = (
         : scoreCrash(angleInDeg, speedInMPH, _rotationCount);
 
       const commonStats = {
-        score,
         speed: speedInMPH.toFixed(1),
         angle: angleInDeg.toFixed(1),
         durationInSeconds: Math.round(timeSinceStart / 1000),
