@@ -154,77 +154,73 @@ export const makeLander = (
         _boostersUsedPreviousFrame = false;
       }
     }
-    // Just landed
-    else if (
-      !_landed &&
-      getVectorVelocity(_velocity) < CRASH_VELOCITY &&
-      getAngleDeltaUpright(_angle) < CRASH_ANGLE
-    ) {
+    // Just landed or crashed, game over
+    else {
+      const landed =
+        !_landed &&
+        getVectorVelocity(_velocity) < CRASH_VELOCITY &&
+        getAngleDeltaUpright(_angle) < CRASH_ANGLE;
+      const crashed = !_landed && !_crashed;
       const speedInMPH = getDisplayVelocity(_velocity);
       const angleInDeg = getAngleDeltaUpright(_angle);
-      const score = scoreLanding(angleInDeg, speedInMPH, _rotationCount);
-      _landed = {
-        description: landingScoreDescription(score),
+      const score = landed
+        ? scoreLanding(angleInDeg, speedInMPH, _rotationCount)
+        : scoreCrash(angleInDeg, speedInMPH, _rotationCount);
+
+      const commonStats = {
+        score,
         speed: speedInMPH.toFixed(1),
-        speedPercent: percentProgress(
-          0,
-          CRASH_VELOCITY,
-          getVectorVelocity(_velocity)
-        ),
         angle: angleInDeg.toFixed(1),
-        anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
         durationInSeconds: Math.round(timeSinceStart / 1000),
         rotations: _rotationCount,
         maxSpeed: _maxSpeed.toFixed(1),
         maxHeight: getDisplayHeight(_maxHeight, _groundedHeight),
         engineUsed: _engineUsed,
         boostersUsed: _boostersUsed,
-        confetti: makeConfetti(
-          CTX,
-          canvasWidth,
-          canvasHeight,
-          Math.round(score)
-        ),
       };
 
-      onGameEnd(_landed);
-
-      _angle = Math.PI * 2;
-      _velocity = { x: 0, y: 0 };
-      _rotationVelocity = 0;
-    }
-    // Just crashed
-    else if (!_landed && !_crashed) {
-      const speedInMPH = getDisplayVelocity(_velocity);
-      const angleInDeg = getAngleDeltaUpright(_angle);
-      _crashed = {
-        description: crashScoreDescription(
-          scoreCrash(angleInDeg, speedInMPH, _rotationCount)
-        ),
-        speed: speedInMPH.toFixed(1),
-        speedPercent: percentProgress(
-          0,
-          CRASH_VELOCITY,
-          getVectorVelocity(_velocity)
-        ),
-        angle: angleInDeg.toFixed(1),
-        anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
-        durationInSeconds: Math.round(timeSinceStart / 1000),
-        rotations: _rotationCount,
-        maxSpeed: _maxSpeed.toFixed(1),
-        maxHeight: getDisplayHeight(_maxHeight, _groundedHeight),
-        engineUsed: _engineUsed,
-        boostersUsed: _boostersUsed,
-        explosion: makeExplosion(
-          CTX,
-          _position,
-          _velocity,
-          _angle,
-          canvasWidth,
-          canvasHeight
-        ),
-      };
-      onGameEnd(_crashed);
+      if (landed) {
+        _landed = {
+          ...commonStats,
+          description: landingScoreDescription(score),
+          speedPercent: percentProgress(
+            0,
+            CRASH_VELOCITY,
+            getVectorVelocity(_velocity)
+          ),
+          anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
+          confetti: makeConfetti(
+            CTX,
+            canvasWidth,
+            canvasHeight,
+            Math.round(score)
+          ),
+        };
+        _angle = Math.PI * 2;
+        _velocity = { x: 0, y: 0 };
+        _rotationVelocity = 0;
+        onGameEnd(_landed);
+      } else if (crashed) {
+        _crashed = {
+          ...commonStats,
+          description: crashScoreDescription(score),
+          speedPercent: percentProgress(
+            0,
+            CRASH_VELOCITY,
+            getVectorVelocity(_velocity)
+          ),
+          anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
+          explosion: makeExplosion(
+            CTX,
+            _position,
+            _velocity,
+            _angle,
+            canvasWidth,
+            canvasHeight
+          ),
+        };
+        onGameEnd(_crashed);
+      }
     }
   };
 
