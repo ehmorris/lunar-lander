@@ -5,8 +5,8 @@ export const makeAudioManager = () => {
   const boosterFileBuffer = _loadFile(audioCTX, "./audio/booster.mp3");
 
   let engineFileBufferSource = false;
-  let leftBoosterFileBufferSource = false;
-  let rightBoosterFileBufferSource = false;
+  let booster1FileBufferSource = false;
+  let booster2FileBufferSource = false;
 
   async function _loadFile(context, filePath) {
     const response = await fetch(filePath);
@@ -34,15 +34,15 @@ export const makeAudioManager = () => {
     }
   }
 
-  function playLeftBoosterSound() {
-    if (!leftBoosterFileBufferSource) {
-      leftBoosterFileBufferSource = _playTrack(boosterFileBuffer);
+  function playBoosterSound1() {
+    if (!booster1FileBufferSource) {
+      booster1FileBufferSource = _playTrack(boosterFileBuffer);
     }
   }
 
-  function playRightBoosterSound() {
-    if (!rightBoosterFileBufferSource) {
-      rightBoosterFileBufferSource = _playTrack(boosterFileBuffer);
+  function playBoosterSound2() {
+    if (!booster2FileBufferSource) {
+      booster2FileBufferSource = _playTrack(boosterFileBuffer);
     }
   }
 
@@ -55,20 +55,20 @@ export const makeAudioManager = () => {
     }
   }
 
-  function stopLeftBoosterSound() {
-    if (leftBoosterFileBufferSource) {
-      leftBoosterFileBufferSource.then((e) => {
+  function stopBoosterSound1() {
+    if (booster1FileBufferSource) {
+      booster1FileBufferSource.then((e) => {
         e.stop();
-        leftBoosterFileBufferSource = false;
+        booster1FileBufferSource = false;
       });
     }
   }
 
-  function stopRightBoosterSound() {
-    if (rightBoosterFileBufferSource) {
-      rightBoosterFileBufferSource.then((e) => {
+  function stopBoosterSound2() {
+    if (booster2FileBufferSource) {
+      booster2FileBufferSource.then((e) => {
         e.stop();
-        rightBoosterFileBufferSource = false;
+        booster2FileBufferSource = false;
       });
     }
   }
@@ -79,11 +79,11 @@ export const makeAudioManager = () => {
 
   return {
     playEngineSound,
-    playLeftBoosterSound,
-    playRightBoosterSound,
+    playBoosterSound1,
+    playBoosterSound2,
     stopEngineSound,
-    stopLeftBoosterSound,
-    stopRightBoosterSound,
+    stopBoosterSound1,
+    stopBoosterSound2,
     playTheme,
   };
 };
