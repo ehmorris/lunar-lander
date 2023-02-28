@@ -1,6 +1,5 @@
 # TODO
 
-- Stabilize lander HUD info when going very fast
 - When the lander explodes, show the nose cone as debris
 - Add fuel? May make some types of play less fun
 - Make terrain land-able

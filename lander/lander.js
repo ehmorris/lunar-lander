@@ -6,6 +6,7 @@ import {
   getVectorVelocity,
   getDisplayVelocity,
   getAngleDeltaUpright,
+  getAngleDeltaUprightWithSign,
   getDisplayHeight,
   percentProgress,
 } from "../helpers.js";
@@ -225,10 +226,10 @@ export const makeLander = (
 
   const _drawSideBySideStats = () => {
     const textWidth = CTX.measureText("100.0 MPH").width + 2;
-    const xPosBasis = Math.min(
-      _position.x + LANDER_WIDTH * 2,
-      canvasWidth - textWidth
-    );
+    const staticPosition = getVectorVelocity(_velocity) > 10;
+    const xPosBasis = staticPosition
+      ? 8
+      : Math.min(_position.x + LANDER_WIDTH * 2, canvasWidth - textWidth);
     const yPosBasis = Math.max(_position.y, 30);
     const lineHeight = 14;
 
@@ -247,7 +248,7 @@ export const makeLander = (
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
     CTX.fillText(
-      `${getAngleDeltaUpright(_angle).toFixed(1)}°`,
+      `${getAngleDeltaUprightWithSign(_angle).toFixed(1)}°`,
       xPosBasis,
       yPosBasis
     );

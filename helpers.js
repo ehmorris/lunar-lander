@@ -47,6 +47,12 @@ export const getAngleDeltaUpright = (angle) => {
   return repeatingAngle > 180 ? Math.abs(repeatingAngle - 360) : repeatingAngle;
 };
 
+export const getAngleDeltaUprightWithSign = (angle) => {
+  const angleInDeg = (angle * 180) / Math.PI;
+  const repeatingAngle = Math.abs(angleInDeg) % 360;
+  return repeatingAngle > 180 ? repeatingAngle - 360 : repeatingAngle;
+};
+
 export const getDisplayVelocity = (velocity) =>
   getVectorVelocity(velocity) * VELOCITY_MULTIPLIER;
 
