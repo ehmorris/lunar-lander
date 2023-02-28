@@ -60,12 +60,16 @@ export const showStatsAndResetControl = (
 
   function showShareSheet() {
     navigator.share({
-      text: `Speed: ${data.speed} MPH
+      text: `${data.description}
+
+Speed: ${data.speed} MPH
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds} S
 Flips: ${data.rotations}
 Max speed: ${data.maxSpeed} MPH
 Max height: ${data.maxHeight} FT
+Engine used: ${data.engineUsed} TIMES
+Boosters used: ${data.boostersUsed} TIMES
 https://ehmorris.com/lander/`,
     });
   }
