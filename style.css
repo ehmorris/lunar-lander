@@ -100,7 +100,15 @@ li.strikethrough {
 .meter {
   position: relative;
   height: 18px;
-  background: linear-gradient(90deg, rgb(0, 255, 0), rgb(255, 0, 0));
+  background: linear-gradient(
+    90deg,
+    hsl(142deg 100% 48%) 0%,
+    hsl(84deg 100% 42%) 6%,
+    hsl(61deg 100% 35%) 15%,
+    hsl(41deg 100% 40%) 29%,
+    hsl(25deg 100% 44%) 50%,
+    hsl(0deg 100% 46%) 100%
+  );
 }
 
 .cursor {
