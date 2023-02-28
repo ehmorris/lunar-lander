@@ -6,6 +6,14 @@ export const makeControls = (
   canvasElement,
   audioManager
 ) => {
+  const allActiveTouches = new Set();
+  const touchColumnBasis = canvasWidth / 4;
+  const touchColumnMap = new Map([
+    [0, "left"],
+    [1, "center"],
+    [2, "center"],
+    [3, "right"],
+  ]);
   let _showCenterOverlay = false;
   let _showRightOverlay = false;
   let _showLeftOverlay = false;
@@ -42,17 +50,22 @@ export const makeControls = (
     }
   }
 
-  const _leftTouch = (touch) =>
-    touch.clientX / canvasWidth > 0 && touch.clientX / canvasWidth < 0.25;
-  const _centerTouch = (touch) =>
-    touch.clientX / canvasWidth >= 0.25 && touch.clientX / canvasWidth <= 0.75;
+  const _getTouchZone = (x) => {
+    const columnNumber = Math.floor(x / touchColumnBasis);
+    const clampedColumnNumber = Math.max(
+      0,
+      Math.min(columnNumber, touchColumnMap.size)
+    );
 
-  const _activateTouchZone = (touch) => {
-    if (_leftTouch(touch)) {
+    return touchColumnMap.get(clampedColumnNumber);
+  };
+
+  const _activateTouchZone = (zoneNumber) => {
+    if (zoneNumber === "left") {
       lander.rotateLeft();
       audioManager.playLeftBoosterSound();
       _showLeftOverlay = true;
-    } else if (_centerTouch(touch)) {
+    } else if (zoneNumber === "center") {
       lander.engineOn();
       audioManager.playEngineSound();
       _showCenterOverlay = true;
@@ -63,27 +76,48 @@ export const makeControls = (
     }
   };
 
+  const _deactivateTouchZone = (zoneNumber) => {
+    if (zoneNumber === "left") {
+      lander.stopLeftRotation();
+      audioManager.stopLeftBoosterSound();
+      _showLeftOverlay = false;
+    } else if (zoneNumber === "center") {
+      lander.engineOff();
+      audioManager.stopEngineSound();
+      _showCenterOverlay = false;
+    } else {
+      lander.stopRightRotation();
+      audioManager.stopRightBoosterSound();
+      _showRightOverlay = false;
+    }
+  };
+
   function _onTouchStart(e) {
-    for (let index = 0; index < e.touches.length; index++) {
-      _activateTouchZone(e.touches[index]);
+    for (let index = 0; index < e.changedTouches.length; index++) {
+      _activateTouchZone(_getTouchZone(e.changedTouches[index].clientX));
+      allActiveTouches.add(e.changedTouches[index]);
     }
 
     e.preventDefault();
   }
 
   function _onTouchMove(e) {
-    lander.engineOff();
-    lander.stopLeftRotation();
-    lander.stopRightRotation();
-    audioManager.stopEngineSound();
-    audioManager.stopLeftBoosterSound();
-    audioManager.stopRightBoosterSound();
-    _showCenterOverlay = false;
-    _showLeftOverlay = false;
-    _showRightOverlay = false;
+    for (let index = 0; index < e.changedTouches.length; index++) {
+      let touchPreviousData;
+      allActiveTouches.forEach((touch) => {
+        if (touch.identifier === e.changedTouches[index].identifier) {
+          touchPreviousData = touch;
+        }
+      });
+      const previousTouchZone = _getTouchZone(touchPreviousData.clientX);
+      const currentTouchZone = _getTouchZone(e.changedTouches[index].clientX);
 
-    for (let index = 0; index < e.touches.length; index++) {
-      _activateTouchZone(e.touches[index]);
+      if (previousTouchZone !== currentTouchZone) {
+        _deactivateTouchZone(previousTouchZone);
+        _activateTouchZone(currentTouchZone);
+        allActiveTouches.delete(touchPreviousData);
+        allActiveTouches.add(e.changedTouches[index]);
+      }
     }
 
     e.preventDefault();
@@ -91,19 +125,13 @@ export const makeControls = (
 
   function _onTouchEnd(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
-      if (_leftTouch(e.changedTouches[index])) {
-        lander.stopLeftRotation();
-        audioManager.stopLeftBoosterSound();
-        _showLeftOverlay = false;
-      } else if (_centerTouch(e.changedTouches[index])) {
-        lander.engineOff();
-        audioManager.stopEngineSound();
-        _showCenterOverlay = false;
-      } else {
-        lander.stopRightRotation();
-        audioManager.stopRightBoosterSound();
-        _showRightOverlay = false;
-      }
+      _deactivateTouchZone(_getTouchZone(e.changedTouches[index].clientX));
+
+      allActiveTouches.forEach((touch) => {
+        if (touch.identifier === e.changedTouches[index].identifier) {
+          allActiveTouches.delete(touch);
+        }
+      });
     }
 
     e.preventDefault();
