@@ -2,17 +2,16 @@ import { randomBetween } from "./helpers.js";
 
 export const makeTerrain = (CTX, canvasWidth, canvasHeight) => {
   let terrain = [];
-  const maxHeight = canvasHeight / 60;
+  const maxHeight = 10;
   const minHeight = 5;
-  const points = 20;
-  const widthOfPoint = canvasWidth / points;
+  const points = Math.max(canvasWidth / 60, 20);
 
   const reGenerate = () => {
     terrain = [];
 
     for (let index = 1; index < points; index++) {
       terrain.push({
-        x: index * widthOfPoint,
+        x: index * (canvasWidth / points),
         y: randomBetween(canvasHeight - minHeight, canvasHeight - maxHeight),
       });
     }

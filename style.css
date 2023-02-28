@@ -32,11 +32,14 @@ li.strikethrough {
   display: none;
   position: absolute;
   top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(800px + 16vw);
+  padding: 8vw;
   flex-direction: column;
   justify-content: center;
   height: 100svh;
   grid-gap: 0.8rem;
-  padding: 8vw;
   box-sizing: border-box;
   width: 100%;
   touch-action: manipulation;
@@ -48,21 +51,12 @@ li.strikethrough {
   pointer-events: none;
 }
 
-@media screen and (min-width: 1280px) {
-  .fullSizeContainer {
-    padding: 0 25vw;
-  }
-  .fullSizeContainer.instructions {
-    padding: 8vh 25vw;
-  }
-}
-
 .fullSizeContainer.show {
   display: flex;
 }
 
 .fullSizeContainer h1 {
-  font-size: 8vmin;
+  font-size: min(8vmin, 62px);
   font-weight: 900;
   line-height: 1.1;
   color: white;
@@ -70,7 +64,7 @@ li.strikethrough {
 }
 
 .fullSizeContainer h2 {
-  font-size: 6vmin;
+  font-size: min(8vmin, 42px);
   font-weight: 700;
   line-height: 1.2;
   color: white;
