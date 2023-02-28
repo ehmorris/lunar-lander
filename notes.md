@@ -1,9 +1,10 @@
 # TODO
 
+- Stabilize lander HUD info when going very fast
 - Show score number and that flips are part of it
 - When the lander explodes, show the nose cone as debris
 - Tracking?
-- Add fuel
+- Add fuel? May make some types of play less fun
 - Make terrain land-able
 - Extend ramp from lander on land
 - Generate image from canvas for sharing with all stats

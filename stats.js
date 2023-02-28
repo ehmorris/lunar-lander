@@ -46,6 +46,8 @@ export const showStatsAndResetControl = (
     document.querySelector("#rotations").textContent = data.rotations;
     document.querySelector("#maxSpeed").textContent = data.maxSpeed;
     document.querySelector("#maxHeight").textContent = data.maxHeight;
+    document.querySelector("#engineUsed").textContent = data.engineUsed;
+    document.querySelector("#boostersUsed").textContent = data.boostersUsed;
 
     if (hasKeyboard) {
       document.querySelector("#resetText").textContent = "Reset (Spacebar)";

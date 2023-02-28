@@ -42,6 +42,7 @@ export const makeLander = (
   let _engineOn;
   let _rotatingLeft;
   let _rotatingRight;
+
   let _crashed;
   let _landed;
   let _flipConfetti;
@@ -50,6 +51,10 @@ export const makeLander = (
   let _rotationCount;
   let _maxSpeed;
   let _maxHeight;
+  let _engineUsed;
+  let _engineUsedPreviousFrame;
+  let _boostersUsed;
+  let _boostersUsedPreviousFrame;
 
   const resetProps = () => {
     _position = {
@@ -76,6 +81,10 @@ export const makeLander = (
     _rotationCount = 0;
     _maxSpeed = 0;
     _maxHeight = _position.y;
+    _engineUsed = 0;
+    _engineUsedPreviousFrame = false;
+    _boostersUsed = 0;
+    _boostersUsedPreviousFrame = false;
   };
   resetProps();
 
@@ -125,6 +134,25 @@ export const makeLander = (
       if (getDisplayVelocity(_velocity) > _maxSpeed) {
         _maxSpeed = getDisplayVelocity(_velocity);
       }
+
+      // Log engine and booster usage
+      if (!_engineUsedPreviousFrame && _engineOn) {
+        _engineUsed++;
+        _engineUsedPreviousFrame = true;
+      } else if (_engineUsedPreviousFrame && !_engineOn) {
+        _engineUsedPreviousFrame = false;
+      }
+
+      if (!_boostersUsedPreviousFrame && (_rotatingLeft || _rotatingRight)) {
+        _boostersUsed++;
+        _boostersUsedPreviousFrame = true;
+      } else if (
+        _boostersUsedPreviousFrame &&
+        !_rotatingLeft &&
+        !_rotatingRight
+      ) {
+        _boostersUsedPreviousFrame = false;
+      }
     }
     // Just landed
     else if (
@@ -149,6 +177,8 @@ export const makeLander = (
         rotations: _rotationCount,
         maxSpeed: _maxSpeed.toFixed(1),
         maxHeight: getDisplayHeight(_maxHeight, _groundedHeight),
+        engineUsed: _engineUsed,
+        boostersUsed: _boostersUsed,
         confetti: makeConfetti(
           CTX,
           canvasWidth,
@@ -183,6 +213,8 @@ export const makeLander = (
         rotations: _rotationCount,
         maxSpeed: _maxSpeed.toFixed(1),
         maxHeight: getDisplayHeight(_maxHeight, _groundedHeight),
+        engineUsed: _engineUsed,
+        boostersUsed: _boostersUsed,
         explosion: makeExplosion(
           CTX,
           _position,
