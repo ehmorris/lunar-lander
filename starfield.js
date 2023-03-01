@@ -1,6 +1,9 @@
 import { randomBetween } from "./helpers.js";
 
-export const makeStarfield = (CTX, canvasWidth, canvasHeight) => {
+export const makeStarfield = (state) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
   let stars = [];
 
   const reGenerate = () => {

@@ -1,11 +1,8 @@
-export const makeControls = (
-  CTX,
-  lander,
-  canvasWidth,
-  canvasHeight,
-  canvasElement,
-  audioManager
-) => {
+export const makeControls = (state, lander, audioManager) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
+  const canvasElement = state.get("canvasElement");
   const allActiveTouches = new Set();
   const touchColumnBasis = canvasWidth / 4;
   const touchColumnMap = new Map([

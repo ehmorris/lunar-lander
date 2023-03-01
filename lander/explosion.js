@@ -6,14 +6,11 @@ import {
 import { LANDER_WIDTH, LANDER_HEIGHT } from "../constants.js";
 import { drawLanderGradient } from "./gradient.js";
 
-export const makeExplosion = (
-  CTX,
-  position,
-  velocity,
-  angle,
-  canvasWidth,
-  canvasHeight
-) => {
+export const makeExplosion = (state, position, velocity, angle) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
+
   const _makeLanderChunk = (drawInstructions, height) => {
     const _rotationDirection = randomBool();
     const _groundedHeight = canvasHeight - height + height / 2;

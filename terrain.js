@@ -1,10 +1,13 @@
 import { randomBetween } from "./helpers.js";
 
-export const makeTerrain = (CTX, canvasWidth, canvasHeight) => {
-  let terrain = [];
+export const makeTerrain = (state) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
   const maxHeight = 10;
   const minHeight = 5;
   const points = Math.max(canvasWidth / 60, 20);
+  let terrain = [];
 
   const reGenerate = () => {
     terrain = [];

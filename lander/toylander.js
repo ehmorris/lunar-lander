@@ -2,14 +2,16 @@ import { randomBetween, randomBool } from "../helpers.js";
 import { drawLanderGradient } from "./gradient.js";
 
 export const makeToyLander = (
-  CTX,
-  canvasWidth,
-  canvasHeight,
+  state,
   onEngineOn,
   onLeftRotation,
   onRightRotation,
   onEngineAndRotation
 ) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
+
   const _toyLanderWidth = Math.min(canvasWidth, canvasHeight) / 7;
   const _toyLanderHeight = _toyLanderWidth * 2;
   const _toyLanderBoosterLengthMin = _toyLanderWidth / 4;

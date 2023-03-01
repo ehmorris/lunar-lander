@@ -26,13 +26,11 @@ import {
 } from "../constants.js";
 import { drawLanderGradient } from "./gradient.js";
 
-export const makeLander = (
-  CTX,
-  canvasWidth,
-  canvasHeight,
-  onGameEnd,
-  onResetXPos
-) => {
+export const makeLander = (state, onGameEnd, onResetXPos) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
+
   const _thrust = 0.01;
   const _groundedHeight = canvasHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
 
@@ -74,8 +72,9 @@ export const makeLander = (
     _engineOn = false;
     _rotatingLeft = false;
     _rotatingRight = false;
-    _landed = false;
+
     _crashed = false;
+    _landed = false;
     _flipConfetti = [];
     _lastRotation = 1;
     _lastRotationAngle = Math.PI * 2;
@@ -124,9 +123,7 @@ export const makeLander = (
         _rotationCount++;
         _lastRotation = rotations;
         _lastRotationAngle = _angle;
-        _flipConfetti.push(
-          makeConfetti(CTX, canvasWidth, canvasHeight, 10, _position)
-        );
+        _flipConfetti.push(makeConfetti(state, 10, _position));
       }
 
       // Log new max speed and height
@@ -189,12 +186,7 @@ export const makeLander = (
             getVectorVelocity(_velocity)
           ),
           anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
-          confetti: makeConfetti(
-            CTX,
-            canvasWidth,
-            canvasHeight,
-            Math.round(score)
-          ),
+          confetti: makeConfetti(state, Math.round(score)),
         };
         _angle = Math.PI * 2;
         _velocity = { x: 0, y: 0 };
@@ -210,14 +202,7 @@ export const makeLander = (
             getVectorVelocity(_velocity)
           ),
           anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
-          explosion: makeExplosion(
-            CTX,
-            _position,
-            _velocity,
-            _angle,
-            canvasWidth,
-            canvasHeight
-          ),
+          explosion: makeExplosion(state, _position, _velocity, _angle),
         };
         onGameEnd(_crashed);
       }

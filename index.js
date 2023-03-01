@@ -7,6 +7,7 @@ import { makeTerrain } from "./terrain.js";
 import { showStatsAndResetControl } from "./stats.js";
 import { manageInstructions } from "./instructions.js";
 import { makeAudioManager } from "./audio.js";
+import { makeStateManager } from "./state.js";
 
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   width: window.innerWidth,
@@ -14,42 +15,26 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   attachNode: ".game",
 });
 
+const appState = makeStateManager()
+  .set("CTX", CTX)
+  .set("canvasWidth", canvasWidth)
+  .set("canvasHeight", canvasHeight)
+  .set("canvasElement", canvasElement);
+
 const audioManager = makeAudioManager();
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
-  CTX,
-  canvasWidth,
-  canvasHeight,
+  appState,
   () => instructions.setEngineDone(),
   () => instructions.setLeftRotationDone(),
   () => instructions.setRightRotationDone(),
   () => instructions.setEngineAndRotationDone()
 );
-const toyLanderControls = makeControls(
-  CTX,
-  toyLander,
-  canvasWidth,
-  canvasHeight,
-  canvasElement,
-  audioManager
-);
-const lander = makeLander(
-  CTX,
-  canvasWidth,
-  canvasHeight,
-  onGameEnd,
-  onResetXPos
-);
-const landerControls = makeControls(
-  CTX,
-  lander,
-  canvasWidth,
-  canvasHeight,
-  canvasElement,
-  audioManager
-);
-const stars = makeStarfield(CTX, canvasWidth, canvasHeight);
-const terrain = makeTerrain(CTX, canvasWidth, canvasHeight);
+const toyLanderControls = makeControls(appState, toyLander, audioManager);
+const lander = makeLander(appState, onGameEnd, onResetXPos);
+const landerControls = makeControls(appState, lander, audioManager);
+const stars = makeStarfield(appState);
+const terrain = makeTerrain(appState);
 
 if (!instructions.hasClosedInstructions()) {
   instructions.show();

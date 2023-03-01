@@ -4,13 +4,11 @@ import {
   simpleBallisticUpdate,
 } from "../helpers.js";
 
-export const makeConfetti = (
-  CTX,
-  canvasWidth,
-  canvasHeight,
-  amount,
-  position
-) => {
+export const makeConfetti = (state, amount, position) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
+
   const _makeConfettiPiece = (position, velocity) => {
     const _size = randomBetween(1, 6);
     const _rotationDirection = randomBool();
