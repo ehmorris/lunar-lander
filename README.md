@@ -12,4 +12,4 @@ Thanks to [this guide](http://students.cs.ucl.ac.uk/schoolslab/projects/HT5/) fo
 
 Deployed to ehmorris.com via a git submodule.
 
-Run `npx http-server` to develop.
+See `launch.json` for running.
