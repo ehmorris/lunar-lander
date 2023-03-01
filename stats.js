@@ -10,6 +10,7 @@ export const showStatsAndResetControl = (
     document.querySelector("#endGameStats").classList.add("show");
     document.querySelector("#reset").classList.add("loading");
   };
+  const canCopyText = navigator && navigator.clipboard;
 
   const hideStats = () => {
     document
@@ -53,8 +54,16 @@ export const showStatsAndResetControl = (
       document.querySelector("#resetText").textContent = "Reset (Spacebar)";
     }
 
-    if (!canShowShareSheet && document.querySelector("#share")) {
+    if (canShowShareSheet) {
+      if (document.querySelector("#copyText")) {
+        document.querySelector("#copyText").remove();
+      }
+    } else if (document.querySelector("#share")) {
       document.querySelector("#share").remove();
+    }
+
+    if (!canCopyText && document.querySelector("#copyText")) {
+      document.querySelector("#copyText").remove();
     }
   };
 
@@ -74,6 +83,22 @@ https://ehmorris.com/lander/`,
     });
   }
 
+  function copyShareStats() {
+    navigator.clipboard.writeText(
+      `${data.description}
+
+Speed: ${data.speed} MPH
+Angle: ${data.angle}°
+Time: ${data.durationInSeconds} S
+Flips: ${data.rotations}
+Max speed: ${data.maxSpeed} MPH
+Max height: ${data.maxHeight} FT
+Engine used: ${data.engineUsed} TIMES
+Boosters used: ${data.boostersUsed} TIMES
+https://ehmorris.com/lander/`
+    );
+  }
+
   function resetOnSpace({ code }) {
     if (code === "Space") resetGame();
   }
@@ -90,6 +115,10 @@ https://ehmorris.com/lander/`,
       document
         .querySelector("#share")
         .addEventListener("click", showShareSheet);
+    } else if (canCopyText) {
+      document
+        .querySelector("#copyText")
+        .addEventListener("click", copyShareStats);
     }
 
     if (hasKeyboard) {
