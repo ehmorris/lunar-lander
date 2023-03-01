@@ -35,11 +35,11 @@ li.strikethrough {
   left: 50%;
   transform: translateX(-50%);
   max-width: calc(800px + 16vw);
-  padding: 8vw;
+  padding: 8vmin;
   flex-direction: column;
   justify-content: center;
   height: 100svh;
-  grid-gap: 0.8rem;
+  grid-gap: 12px;
   box-sizing: border-box;
   width: 100%;
   touch-action: manipulation;
@@ -60,7 +60,11 @@ li.strikethrough {
   font-weight: 900;
   line-height: 1.1;
   color: white;
-  margin: 0 0 1rem;
+  margin: 0;
+}
+
+.fullSizeContainer h1 + p {
+  margin-top: 0.6rem;
 }
 
 .fullSizeContainer h2 {
@@ -68,7 +72,7 @@ li.strikethrough {
   font-weight: 700;
   line-height: 1.2;
   color: white;
-  margin: 0 0 0.2em;
+  margin: 0 0 0.4rem;
 }
 
 @media screen and (max-width: 640px) {
@@ -78,10 +82,13 @@ li.strikethrough {
     line-height: 1.2;
   }
 
+  .fullSizeContainer h1 + p {
+    margin-top: 0;
+  }
+
   .fullSizeContainer h2 {
     font-size: 24px;
     font-weight: 600;
-    line-height: 1.3;
     margin-bottom: 0;
   }
 }
@@ -94,7 +101,7 @@ li.strikethrough {
   font-size: var(--stats-font-size);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding-bottom: var(--stats-font-size);
+  padding: 4px 0;
 }
 
 .meter {
@@ -133,13 +140,19 @@ li.strikethrough {
 }
 
 .statsTable {
-  margin: 1rem 0 1.6rem;
+  margin: 18px 0 22px;
   font-size: var(--stats-font-size);
   text-transform: uppercase;
-  row-gap: 0.5em;
-  column-gap: 4em;
+  row-gap: 8px;
+  column-gap: 22px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+@media screen and (min-height: 800px) {
+  .statsTable {
+    row-gap: 12px;
+  }
 }
 
 .tableRow {
@@ -175,7 +188,8 @@ li.strikethrough {
   flex-wrap: wrap;
   box-sizing: border-box;
   justify-content: center;
-  grid-gap: 1rem;
+  column-gap: 22px;
+  row-gap: 12px;
 }
 
 .button {
@@ -183,7 +197,7 @@ li.strikethrough {
   text-align: center;
   color: white;
   flex: 1;
-  padding: 1rem;
+  padding: 12px;
   max-width: 400px;
   min-width: 200px;
   backdrop-filter: blur(4px);
