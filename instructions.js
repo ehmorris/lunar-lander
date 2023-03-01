@@ -44,25 +44,23 @@ export const manageInstructions = (onCloseInstructions) => {
       _engineDone &&
       _leftRotationDone &&
       _rightRotationDone &&
-      _engineAndRotationDone
+      _engineAndRotationDone &&
+      !_hasClosedInstructionsVar
     ) {
-      if (likelyTouchDevice) {
-        document.addEventListener(
-          "touchend",
-          () => {
-            setTimeout(close, 1000);
-          },
-          { once: true }
-        );
-      } else {
-        document.addEventListener(
-          "keyup",
-          () => {
-            setTimeout(close, 1000);
-          },
-          { once: true }
-        );
-      }
+      document.addEventListener(
+        "touchend",
+        () => {
+          setTimeout(close, 1000);
+        },
+        { once: true }
+      );
+      document.addEventListener(
+        "keyup",
+        () => {
+          setTimeout(close, 1000);
+        },
+        { once: true }
+      );
     }
   };
 
