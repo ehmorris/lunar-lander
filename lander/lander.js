@@ -166,6 +166,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         : scoreCrash(angleInDeg, speedInMPH, _rotationCount);
 
       const commonStats = {
+        landed,
         speed: speedInMPH.toFixed(1),
         angle: angleInDeg.toFixed(1),
         durationInSeconds: Math.round(timeSinceStart / 1000),

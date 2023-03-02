@@ -1,8 +1,16 @@
+import { randomBool } from "./helpers.js";
+
 export const makeAudioManager = () => {
   const audioCTX = new AudioContext();
   const themeFileBuffer = _loadFile(audioCTX, "./audio/theme.mp3");
   const engineFileBuffer = _loadFile(audioCTX, "./audio/engine.mp3");
   const boosterFileBuffer = _loadFile(audioCTX, "./audio/booster.mp3");
+  const crash1FileBuffer = _loadFile(audioCTX, "./audio/crash1.mp3");
+  const crash2FileBuffer = _loadFile(audioCTX, "./audio/crash2.mp3");
+  const landing1FileBuffer = _loadFile(audioCTX, "./audio/landing1.mp3");
+  const landing2FileBuffer = _loadFile(audioCTX, "./audio/landing2.mp3");
+  const confetti1FileBuffer = _loadFile(audioCTX, "./audio/confetti1.mp3");
+  const confetti2FileBuffer = _loadFile(audioCTX, "./audio/confetti2.mp3");
 
   let engineFileBufferSource = false;
   let booster1FileBufferSource = false;
@@ -15,11 +23,11 @@ export const makeAudioManager = () => {
     return audioBuffer;
   }
 
-  async function _playTrack(audioBuffer) {
+  async function _playTrack(audioBuffer, loop = true) {
     return Promise.all([audioBuffer, audioCTX.resume()]).then((e) => {
       const trackSource = new AudioBufferSourceNode(audioCTX, {
         buffer: e[0],
-        loop: true,
+        loop: loop,
       });
       trackSource.connect(audioCTX.destination);
       trackSource.start();
@@ -73,6 +81,18 @@ export const makeAudioManager = () => {
     }
   }
 
+  function playCrash() {
+    _playTrack(randomBool() ? crash1FileBuffer : crash2FileBuffer, false);
+  }
+
+  function playLanding() {
+    _playTrack(randomBool() ? landing1FileBuffer : landing2FileBuffer, false);
+  }
+
+  function playConfetti() {
+    _playTrack(randomBool() ? confetti1FileBuffer : confetti2FileBuffer, false);
+  }
+
   function playTheme() {
     _playTrack(themeFileBuffer);
   }
@@ -84,6 +104,9 @@ export const makeAudioManager = () => {
     stopEngineSound,
     stopBoosterSound1,
     stopBoosterSound2,
+    playCrash,
+    playLanding,
+    playConfetti,
     playTheme,
   };
 };

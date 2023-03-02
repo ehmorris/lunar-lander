@@ -8,6 +8,8 @@ export const makeConfetti = (state, amount, position) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
+  const audio = state.get("audioManager");
+  let hasPlayedAudio = false;
 
   const _makeConfettiPiece = (position, velocity) => {
     const _size = randomBetween(1, 6);
@@ -57,6 +59,10 @@ export const makeConfetti = (state, amount, position) => {
     );
 
   const draw = () => {
+    if (!hasPlayedAudio) {
+      audio.playConfetti();
+      hasPlayedAudio = true;
+    }
     confettiPieces.forEach((e) => e.draw());
   };
 

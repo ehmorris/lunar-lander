@@ -10,6 +10,9 @@ import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 
+// SETUP
+
+const audioManager = makeAudioManager();
 const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   width: window.innerWidth,
   height: window.innerHeight,
@@ -20,9 +23,9 @@ const appState = makeStateManager()
   .set("CTX", CTX)
   .set("canvasWidth", canvasWidth)
   .set("canvasHeight", canvasHeight)
-  .set("canvasElement", canvasElement);
+  .set("canvasElement", canvasElement)
+  .set("audioManager", audioManager);
 
-const audioManager = makeAudioManager();
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
   appState,
@@ -38,6 +41,8 @@ const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const randomConfetti = [];
 
+// INSTRUCTIONS SHOW/HIDE
+
 if (!instructions.hasClosedInstructions()) {
   instructions.show();
   toyLanderControls.attachEventListeners();
@@ -45,18 +50,7 @@ if (!instructions.hasClosedInstructions()) {
   landerControls.attachEventListeners();
 }
 
-document.addEventListener("keydown", ({ key }) => {
-  if (key === "c") {
-    randomConfetti.push(
-      makeConfetti(appState, 10, {
-        x: randomBetween(0, canvasWidth),
-        y: randomBetween(0, canvasHeight),
-      })
-    );
-  }
-});
-
-audioManager.playTheme();
+// MAIN ANIMATION LOOP
 
 const animationObject = animate((timeSinceStart) => {
   CTX.fillStyle = getComputedStyle(document.body).getPropertyValue(
@@ -78,6 +72,8 @@ const animationObject = animate((timeSinceStart) => {
   }
 });
 
+// PASSED FUNCTIONS
+
 function onCloseInstructions() {
   toyLanderControls.detachEventListeners();
   landerControls.attachEventListeners();
@@ -90,9 +86,26 @@ function onGameEnd(data) {
     data,
     landerControls.getHasKeyboard()
   );
+
+  data.landed ? audioManager.playLanding() : audioManager.playCrash();
 }
 
 function onResetXPos() {
   stars.reGenerate();
   terrain.reGenerate();
 }
+
+// EXTRAS
+
+document.addEventListener("keydown", ({ key }) => {
+  if (key === "c") {
+    randomConfetti.push(
+      makeConfetti(appState, 10, {
+        x: randomBetween(0, canvasWidth),
+        y: randomBetween(0, canvasHeight),
+      })
+    );
+  }
+});
+
+audioManager.playTheme();
