@@ -198,7 +198,6 @@ li.strikethrough {
   color: white;
   flex: 1;
   padding: 12px;
-  max-width: 400px;
   min-width: 200px;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
