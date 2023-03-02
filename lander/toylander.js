@@ -1,4 +1,4 @@
-import { randomBetween, randomBool } from "../helpers.js";
+import { randomBetween, randomBool } from "../helpers/helpers.js";
 import { drawLanderGradient } from "./gradient.js";
 
 export const makeToyLander = (

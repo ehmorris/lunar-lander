@@ -1,4 +1,4 @@
-import { LANDER_WIDTH } from "../constants.js";
+import { LANDER_WIDTH } from "../helpers/constants.js";
 
 export const drawLanderGradient = (CTX, width = LANDER_WIDTH) => {
   const gradient = CTX.createLinearGradient(-width / 2, 0, width / 2, 0);

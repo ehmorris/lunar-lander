@@ -9,13 +9,13 @@ import {
   getAngleDeltaUprightWithSign,
   getDisplayHeight,
   percentProgress,
-} from "../helpers.js";
+} from "../helpers/helpers.js";
 import {
   scoreLanding,
   scoreCrash,
   landingScoreDescription,
   crashScoreDescription,
-} from "../scoring.js";
+} from "../helpers/scoring.js";
 import { drawTrajectory } from "./trajectory.js";
 import {
   GRAVITY,
@@ -23,7 +23,7 @@ import {
   LANDER_HEIGHT,
   CRASH_VELOCITY,
   CRASH_ANGLE,
-} from "../constants.js";
+} from "../helpers/constants.js";
 import { drawLanderGradient } from "./gradient.js";
 
 export const makeLander = (state, onGameEnd, onResetXPos) => {

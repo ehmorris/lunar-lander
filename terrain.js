@@ -1,4 +1,4 @@
-import { randomBetween } from "./helpers.js";
+import { randomBetween } from "./helpers/helpers.js";
 
 export const makeTerrain = (state) => {
   const CTX = state.get("CTX");

@@ -2,8 +2,8 @@ import {
   randomBool,
   randomBetween,
   simpleBallisticUpdate,
-} from "../helpers.js";
-import { LANDER_WIDTH, LANDER_HEIGHT } from "../constants.js";
+} from "../helpers/helpers.js";
+import { LANDER_WIDTH, LANDER_HEIGHT } from "../helpers/constants.js";
 import { drawLanderGradient } from "./gradient.js";
 
 export const makeExplosion = (state, position, velocity, angle) => {

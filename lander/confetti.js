@@ -2,7 +2,7 @@ import {
   randomBool,
   randomBetween,
   simpleBallisticUpdate,
-} from "../helpers.js";
+} from "../helpers/helpers.js";
 
 export const makeConfetti = (state, amount, position) => {
   const CTX = state.get("CTX");

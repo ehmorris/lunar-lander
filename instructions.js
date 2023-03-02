@@ -2,7 +2,7 @@ import {
   CRASH_ANGLE,
   CRASH_VELOCITY,
   VELOCITY_MULTIPLIER,
-} from "./constants.js";
+} from "./helpers/constants.js";
 
 export const manageInstructions = (onCloseInstructions) => {
   let _engineDone = false;
