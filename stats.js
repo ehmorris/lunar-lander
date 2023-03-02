@@ -73,7 +73,7 @@ export const showStatsAndResetControl = (
 
 Speed: ${data.speed} MPH
 Angle: ${data.angle}°
-Time: ${data.durationInSeconds} S
+Time: ${data.durationInSeconds} SECONDS
 Flips: ${data.rotations}
 Max speed: ${data.maxSpeed} MPH
 Max height: ${data.maxHeight} FT
@@ -89,7 +89,7 @@ https://ehmorris.com/lander/`,
 
 Speed: ${data.speed} MPH
 Angle: ${data.angle}°
-Time: ${data.durationInSeconds} S
+Time: ${data.durationInSeconds} SECONDS
 Flips: ${data.rotations}
 Max speed: ${data.maxSpeed} MPH
 Max height: ${data.maxHeight} FT
