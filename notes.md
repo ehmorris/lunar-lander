@@ -1,12 +1,9 @@
 # TODO
 
 - Move mobile boosters to one side?
-- When the lander explodes, show the nose cone as debris
-- Add fuel? May make some types of play less fun
+- Add rings / bonus point areas to hit before landing
 - Make terrain land-able
-- Extend ramp from lander on land
 - Generate image from canvas for sharing with all stats
-- Add "copy stats" button on platforms that don't have navigator access
 
 # Extras
 
