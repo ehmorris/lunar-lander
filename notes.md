@@ -1,5 +1,6 @@
 # TODO
 
+- Separate score somehow from text. Say "points" somewhere.
 - Move end-game logic into index
 - Move landed and crashed data objects into state
 - Move background track to normal audio API to move web audio api stuff onto the regular sound channel in iOS?
