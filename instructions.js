@@ -33,10 +33,14 @@ export const manageInstructions = (onCloseInstructions) => {
   };
 
   function close() {
-    document.querySelector("#instructions").classList.remove("show");
-    localStorage.setItem("closedInstructions", true);
-    _hasClosedInstructionsVar = true;
-    onCloseInstructions();
+    // May be called twice in checkDone() on devices with both touch support
+    // and a keyboard
+    if (!_hasClosedInstructionsVar) {
+      document.querySelector("#instructions").classList.remove("show");
+      localStorage.setItem("closedInstructions", true);
+      _hasClosedInstructionsVar = true;
+      onCloseInstructions();
+    }
   }
 
   const checkDone = () => {
@@ -44,23 +48,12 @@ export const manageInstructions = (onCloseInstructions) => {
       _engineDone &&
       _leftRotationDone &&
       _rightRotationDone &&
-      _engineAndRotationDone &&
-      !_hasClosedInstructionsVar
+      _engineAndRotationDone
     ) {
-      document.addEventListener(
-        "touchend",
-        () => {
-          setTimeout(close, 1000);
-        },
-        { once: true }
-      );
-      document.addEventListener(
-        "keyup",
-        () => {
-          setTimeout(close, 1000);
-        },
-        { once: true }
-      );
+      const closeTimeout = () => setTimeout(close, 1000);
+      const options = { once: true };
+      document.addEventListener("touchend", closeTimeout, options);
+      document.addEventListener("keyup", closeTimeout, options);
     }
   };
 
