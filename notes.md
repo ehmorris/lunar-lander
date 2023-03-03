@@ -1,5 +1,6 @@
 # TODO
 
+- Pause theme when tab loses focus
 - Separate score somehow from text. Say "points" somewhere.
 - Move end-game logic into index
 - Move landed and crashed data objects into state
