@@ -157,7 +157,7 @@ li.strikethrough {
   font-size: var(--stats-font-size);
   text-transform: uppercase;
   row-gap: 8px;
-  column-gap: 22px;
+  column-gap: clamp(12px, 4vmin, 22px);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
@@ -201,7 +201,7 @@ li.strikethrough {
   flex-wrap: wrap;
   box-sizing: border-box;
   justify-content: center;
-  column-gap: 22px;
+  column-gap: clamp(12px, 4vmin, 22px);
   row-gap: 12px;
 }
 
@@ -219,6 +219,9 @@ li.strikethrough {
   letter-spacing: 0.05em;
   font-weight: 500;
   position: relative;
+  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .button.loading {
