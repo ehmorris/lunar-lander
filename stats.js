@@ -11,6 +11,18 @@ export const showStatsAndResetControl = (
     document.querySelector("#reset").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
+  const shareText = `${data.description}
+
+Score: ${data.score} POINT ${data.landing ? "LANDING" : "CRASH"}
+Speed: ${data.speed} MPH
+Angle: ${data.angle}°
+Time: ${data.durationInSeconds} SECONDS
+Flips: ${data.rotations}
+Max speed: ${data.maxSpeed} MPH
+Max height: ${data.maxHeight} FT
+Engine used: ${data.engineUsed} TIMES
+Boosters used: ${data.boostersUsed} TIMES
+https://ehmorris.com/lander/`;
 
   const hideStats = () => {
     document
@@ -72,37 +84,11 @@ export const showStatsAndResetControl = (
   };
 
   function showShareSheet() {
-    navigator.share({
-      text: `${data.description}
-
-Score: ${data.score} POINTS
-Speed: ${data.speed} MPH
-Angle: ${data.angle}°
-Time: ${data.durationInSeconds} SECONDS
-Flips: ${data.rotations}
-Max speed: ${data.maxSpeed} MPH
-Max height: ${data.maxHeight} FT
-Engine used: ${data.engineUsed} TIMES
-Boosters used: ${data.boostersUsed} TIMES
-https://ehmorris.com/lander/`,
-    });
+    navigator.share({ text: shareText });
   }
 
   function copyShareStats() {
-    navigator.clipboard.writeText(
-      `${data.description}
-
-Score: ${data.score} POINTS
-Speed: ${data.speed} MPH
-Angle: ${data.angle}°
-Time: ${data.durationInSeconds} SECONDS
-Flips: ${data.rotations}
-Max speed: ${data.maxSpeed} MPH
-Max height: ${data.maxHeight} FT
-Engine used: ${data.engineUsed} TIMES
-Boosters used: ${data.boostersUsed} TIMES
-https://ehmorris.com/lander/`
-    );
+    navigator.clipboard.writeText(shareText);
   }
 
   function resetOnSpace({ code }) {
