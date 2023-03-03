@@ -13,7 +13,7 @@ export const showStatsAndResetControl = (
   const canCopyText = navigator && navigator.clipboard;
   const shareText = `${data.description}
 
-Score: ${data.score} POINT ${data.landing ? "LANDING" : "CRASH"}
+Score: ${data.score} POINT ${data.landed ? "LANDING" : "CRASH"}
 Speed: ${data.speed} MPH
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds} SECONDS
@@ -54,7 +54,7 @@ https://ehmorris.com/lander/`;
   const populateStats = (data) => {
     document.querySelector("#description").textContent = data.description;
     document.querySelector("#score").textContent = data.score;
-    document.querySelector("#type").textContent = data.landing
+    document.querySelector("#type").textContent = data.landed
       ? "landing"
       : "crash";
     populateMeter("speed", data.speedPercent, data.speed);
