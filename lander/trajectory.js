@@ -6,14 +6,15 @@ import {
 } from "../helpers/constants.js";
 
 export const drawTrajectory = (
-  CTX,
+  state,
   currentPosition,
   currentAngle,
   currentVelocity,
   currentRotationVelocity,
-  canvasHeight,
   groundedHeight
 ) => {
+  const CTX = state.get("CTX");
+  const canvasHeight = state.get("canvasHeight");
   let projectedXPosition = currentPosition.x;
   let projectedYPosition = currentPosition.y;
   let projectedAngle = currentAngle;

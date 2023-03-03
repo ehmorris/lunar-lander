@@ -2,7 +2,6 @@ import { randomBool } from "./helpers.js";
 
 export const makeAudioManager = () => {
   const audioCTX = new AudioContext();
-  const themeFileBuffer = _loadFile(audioCTX, "./audio/theme.mp3");
   const engineFileBuffer = _loadFile(audioCTX, "./audio/engine.mp3");
   const boosterFileBuffer = _loadFile(audioCTX, "./audio/booster.mp3");
   const crash1FileBuffer = _loadFile(audioCTX, "./audio/crash1.mp3");
@@ -11,10 +10,27 @@ export const makeAudioManager = () => {
   const landing2FileBuffer = _loadFile(audioCTX, "./audio/landing2.mp3");
   const confetti1FileBuffer = _loadFile(audioCTX, "./audio/confetti1.mp3");
   const confetti2FileBuffer = _loadFile(audioCTX, "./audio/confetti2.mp3");
+  const babyFileBuffer = _loadFile(audioCTX, "./audio/baby.mp3");
 
   let engineFileBufferSource = false;
   let booster1FileBufferSource = false;
   let booster2FileBufferSource = false;
+
+  // Play theme in a loop in the background on instantiation. Playing some
+  // audio continuously with the HTML audio API will allow audio via the Web
+  // Audio API to play on the main sound channel in iOS, rather than the
+  // ringer channel.
+  let themeAudio = false;
+  const startThemeAudio = () => {
+    if (!themeAudio) {
+      themeAudio = new Audio("./audio/theme.mp3");
+      themeAudio.loop = true;
+      themeAudio.play();
+    }
+  };
+  const options = { once: true };
+  document.addEventListener("touchstart", startThemeAudio, options);
+  document.addEventListener("keydown", startThemeAudio, options);
 
   async function _loadFile(context, filePath) {
     const response = await fetch(filePath);
@@ -36,66 +52,66 @@ export const makeAudioManager = () => {
     });
   }
 
-  function playEngineSound() {
+  const playEngineSound = () => {
     if (!engineFileBufferSource) {
       engineFileBufferSource = _playTrack(engineFileBuffer);
     }
-  }
+  };
 
-  function playBoosterSound1() {
+  const playBoosterSound1 = () => {
     if (!booster1FileBufferSource) {
       booster1FileBufferSource = _playTrack(boosterFileBuffer);
     }
-  }
+  };
 
-  function playBoosterSound2() {
+  const playBoosterSound2 = () => {
     if (!booster2FileBufferSource) {
       booster2FileBufferSource = _playTrack(boosterFileBuffer);
     }
-  }
+  };
 
-  function stopEngineSound() {
+  const stopEngineSound = () => {
     if (engineFileBufferSource) {
       engineFileBufferSource.then((e) => {
         e.stop();
         engineFileBufferSource = false;
       });
     }
-  }
+  };
 
-  function stopBoosterSound1() {
+  const stopBoosterSound1 = () => {
     if (booster1FileBufferSource) {
       booster1FileBufferSource.then((e) => {
         e.stop();
         booster1FileBufferSource = false;
       });
     }
-  }
+  };
 
-  function stopBoosterSound2() {
+  const stopBoosterSound2 = () => {
     if (booster2FileBufferSource) {
       booster2FileBufferSource.then((e) => {
         e.stop();
         booster2FileBufferSource = false;
       });
     }
-  }
+  };
 
-  function playCrash() {
+  const playCrash = () => {
     _playTrack(randomBool() ? crash1FileBuffer : crash2FileBuffer, false);
-  }
+  };
 
-  function playLanding() {
+  const playLanding = () => {
     _playTrack(randomBool() ? landing1FileBuffer : landing2FileBuffer, false);
-  }
+  };
 
-  function playConfetti() {
+  const playConfetti = () => {
     _playTrack(randomBool() ? confetti1FileBuffer : confetti2FileBuffer, false);
-  }
+  };
 
-  function playTheme() {
-    _playTrack(themeFileBuffer);
-  }
+  const playBaby = () => {
+    _playTrack(babyFileBuffer, false);
+  };
 
   return {
     playEngineSound,
@@ -107,6 +123,6 @@ export const makeAudioManager = () => {
     playCrash,
     playLanding,
     playConfetti,
-    playTheme,
+    playBaby,
   };
 };

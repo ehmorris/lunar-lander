@@ -54,6 +54,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   let _engineUsedPreviousFrame;
   let _boostersUsed;
   let _boostersUsedPreviousFrame;
+  let _babySoundPlayed;
 
   const resetProps = () => {
     _position = {
@@ -85,6 +86,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _engineUsedPreviousFrame = false;
     _boostersUsed = 0;
     _boostersUsedPreviousFrame = false;
+    _babySoundPlayed = false;
   };
   resetProps();
 
@@ -93,6 +95,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
     // Is above ground
     if (_position.y < _groundedHeight) {
+      // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += 0.01;
       if (_rotatingLeft) _rotationVelocity -= 0.01;
 
@@ -150,6 +153,14 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         !_rotatingRight
       ) {
         _boostersUsedPreviousFrame = false;
+      }
+
+      // Play easter egg baby sound
+      if (getDisplayVelocity(_velocity) > 400 && !_babySoundPlayed) {
+        state.get("audioManager").playBaby();
+        _babySoundPlayed = true;
+      } else if (getDisplayVelocity(_velocity) < 400 && _babySoundPlayed) {
+        _babySoundPlayed = false;
       }
     }
     // Just landed or crashed, game over
@@ -252,12 +263,11 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
     if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
       drawTrajectory(
-        CTX,
+        state,
         _position,
         _angle,
         _velocity,
         _rotationVelocity,
-        canvasHeight,
         _groundedHeight
       );
     }

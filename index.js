@@ -107,5 +107,3 @@ document.addEventListener("keydown", ({ key }) => {
     );
   }
 });
-
-audioManager.playTheme();
