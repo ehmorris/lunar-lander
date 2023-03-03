@@ -1,7 +1,5 @@
-# TODO
+# Game Ideas
 
-- Move end-game logic into index
-- Move landed and crashed data objects into state
 - Move mobile booster controls to one side?
 - Add rings / bonus point areas to hit before landing
 - Make terrain land-able
@@ -14,6 +12,11 @@
 - Confetti pieces that don't rotate, but "flip" in 3-D. Maybe diamond shaped, and flipping horizontally.
 - Konami code on desktop?
 - Use broadcast channel to make a second screen a big dashboard of controls and graphs
+
+# Refactor
+
+- Move end-game logic into index
+- Move landed and crashed data objects into state
 
 # Bugs
 
