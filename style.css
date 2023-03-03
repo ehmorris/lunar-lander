@@ -56,7 +56,7 @@ li.strikethrough {
 }
 
 .fullSizeContainer h1 {
-  font-size: min(8vmin, 62px);
+  font-size: clamp(32px, 8vmin, 62px);
   font-weight: 900;
   line-height: 1.1;
   color: white;
@@ -64,20 +64,25 @@ li.strikethrough {
 }
 
 .fullSizeContainer h1 + p {
-  margin-top: 0.6rem;
+  margin-top: 0.6em;
 }
 
 .fullSizeContainer h2 {
-  font-size: min(8vmin, 42px);
+  font-size: clamp(24px, 6vmin, 42px);
   font-weight: 700;
   line-height: 1.2;
   color: white;
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.2em;
+}
+
+.fullSizeContainer h3 {
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(20px, 4vmin, 32px);
 }
 
 @media screen and (max-width: 640px) {
   .fullSizeContainer h1 {
-    font-size: 32px;
     font-weight: 800;
     line-height: 1.2;
   }
@@ -87,7 +92,6 @@ li.strikethrough {
   }
 
   .fullSizeContainer h2 {
-    font-size: 24px;
     font-weight: 600;
     margin-bottom: 0;
   }
@@ -98,15 +102,22 @@ li.strikethrough {
 }
 
 .meterAndLabel {
+  --meter-height: 16px;
   font-size: var(--stats-font-size);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 4px 0;
 }
 
+@media screen and (min-height: 800px) {
+  .meterAndLabel {
+    --meter-height: 24px;
+  }
+}
+
 .meter {
   position: relative;
-  height: 18px;
+  height: var(--meter-height);
   background: linear-gradient(
     90deg,
     hsl(142deg 100% 48%) 0%,
@@ -128,13 +139,15 @@ li.strikethrough {
 }
 
 .cursor::before {
-  --cursor-size: 14px;
+  --cursor-size: calc(var(--meter-height) - var(--meter-height) / 6);
   content: "";
   width: var(--cursor-size);
   height: var(--cursor-size);
   background: white;
-  top: -16px;
-  left: calc(50% - 7px);
+  top: calc(
+    -1 * var(--cursor-size) - ((var(--meter-height) - var(--cursor-size)) / 2)
+  );
+  left: calc(50% - var(--cursor-size) / 2);
   position: absolute;
   border-radius: var(--cursor-size);
 }
@@ -198,7 +211,6 @@ li.strikethrough {
   color: white;
   flex: 1;
   padding: 12px;
-  min-width: 200px;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   transition: all 0.6s ease-out;

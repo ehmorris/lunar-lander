@@ -41,6 +41,10 @@ export const showStatsAndResetControl = (
 
   const populateStats = (data) => {
     document.querySelector("#description").textContent = data.description;
+    document.querySelector("#score").textContent = data.score;
+    document.querySelector("#type").textContent = data.landing
+      ? "landing"
+      : "crash";
     populateMeter("speed", data.speedPercent, data.speed);
     populateMeter("angle", data.anglePercent, data.angle);
     document.querySelector("#duration").textContent = data.durationInSeconds;
@@ -71,6 +75,7 @@ export const showStatsAndResetControl = (
     navigator.share({
       text: `${data.description}
 
+Score: ${data.score} POINTS
 Speed: ${data.speed} MPH
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds} SECONDS
@@ -87,6 +92,7 @@ https://ehmorris.com/lander/`,
     navigator.clipboard.writeText(
       `${data.description}
 
+Score: ${data.score} POINTS
 Speed: ${data.speed} MPH
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds} SECONDS
