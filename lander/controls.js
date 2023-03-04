@@ -149,6 +149,8 @@ export const makeControls = (
         }
       });
     }
+
+    if (e.cancelable) e.preventDefault();
   }
 
   const attachEventListeners = () => {
