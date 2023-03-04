@@ -259,6 +259,78 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     CTX.restore();
   };
 
+  const _drawLander = () => {
+    // Move to top left of the lander and then rotate at that origin
+    CTX.save();
+    CTX.fillStyle = drawLanderGradient(CTX);
+    CTX.translate(_position.x, _position.y);
+    CTX.rotate(_angle);
+
+    // Draw the lander
+    //
+    // We want the center of rotation to be in the center of the bottom
+    // rectangle, excluding the tip of the lander. To accomplish this, the
+    // lander is drawn offset to the top and left of _position.x and y.
+    // The tip is also drawn offset to the top of that so that the lander
+    // is a bit taller than LANDER_HEIGHT.
+    //
+    //                                      /\
+    //                                     /  \
+    // Start at top left of this segment → |  |
+    // and work clockwise.                 |__|
+    CTX.beginPath();
+    CTX.moveTo(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
+    CTX.lineTo(0, -LANDER_HEIGHT);
+    CTX.lineTo(LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
+    CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
+    CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
+    CTX.closePath();
+    CTX.fill();
+
+    // Translate to the top-left corner of the lander so engine and booster
+    // flames can be drawn from 0, 0
+    CTX.translate(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
+
+    if (_engineOn || _rotatingLeft || _rotatingRight) {
+      CTX.fillStyle = randomBool() ? "#415B8C" : "#F3AFA3";
+    }
+
+    // Main engine flame
+    if (_engineOn) {
+      const _flameHeight = randomBetween(10, 50);
+      const _flameMargin = 3;
+      CTX.beginPath();
+      CTX.moveTo(_flameMargin, LANDER_HEIGHT);
+      CTX.lineTo(LANDER_WIDTH - _flameMargin, LANDER_HEIGHT);
+      CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT + _flameHeight);
+      CTX.closePath();
+      CTX.fill();
+    }
+
+    const _boosterLength = randomBetween(5, 25);
+    // Right booster flame
+    if (_rotatingLeft) {
+      CTX.beginPath();
+      CTX.moveTo(LANDER_WIDTH, 0);
+      CTX.lineTo(LANDER_WIDTH + _boosterLength, LANDER_HEIGHT * 0.05);
+      CTX.lineTo(LANDER_WIDTH, LANDER_HEIGHT * 0.1);
+      CTX.closePath();
+      CTX.fill();
+    }
+
+    // Left booster flame
+    if (_rotatingRight) {
+      CTX.beginPath();
+      CTX.moveTo(0, 0);
+      CTX.lineTo(-_boosterLength, LANDER_HEIGHT * 0.05);
+      CTX.lineTo(0, LANDER_HEIGHT * 0.1);
+      CTX.closePath();
+      CTX.fill();
+    }
+
+    CTX.restore();
+  };
+
   const draw = (timeSinceStart) => {
     _updateProps(timeSinceStart);
 
@@ -273,88 +345,13 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
       );
     }
 
-    if (_flipConfetti.length > 0) {
-      _flipConfetti.forEach((c) => c.draw());
-    }
+    if (_flipConfetti.length > 0) _flipConfetti.forEach((c) => c.draw());
 
-    if (_landed) {
-      _landed.confetti.draw();
-    }
+    if (_landed) _landed.confetti.draw();
 
-    // Draw the lander when it hasn't crashed
-    if (_crashed) {
-      _crashed.explosion.draw();
-    } else {
-      // Move to top left of the lander and then rotate at that origin
-      CTX.save();
-      CTX.fillStyle = drawLanderGradient(CTX);
-      CTX.translate(_position.x, _position.y);
-      CTX.rotate(_angle);
-
-      // Draw the lander
-      //
-      // We want the center of rotation to be in the center of the bottom
-      // rectangle, excluding the tip of the lander. To accomplish this, the
-      // lander is drawn offset to the top and left of _position.x and y.
-      // The tip is also drawn offset to the top of that so that the lander
-      // is a bit taller than LANDER_HEIGHT.
-      //
-      //                                      /\
-      //                                     /  \
-      // Start at top left of this segment → |  |
-      // and work clockwise.                 |__|
-      CTX.beginPath();
-      CTX.moveTo(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
-      CTX.lineTo(0, -LANDER_HEIGHT);
-      CTX.lineTo(LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
-      CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
-      CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
-      CTX.closePath();
-      CTX.fill();
-
-      // Translate to the top-left corner of the lander so engine and booster
-      // flames can be drawn from 0, 0
-      CTX.translate(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
-
-      if (_engineOn || _rotatingLeft || _rotatingRight) {
-        CTX.fillStyle = randomBool() ? "#415B8C" : "#F3AFA3";
-      }
-
-      // Main engine flame
-      if (_engineOn) {
-        const _flameHeight = randomBetween(10, 50);
-        const _flameMargin = 3;
-        CTX.beginPath();
-        CTX.moveTo(_flameMargin, LANDER_HEIGHT);
-        CTX.lineTo(LANDER_WIDTH - _flameMargin, LANDER_HEIGHT);
-        CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT + _flameHeight);
-        CTX.closePath();
-        CTX.fill();
-      }
-
-      const _boosterLength = randomBetween(5, 25);
-      // Right booster flame
-      if (_rotatingLeft) {
-        CTX.beginPath();
-        CTX.moveTo(LANDER_WIDTH, 0);
-        CTX.lineTo(LANDER_WIDTH + _boosterLength, LANDER_HEIGHT * 0.05);
-        CTX.lineTo(LANDER_WIDTH, LANDER_HEIGHT * 0.1);
-        CTX.closePath();
-        CTX.fill();
-      }
-
-      // Left booster flame
-      if (_rotatingRight) {
-        CTX.beginPath();
-        CTX.moveTo(0, 0);
-        CTX.lineTo(-_boosterLength, LANDER_HEIGHT * 0.05);
-        CTX.lineTo(0, LANDER_HEIGHT * 0.1);
-        CTX.closePath();
-        CTX.fill();
-      }
-
-      CTX.restore();
-    }
+    // Don't draw the lander after crashing
+    if (_crashed) _crashed.explosion.draw();
+    else _drawLander();
 
     // Draw speed and angle text beside lander, even after crashing
     _drawSideBySideStats();
