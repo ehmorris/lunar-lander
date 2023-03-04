@@ -49,6 +49,40 @@ export const makeControls = (
     onInput();
   }
 
+  const activateTouchZone = (zoneName) => {
+    if (zoneName === "left") {
+      lander.rotateLeft();
+      audioManager.playBoosterSound1();
+      showLeftOverlay = true;
+    } else if (zoneName === "center") {
+      lander.engineOn();
+      audioManager.playEngineSound();
+      showCenterOverlay = true;
+    } else {
+      lander.rotateRight();
+      audioManager.playBoosterSound2();
+      showRightOverlay = true;
+    }
+    onInput();
+  };
+
+  const deactivateTouchZone = (zoneName) => {
+    if (zoneName === "left") {
+      lander.stopLeftRotation();
+      audioManager.stopBoosterSound1();
+      showLeftOverlay = false;
+    } else if (zoneName === "center") {
+      lander.engineOff();
+      audioManager.stopEngineSound();
+      showCenterOverlay = false;
+    } else {
+      lander.stopRightRotation();
+      audioManager.stopBoosterSound2();
+      showRightOverlay = false;
+    }
+    onInput();
+  };
+
   const getTouchZone = (x) => {
     const clampedColumnNumber = Math.max(
       0,
@@ -74,41 +108,7 @@ export const makeControls = (
     };
   };
 
-  const activateTouchZone = (zoneNumber) => {
-    if (zoneNumber === "left") {
-      lander.rotateLeft();
-      audioManager.playBoosterSound1();
-      showLeftOverlay = true;
-    } else if (zoneNumber === "center") {
-      lander.engineOn();
-      audioManager.playEngineSound();
-      showCenterOverlay = true;
-    } else {
-      lander.rotateRight();
-      audioManager.playBoosterSound2();
-      showRightOverlay = true;
-    }
-    onInput();
-  };
-
-  const deactivateTouchZone = (zoneNumber) => {
-    if (zoneNumber === "left") {
-      lander.stopLeftRotation();
-      audioManager.stopBoosterSound1();
-      showLeftOverlay = false;
-    } else if (zoneNumber === "center") {
-      lander.engineOff();
-      audioManager.stopEngineSound();
-      showCenterOverlay = false;
-    } else {
-      lander.stopRightRotation();
-      audioManager.stopBoosterSound2();
-      showRightOverlay = false;
-    }
-    onInput();
-  };
-
-  function _onTouchStart(e) {
+  function onTouchStart(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
       activateTouchZone(getTouchZone(e.changedTouches[index].clientX));
       allActiveTouches.add(e.changedTouches[index]);
@@ -117,7 +117,7 @@ export const makeControls = (
     if (e.cancelable) e.preventDefault();
   }
 
-  function _onTouchMove(e) {
+  function onTouchMove(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
       let touchPreviousData;
       allActiveTouches.forEach((touch) => {
@@ -139,7 +139,7 @@ export const makeControls = (
     if (e.cancelable) e.preventDefault();
   }
 
-  function _onTouchEnd(e) {
+  function onTouchEnd(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
       deactivateTouchZone(getTouchZone(e.changedTouches[index].clientX));
 
@@ -156,17 +156,17 @@ export const makeControls = (
   const attachEventListeners = () => {
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("keyup", onKeyUp);
-    canvasElement.addEventListener("touchstart", _onTouchStart);
-    canvasElement.addEventListener("touchmove", _onTouchMove);
-    canvasElement.addEventListener("touchend", _onTouchEnd);
+    canvasElement.addEventListener("touchstart", onTouchStart);
+    canvasElement.addEventListener("touchmove", onTouchMove);
+    canvasElement.addEventListener("touchend", onTouchEnd);
   };
 
   const detachEventListeners = () => {
     document.removeEventListener("keydown", onKeyDown);
     document.removeEventListener("keyup", onKeyUp);
-    canvasElement.removeEventListener("touchstart", _onTouchStart);
-    canvasElement.removeEventListener("touchmove", _onTouchMove);
-    canvasElement.removeEventListener("touchend", _onTouchEnd);
+    canvasElement.removeEventListener("touchstart", onTouchStart);
+    canvasElement.removeEventListener("touchmove", onTouchMove);
+    canvasElement.removeEventListener("touchend", onTouchEnd);
   };
 
   const drawTouchOverlay = () => {
