@@ -52,6 +52,7 @@ export const makeConfetti = (state, amount, position) => {
     const _size = randomBetween(4, 8);
     const _groundedHeight = canvasHeight - _size + _size / 2;
     const _color = `hsl(${randomBetween(0, 360)}, 100%, 50%)`;
+    const _rotationDirection = randomBool();
 
     let _position = { ...position };
     let _velocity = {
@@ -73,12 +74,13 @@ export const makeConfetti = (state, amount, position) => {
         _velocity,
         0,
         _groundedHeight,
-        true,
+        _rotationDirection,
         _rotationVelocity,
         canvasWidth
       );
 
-      const width = mirroredLoopingProgress(0, 0.1, _rotationVelocity) * _size;
+      const width =
+        mirroredLoopingProgress(0, 0.1, Math.abs(_rotationVelocity)) * _size;
 
       CTX.save();
       CTX.fillStyle = _color;
@@ -107,7 +109,7 @@ export const makeConfetti = (state, amount, position) => {
       )
     );
 
-  const twirlPieces = new Array(amount / 2)
+  const twirlPieces = new Array(amount)
     .fill()
     .map((_, index) =>
       _makeTwirlPiece(
