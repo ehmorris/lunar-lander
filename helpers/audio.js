@@ -21,16 +21,28 @@ export const makeAudioManager = () => {
   // Audio API to play on the main sound channel in iOS, rather than the
   // ringer channel.
   let themeAudio = false;
-  const startThemeAudio = () => {
+  const playTheme = () => {
     if (!themeAudio) {
       themeAudio = new Audio("./audio/theme.mp3");
       themeAudio.loop = true;
       themeAudio.play();
+    } else {
+      themeAudio.play();
     }
   };
+
+  const pauseTheme = () => {
+    if (themeAudio) themeAudio.pause();
+  };
+
   const options = { once: true };
-  document.addEventListener("touchstart", startThemeAudio, options);
-  document.addEventListener("keydown", startThemeAudio, options);
+  document.addEventListener("touchend", playTheme, options);
+  document.addEventListener("keyup", playTheme, options);
+  document.addEventListener("visibilitychange", () => {
+    if (themeAudio) {
+      document.hidden ? pauseTheme() : playTheme();
+    }
+  });
 
   async function _loadFile(context, filePath) {
     const response = await fetch(filePath);
@@ -124,5 +136,7 @@ export const makeAudioManager = () => {
     playLanding,
     playConfetti,
     playBaby,
+    playTheme,
+    pauseTheme,
   };
 };

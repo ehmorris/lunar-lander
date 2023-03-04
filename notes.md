@@ -1,6 +1,5 @@
 # Game Ideas
 
-- Remove event cancellation from touchend and redo audio pausing
 - Move mobile booster controls to one side?
 - Add rings / bonus point areas to hit before landing
 - Make terrain land-able

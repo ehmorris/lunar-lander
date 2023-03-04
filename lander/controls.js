@@ -1,4 +1,9 @@
-export const makeControls = (state, lander, audioManager) => {
+export const makeControls = (
+  state,
+  lander,
+  audioManager,
+  onInput = () => {}
+) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
@@ -25,6 +30,7 @@ export const makeControls = (state, lander, audioManager) => {
       audioManager.playBoosterSound2();
     }
     hasKeyboard = true;
+    onInput();
   }
 
   function onKeyUp({ key }) {
@@ -40,6 +46,7 @@ export const makeControls = (state, lander, audioManager) => {
       lander.stopRightRotation();
       audioManager.stopBoosterSound2();
     }
+    onInput();
   }
 
   const getTouchZone = (x) => {
@@ -81,6 +88,7 @@ export const makeControls = (state, lander, audioManager) => {
       audioManager.playBoosterSound2();
       showRightOverlay = true;
     }
+    onInput();
   };
 
   const deactivateTouchZone = (zoneNumber) => {
@@ -97,6 +105,7 @@ export const makeControls = (state, lander, audioManager) => {
       audioManager.stopBoosterSound2();
       showRightOverlay = false;
     }
+    onInput();
   };
 
   function _onTouchStart(e) {
@@ -140,8 +149,6 @@ export const makeControls = (state, lander, audioManager) => {
         }
       });
     }
-
-    if (e.cancelable) e.preventDefault();
   }
 
   const attachEventListeners = () => {
