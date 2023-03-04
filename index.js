@@ -9,7 +9,6 @@ import { manageInstructions } from "./instructions.js";
 import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
-import { INACTIVE_DURATION } from "./helpers/constants.js";
 
 // SETUP
 
@@ -37,18 +36,10 @@ const toyLander = makeToyLander(
 );
 const toyLanderControls = makeControls(appState, toyLander, audioManager);
 const lander = makeLander(appState, onGameEnd, onResetXPos);
-const landerControls = makeControls(
-  appState,
-  lander,
-  audioManager,
-  onLanderInput
-);
+const landerControls = makeControls(appState, lander, audioManager);
 const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const randomConfetti = [];
-
-let lastInput = false;
-let pausedDueToNoInput = false;
 
 // INSTRUCTIONS SHOW/HIDE
 
@@ -79,25 +70,9 @@ const animationObject = animate((timeSinceStart) => {
   if (randomConfetti.length > 0) {
     randomConfetti.forEach((c) => c.draw());
   }
-
-  if (
-    lastInput &&
-    !pausedDueToNoInput &&
-    Date.now() - lastInput > INACTIVE_DURATION
-  ) {
-    audioManager.pauseTheme();
-    pausedDueToNoInput = true;
-  } else if (pausedDueToNoInput && Date.now() - lastInput < INACTIVE_DURATION) {
-    audioManager.playTheme();
-    pausedDueToNoInput = false;
-  }
 });
 
 // PASSED FUNCTIONS
-
-function onLanderInput() {
-  lastInput = Date.now();
-}
 
 function onCloseInstructions() {
   toyLanderControls.detachEventListeners();

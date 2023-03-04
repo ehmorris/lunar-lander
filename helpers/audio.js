@@ -31,18 +31,9 @@ export const makeAudioManager = () => {
     }
   };
 
-  const pauseTheme = () => {
-    if (themeAudio) themeAudio.pause();
-  };
-
   const options = { once: true };
   document.addEventListener("touchend", playTheme, options);
   document.addEventListener("keyup", playTheme, options);
-  document.addEventListener("visibilitychange", () => {
-    if (themeAudio) {
-      document.hidden ? pauseTheme() : playTheme();
-    }
-  });
 
   async function _loadFile(context, filePath) {
     const response = await fetch(filePath);
@@ -136,7 +127,5 @@ export const makeAudioManager = () => {
     playLanding,
     playConfetti,
     playBaby,
-    playTheme,
-    pauseTheme,
   };
 };

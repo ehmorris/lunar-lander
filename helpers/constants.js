@@ -4,4 +4,3 @@ export const LANDER_HEIGHT = 40;
 export const CRASH_VELOCITY = 0.6;
 export const VELOCITY_MULTIPLIER = 20;
 export const CRASH_ANGLE = 11;
-export const INACTIVE_DURATION = 15_000;

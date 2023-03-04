@@ -17,6 +17,7 @@
 
 - Move end-game logic into index
 - Move landed and crashed data objects into state
+- Sort out underscores - are they needed? Bit of clutter
 
 # Bugs
 

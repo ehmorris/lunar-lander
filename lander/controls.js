@@ -1,27 +1,17 @@
-export const makeControls = (
-  state,
-  lander,
-  audioManager,
-  onInput = () => {}
-) => {
+export const makeControls = (state, lander, audioManager) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const canvasElement = state.get("canvasElement");
   const allActiveTouches = new Set();
-  const touchColumnBasis = canvasWidth / 4;
-  const touchColumnMap = new Map([
-    [0, "left"],
-    [1, "center"],
-    [2, "center"],
-    [3, "right"],
-  ]);
-  let _showCenterOverlay = false;
-  let _showRightOverlay = false;
-  let _showLeftOverlay = false;
+  const touchColumnMap = ["left", "center", "center", "right"];
+
+  let showCenterOverlay = false;
+  let showRightOverlay = false;
+  let showLeftOverlay = false;
   let hasKeyboard = false;
 
-  function _onKeyDown({ key }) {
+  function onKeyDown({ key }) {
     if (key === "ArrowUp") {
       lander.engineOn();
       audioManager.playEngineSound();
@@ -35,10 +25,9 @@ export const makeControls = (
       audioManager.playBoosterSound2();
     }
     hasKeyboard = true;
-    onInput();
   }
 
-  function _onKeyUp({ key }) {
+  function onKeyUp({ key }) {
     if (key === "ArrowUp") {
       lander.engineOff();
       audioManager.stopEngineSound();
@@ -51,56 +40,68 @@ export const makeControls = (
       lander.stopRightRotation();
       audioManager.stopBoosterSound2();
     }
-    onInput();
   }
 
-  const _getTouchZone = (x) => {
-    const columnNumber = Math.floor(x / touchColumnBasis);
+  const getTouchZone = (x) => {
     const clampedColumnNumber = Math.max(
       0,
-      Math.min(columnNumber, touchColumnMap.size)
+      Math.min(
+        Math.floor(x / (canvasWidth / touchColumnMap.length)),
+        touchColumnMap.length
+      )
     );
 
-    return touchColumnMap.get(clampedColumnNumber);
+    return touchColumnMap[clampedColumnNumber];
   };
 
-  const _activateTouchZone = (zoneNumber) => {
+  const getColumnBoundary = (colName) => {
+    const start =
+      touchColumnMap.findIndex((e) => e === colName) / touchColumnMap.length;
+    const end =
+      (touchColumnMap.findLastIndex((e) => e === colName) + 1) /
+      touchColumnMap.length;
+
+    return {
+      startPixel: start * canvasWidth,
+      widthInPixels: (end - start) * canvasWidth,
+    };
+  };
+
+  const activateTouchZone = (zoneNumber) => {
     if (zoneNumber === "left") {
       lander.rotateLeft();
       audioManager.playBoosterSound1();
-      _showLeftOverlay = true;
+      showLeftOverlay = true;
     } else if (zoneNumber === "center") {
       lander.engineOn();
       audioManager.playEngineSound();
-      _showCenterOverlay = true;
+      showCenterOverlay = true;
     } else {
       lander.rotateRight();
       audioManager.playBoosterSound2();
-      _showRightOverlay = true;
+      showRightOverlay = true;
     }
-    onInput();
   };
 
-  const _deactivateTouchZone = (zoneNumber) => {
+  const deactivateTouchZone = (zoneNumber) => {
     if (zoneNumber === "left") {
       lander.stopLeftRotation();
       audioManager.stopBoosterSound1();
-      _showLeftOverlay = false;
+      showLeftOverlay = false;
     } else if (zoneNumber === "center") {
       lander.engineOff();
       audioManager.stopEngineSound();
-      _showCenterOverlay = false;
+      showCenterOverlay = false;
     } else {
       lander.stopRightRotation();
       audioManager.stopBoosterSound2();
-      _showRightOverlay = false;
+      showRightOverlay = false;
     }
-    onInput();
   };
 
   function _onTouchStart(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
-      _activateTouchZone(_getTouchZone(e.changedTouches[index].clientX));
+      activateTouchZone(getTouchZone(e.changedTouches[index].clientX));
       allActiveTouches.add(e.changedTouches[index]);
     }
 
@@ -115,12 +116,12 @@ export const makeControls = (
           touchPreviousData = touch;
         }
       });
-      const previousTouchZone = _getTouchZone(touchPreviousData.clientX);
-      const currentTouchZone = _getTouchZone(e.changedTouches[index].clientX);
+      const previousTouchZone = getTouchZone(touchPreviousData.clientX);
+      const currentTouchZone = getTouchZone(e.changedTouches[index].clientX);
 
       if (previousTouchZone !== currentTouchZone) {
-        _deactivateTouchZone(previousTouchZone);
-        _activateTouchZone(currentTouchZone);
+        deactivateTouchZone(previousTouchZone);
+        activateTouchZone(currentTouchZone);
         allActiveTouches.delete(touchPreviousData);
         allActiveTouches.add(e.changedTouches[index]);
       }
@@ -131,7 +132,7 @@ export const makeControls = (
 
   function _onTouchEnd(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
-      _deactivateTouchZone(_getTouchZone(e.changedTouches[index].clientX));
+      deactivateTouchZone(getTouchZone(e.changedTouches[index].clientX));
 
       allActiveTouches.forEach((touch) => {
         if (touch.identifier === e.changedTouches[index].identifier) {
@@ -144,16 +145,16 @@ export const makeControls = (
   }
 
   const attachEventListeners = () => {
-    document.addEventListener("keydown", _onKeyDown);
-    document.addEventListener("keyup", _onKeyUp);
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
     canvasElement.addEventListener("touchstart", _onTouchStart);
     canvasElement.addEventListener("touchmove", _onTouchMove);
     canvasElement.addEventListener("touchend", _onTouchEnd);
   };
 
   const detachEventListeners = () => {
-    document.removeEventListener("keydown", _onKeyDown);
-    document.removeEventListener("keyup", _onKeyUp);
+    document.removeEventListener("keydown", onKeyDown);
+    document.removeEventListener("keyup", onKeyUp);
     canvasElement.removeEventListener("touchstart", _onTouchStart);
     canvasElement.removeEventListener("touchmove", _onTouchMove);
     canvasElement.removeEventListener("touchend", _onTouchEnd);
@@ -162,14 +163,17 @@ export const makeControls = (
   const drawTouchOverlay = () => {
     CTX.save();
     CTX.fillStyle = "rgba(255, 255, 255, 0.07)";
-    if (_showLeftOverlay) {
-      CTX.fillRect(0, 0, canvasWidth * 0.25, canvasHeight);
+    if (showLeftOverlay) {
+      const { startPixel, widthInPixels } = getColumnBoundary("left");
+      CTX.fillRect(startPixel, 0, widthInPixels, canvasHeight);
     }
-    if (_showCenterOverlay) {
-      CTX.fillRect(canvasWidth * 0.25, 0, canvasWidth * 0.5, canvasHeight);
+    if (showCenterOverlay) {
+      const { startPixel, widthInPixels } = getColumnBoundary("center");
+      CTX.fillRect(startPixel, 0, widthInPixels, canvasHeight);
     }
-    if (_showRightOverlay) {
-      CTX.fillRect(canvasWidth * 0.75, 0, canvasWidth * 0.25, canvasHeight);
+    if (showRightOverlay) {
+      const { startPixel, widthInPixels } = getColumnBoundary("right");
+      CTX.fillRect(startPixel, 0, widthInPixels, canvasHeight);
     }
     CTX.restore();
   };
