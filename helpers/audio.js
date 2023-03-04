@@ -40,8 +40,6 @@ export const makeAudioManager = () => {
   document.addEventListener("keyup", playTheme, options);
   document.addEventListener("visibilitychange", () => {
     if (themeAudio) {
-      debugger;
-
       document.hidden ? pauseTheme() : playTheme();
     }
   });
