@@ -10,6 +10,7 @@ export const makeConfetti = (state, amount, position) => {
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const audio = state.get("audioManager");
+  const confettiTypeAmount = Math.round(amount / 2);
   let hasPlayedAudio = false;
 
   const _makeConfettiPiece = (position, velocity) => {
@@ -98,27 +99,29 @@ export const makeConfetti = (state, amount, position) => {
     return { draw };
   };
 
-  const confettiPieces = new Array(amount)
-    .fill()
-    .map((_, index) =>
-      _makeConfettiPiece(
-        position
-          ? position
-          : { x: canvasWidth / 2 + index - amount / 2, y: canvasHeight / 2 },
-        { x: index < amount / 2 ? -0.5 : 0.5, y: -1 }
-      )
-    );
+  const confettiPieces = new Array(confettiTypeAmount).fill().map((_, index) =>
+    _makeConfettiPiece(
+      position
+        ? position
+        : {
+            x: canvasWidth / 2 + index - confettiTypeAmount / 2,
+            y: canvasHeight / 2,
+          },
+      { x: index < confettiTypeAmount / 2 ? -0.5 : 0.5, y: -1 }
+    )
+  );
 
-  const twirlPieces = new Array(amount)
-    .fill()
-    .map((_, index) =>
-      _makeTwirlPiece(
-        position
-          ? position
-          : { x: canvasWidth / 2 + index - amount / 2, y: canvasHeight / 2 },
-        { x: index < amount / 2 ? -0.5 : 0.5, y: -1 }
-      )
-    );
+  const twirlPieces = new Array(confettiTypeAmount).fill().map((_, index) =>
+    _makeTwirlPiece(
+      position
+        ? position
+        : {
+            x: canvasWidth / 2 + index - confettiTypeAmount / 2,
+            y: canvasHeight / 2,
+          },
+      { x: index < confettiTypeAmount / 2 ? -0.5 : 0.5, y: -1 }
+    )
+  );
 
   const draw = () => {
     if (!hasPlayedAudio) {
