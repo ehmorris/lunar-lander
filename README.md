@@ -23,7 +23,7 @@ See `launch.json` for running.
 - Make terrain land-able
 - Generate a shareable image. Show stats in-canvas.
 
-## Extras
+### Extras
 
 - "Mad dog" mode: start with very high rotation rate
 - Confetti when grazing the bottom, or exceeding certain speeds
