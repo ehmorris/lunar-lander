@@ -13,15 +13,15 @@ export const showStatsAndResetControl = (
   const canCopyText = navigator && navigator.clipboard;
   const shareText = `${data.description}
 
-Score: ${data.score} POINT ${data.landed ? "LANDING" : "CRASH"}
-Speed: ${data.speed} MPH
+Score: ${data.score} point ${data.landed ? "landing" : "crash"}
+Speed: ${data.speed}mph
 Angle: ${data.angle}°
-Time: ${data.durationInSeconds} SECONDS
+Time: ${data.durationInSeconds} seconds
 Flips: ${data.rotations}
-Max speed: ${data.maxSpeed} MPH
-Max height: ${data.maxHeight} FT
-Engine used: ${data.engineUsed} TIMES
-Boosters used: ${data.boostersUsed} TIMES
+Max speed: ${data.maxSpeed}mph
+Max height: ${data.maxHeight}ft
+Engine used: ${data.engineUsed} times
+Boosters used: ${data.boostersUsed} times
 https://ehmorris.com/lander/`;
 
   const hideStats = () => {
