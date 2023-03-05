@@ -280,3 +280,14 @@ li.strikethrough {
   stroke-width: 4px;
   stroke: white;
 }
+
+.cornerInfo {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  top: 2px;
+  right: 6px;
+  font-size: var(--stats-font-size);
+  text-transform: uppercase;
+}

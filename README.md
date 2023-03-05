@@ -18,7 +18,6 @@ See `launch.json` for running.
 
 ### Game Ideas
 
-- Tally of landings and crashes in top corner
 - Move mobile booster controls to one side so they're easier to tap?
 - Add rings / bonus point areas to hit before landing
 - Make terrain land-able

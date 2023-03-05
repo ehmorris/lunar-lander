@@ -9,6 +9,7 @@ import { manageInstructions } from "./instructions.js";
 import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
+import { makeTallyManger } from "./tally.js";
 import { INACTIVE_DURATION } from "./helpers/constants.js";
 
 // SETUP
@@ -45,6 +46,7 @@ const landerControls = makeControls(
 );
 const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
+const tally = makeTallyManger();
 const randomConfetti = [];
 
 let lastInput = false;
@@ -112,7 +114,15 @@ function onGameEnd(data) {
     landerControls.getHasKeyboard()
   );
 
-  data.landed ? audioManager.playLanding() : audioManager.playCrash();
+  if (data.landed) {
+    audioManager.playLanding();
+    tally.storeLanding();
+  } else {
+    audioManager.playCrash();
+    tally.storeCrash();
+  }
+
+  tally.updateDisplay();
 }
 
 function onResetXPos() {
