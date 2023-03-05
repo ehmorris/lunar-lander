@@ -18,6 +18,7 @@ See `launch.json` for running.
 
 ### Game Ideas
 
+- Show rotation velocity / direction in HUD. Help users to stabilize.
 - Move mobile booster controls to one side so they're easier to tap?
 - Add rings / bonus point areas to hit before landing
 - Make terrain land-able
