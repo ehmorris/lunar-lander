@@ -76,7 +76,7 @@ li.strikethrough {
 }
 
 .fullSizeContainer h3 {
-  margin: 0;
+  margin: 0.15em 0 0;
   font-weight: 400;
   font-size: clamp(20px, 4vmin, 32px);
 }
@@ -84,7 +84,6 @@ li.strikethrough {
 @media screen and (max-width: 640px) {
   .fullSizeContainer h1 {
     font-weight: 800;
-    line-height: 1.2;
   }
 
   .fullSizeContainer h1 + p {
