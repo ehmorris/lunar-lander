@@ -5,13 +5,35 @@ import {
   progress,
 } from "../helpers/helpers.js";
 
-export const makeConfetti = (state, amount, position) => {
+export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const audio = state.get("audioManager");
   const confettiTypeAmount = Math.round(amount / 2);
   let hasPlayedAudio = false;
+
+  const _startingPosition = (index) =>
+    passedPosition
+      ? passedPosition
+      : {
+          x: canvasWidth / 2 + index - confettiTypeAmount / 2,
+          y: canvasHeight / 2,
+        };
+
+  const _startingVelocity = (index) =>
+    passedVelocity
+      ? {
+          x:
+            index < confettiTypeAmount / 2
+              ? passedVelocity.x - 1
+              : passedVelocity.x + 1,
+          y: passedVelocity.y - 0.6,
+        }
+      : {
+          x: index < confettiTypeAmount / 2 ? -0.5 : 0.5,
+          y: -1,
+        };
 
   const _makeConfettiPiece = (position, velocity) => {
     const _size = randomBetween(1, 6);
@@ -21,7 +43,7 @@ export const makeConfetti = (state, amount, position) => {
 
     let _position = { ...position };
     let _velocity = {
-      x: randomBetween(velocity.x / 4, velocity.x) + randomBetween(-0.1, 0.1),
+      x: velocity.x + randomBetween(-0.5, 0.5),
       y: velocity.y + randomBetween(-0.1, 0.1),
     };
     let _rotationVelocity = 0.1;
@@ -57,7 +79,7 @@ export const makeConfetti = (state, amount, position) => {
 
     let _position = { ...position };
     let _velocity = {
-      x: randomBetween(velocity.x / 4, velocity.x) + randomBetween(-0.1, 0.1),
+      x: velocity.x + randomBetween(-0.5, 0.5),
       y: velocity.y + randomBetween(-0.1, 0.1),
     };
     let _rotationVelocity = 0;
@@ -99,29 +121,17 @@ export const makeConfetti = (state, amount, position) => {
     return { draw };
   };
 
-  const confettiPieces = new Array(confettiTypeAmount).fill().map((_, index) =>
-    _makeConfettiPiece(
-      position
-        ? position
-        : {
-            x: canvasWidth / 2 + index - confettiTypeAmount / 2,
-            y: canvasHeight / 2,
-          },
-      { x: index < confettiTypeAmount / 2 ? -0.5 : 0.5, y: -1 }
-    )
-  );
+  const confettiPieces = new Array(confettiTypeAmount)
+    .fill()
+    .map((_, index) =>
+      _makeConfettiPiece(_startingPosition(index), _startingVelocity(index))
+    );
 
-  const twirlPieces = new Array(confettiTypeAmount).fill().map((_, index) =>
-    _makeTwirlPiece(
-      position
-        ? position
-        : {
-            x: canvasWidth / 2 + index - confettiTypeAmount / 2,
-            y: canvasHeight / 2,
-          },
-      { x: index < confettiTypeAmount / 2 ? -0.5 : 0.5, y: -1 }
-    )
-  );
+  const twirlPieces = new Array(confettiTypeAmount)
+    .fill()
+    .map((_, index) =>
+      _makeTwirlPiece(_startingPosition(index), _startingVelocity(index))
+    );
 
   const draw = () => {
     if (!hasPlayedAudio) {

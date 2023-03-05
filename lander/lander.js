@@ -126,7 +126,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         _rotationCount++;
         _lastRotation = rotations;
         _lastRotationAngle = _angle;
-        _flipConfetti.push(makeConfetti(state, 10, _position));
+        _flipConfetti.push(makeConfetti(state, 10, _position, _velocity));
       }
 
       // Log new max speed and height
