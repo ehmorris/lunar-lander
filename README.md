@@ -18,6 +18,7 @@ See `launch.json` for running.
 
 ### Game Ideas
 
+- Use number formatting https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat
 - Show rotation velocity / direction in HUD. Help users to stabilize.
 - Move mobile booster controls to one side so they're easier to tap?
 - Add rings / bonus point areas to hit before landing
