@@ -17,15 +17,16 @@ export const makeControls = (
   let hasKeyboard = false;
 
   function onKeyDown({ key }) {
-    if (key === "ArrowUp") {
+    console.log('key down', key);
+    if (key === 'w' || key === "ArrowUp") {
       lander.engineOn();
       audioManager.playEngineSound();
     }
-    if (key === "ArrowLeft") {
+    if (key === 'a' || key === "ArrowLeft") {
       lander.rotateLeft();
       audioManager.playBoosterSound1();
     }
-    if (key === "ArrowRight") {
+    if (key === 'd' || key === "ArrowRight") {
       lander.rotateRight();
       audioManager.playBoosterSound2();
     }
@@ -34,15 +35,15 @@ export const makeControls = (
   }
 
   function onKeyUp({ key }) {
-    if (key === "ArrowUp") {
+    if (key === 'w' || key === "ArrowUp") {
       lander.engineOff();
       audioManager.stopEngineSound();
     }
-    if (key === "ArrowLeft") {
+    if (key === 'a' ||  key === "ArrowLeft") {
       lander.stopLeftRotation();
       audioManager.stopBoosterSound1();
     }
-    if (key === "ArrowRight") {
+    if (key === 'd' || key === "ArrowRight") {
       lander.stopRightRotation();
       audioManager.stopBoosterSound2();
     }
