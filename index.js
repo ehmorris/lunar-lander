@@ -41,7 +41,7 @@ const landerControls = makeControls(appState, lander, audioManager);
 const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
-const randomConfetti = [];
+let randomConfetti = [];
 
 // INSTRUCTIONS SHOW/HIDE
 
@@ -98,6 +98,7 @@ function onGameEnd(data) {
   }
 
   tally.updateDisplay();
+  randomConfetti = [];
 }
 
 function onResetXPos() {
