@@ -1,48 +1,22 @@
 import { randomBool } from "./helpers.js";
 
 export const makeAudioManager = () => {
-  const audioCTX = new AudioContext();
-  const engineFileBuffer = _loadFile(audioCTX, "./audio/engine.mp3");
-  const boosterFileBuffer = _loadFile(audioCTX, "./audio/booster.mp3");
-  const crash1FileBuffer = _loadFile(audioCTX, "./audio/crash1.mp3");
-  const crash2FileBuffer = _loadFile(audioCTX, "./audio/crash2.mp3");
-  const landing1FileBuffer = _loadFile(audioCTX, "./audio/landing1.mp3");
-  const landing2FileBuffer = _loadFile(audioCTX, "./audio/landing2.mp3");
-  const confetti1FileBuffer = _loadFile(audioCTX, "./audio/confetti1.mp3");
-  const confetti2FileBuffer = _loadFile(audioCTX, "./audio/confetti2.mp3");
-  const babyFileBuffer = _loadFile(audioCTX, "./audio/baby.mp3");
+  let hasInitialized = false;
+  let audioCTX;
+  let engineFileBuffer;
+  let boosterFileBuffer;
+  let crash1FileBuffer;
+  let crash2FileBuffer;
+  let landing1FileBuffer;
+  let landing2FileBuffer;
+  let confetti1FileBuffer;
+  let confetti2FileBuffer;
+  let babyFileBuffer;
+  let themeAudio;
 
   let engineFileBufferSource = false;
   let booster1FileBufferSource = false;
   let booster2FileBufferSource = false;
-
-  // Play theme in a loop in the background on instantiation. Playing some
-  // audio continuously with the HTML audio API will allow audio via the Web
-  // Audio API to play on the main sound channel in iOS, rather than the
-  // ringer channel.
-  let themeAudio = false;
-  const playTheme = () => {
-    if (!themeAudio) {
-      themeAudio = new Audio("./audio/theme.mp3");
-      themeAudio.loop = true;
-      themeAudio.play();
-    } else {
-      themeAudio.play();
-    }
-  };
-
-  const pauseTheme = () => {
-    if (themeAudio) themeAudio.pause();
-  };
-
-  const options = { once: true };
-  document.addEventListener("touchstart", playTheme, options);
-  document.addEventListener("keydown", playTheme, options);
-  document.addEventListener("visibilitychange", () => {
-    if (themeAudio) {
-      document.hidden ? pauseTheme() : playTheme();
-    }
-  });
 
   async function _loadFile(context, filePath) {
     const response = await fetch(filePath);
@@ -51,17 +25,59 @@ export const makeAudioManager = () => {
     return audioBuffer;
   }
 
+  const _initialize = (e) => {
+    if (!hasInitialized) {
+      hasInitialized = true;
+      audioCTX = new AudioContext();
+      engineFileBuffer = _loadFile(audioCTX, "./audio/engine.mp3");
+      boosterFileBuffer = _loadFile(audioCTX, "./audio/booster.mp3");
+      crash1FileBuffer = _loadFile(audioCTX, "./audio/crash1.mp3");
+      crash2FileBuffer = _loadFile(audioCTX, "./audio/crash2.mp3");
+      landing1FileBuffer = _loadFile(audioCTX, "./audio/landing1.mp3");
+      landing2FileBuffer = _loadFile(audioCTX, "./audio/landing2.mp3");
+      confetti1FileBuffer = _loadFile(audioCTX, "./audio/confetti1.mp3");
+      confetti2FileBuffer = _loadFile(audioCTX, "./audio/confetti2.mp3");
+      babyFileBuffer = _loadFile(audioCTX, "./audio/baby.mp3");
+
+      // Play theme in a loop in the background on instantiation. Playing some
+      // audio continuously with the HTML audio API will allow audio via the Web
+      // Audio API to play on the main sound channel in iOS, rather than the
+      // ringer channel.
+      themeAudio = new Audio("./audio/theme.mp3");
+      themeAudio.loop = true;
+      themeAudio.play();
+    }
+  };
+
+  document.addEventListener("touchend", _initialize, { once: true });
+  document.addEventListener("keydown", _initialize, { once: true });
+
+  document.addEventListener("visibilitychange", () => {
+    if (themeAudio) {
+      document.hidden ? themeAudio.pause() : themeAudio.play();
+    }
+  });
+
   async function _playTrack(audioBuffer, loop = true) {
-    return Promise.all([audioBuffer, audioCTX.resume()]).then((e) => {
+    const playBuffer = (buffer) => {
       const trackSource = new AudioBufferSourceNode(audioCTX, {
-        buffer: e[0],
+        buffer: buffer,
         loop: loop,
       });
       trackSource.connect(audioCTX.destination);
       trackSource.start();
-
       return trackSource;
-    });
+    };
+
+    if (hasInitialized) {
+      return Promise.all([audioCTX.resume(), audioBuffer]).then((e) =>
+        playBuffer(e[1])
+      );
+    } else {
+      return Promise.all([_initialize(), audioBuffer]).then((e) =>
+        playBuffer(e[1])
+      );
+    }
   }
 
   const playEngineSound = () => {
@@ -136,7 +152,5 @@ export const makeAudioManager = () => {
     playLanding,
     playConfetti,
     playBaby,
-    playTheme,
-    pauseTheme,
   };
 };
