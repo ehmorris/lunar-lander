@@ -50,7 +50,20 @@ export const makeAudioManager = () => {
   };
 
   document.addEventListener("touchend", _initialize, { once: true });
-  document.addEventListener("keydown", _initialize, { once: true });
+  document.addEventListener(
+    "keydown",
+    ({ isTrusted, metaKey, shiftKey, ctrlKey, altKey, key }) => {
+      if (
+        isTrusted &&
+        !(metaKey || shiftKey || ctrlKey || altKey) &&
+        key !== "Escape" &&
+        key !== "Esc"
+      ) {
+        _initialize();
+      }
+    },
+    { once: true }
+  );
 
   document.addEventListener("visibilitychange", () => {
     if (themeAudio) {
