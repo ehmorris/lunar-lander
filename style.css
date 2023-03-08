@@ -1,5 +1,5 @@
 body {
-  --stats-font-size: 12px;
+  --stats-font-size: clamp(12px, 2vmin, 16px);
   --background-color: #02071e;
   margin: 0;
   background: var(--background-color);
@@ -39,7 +39,7 @@ li.strikethrough {
   flex-direction: column;
   justify-content: center;
   height: 100svh;
-  grid-gap: 12px;
+  grid-gap: clamp(12px, 2vmin, 18px);
   box-sizing: border-box;
   width: 100%;
   touch-action: manipulation;
@@ -155,16 +155,10 @@ li.strikethrough {
   margin: 18px 0 22px;
   font-size: var(--stats-font-size);
   text-transform: uppercase;
-  row-gap: 8px;
+  row-gap: clamp(8px, 2vmin, 16px);
   column-gap: clamp(12px, 4vmin, 22px);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-}
-
-@media screen and (min-height: 800px) {
-  .statsTable {
-    row-gap: 12px;
-  }
 }
 
 .tableRow {
