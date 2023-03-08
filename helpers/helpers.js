@@ -53,11 +53,15 @@ export const getAngleDeltaUprightWithSign = (angle) => {
   return repeatingAngle > 180 ? repeatingAngle - 360 : repeatingAngle;
 };
 
-export const getDisplayVelocity = (velocity) =>
-  getVectorVelocity(velocity) * VELOCITY_MULTIPLIER;
+export const velocityInMPH = (velocity) =>
+  Intl.NumberFormat().format(
+    (getVectorVelocity(velocity) * VELOCITY_MULTIPLIER).toFixed(1)
+  );
 
-export const getDisplayHeight = (yPos, groundedHeight) =>
-  Math.abs(Math.round((yPos - groundedHeight) / 3.5));
+export const heightInFeet = (yPos, groundedHeight) =>
+  Intl.NumberFormat().format(
+    Math.abs(Math.round((yPos - groundedHeight) / 3.5))
+  );
 
 // Progress
 // Transforms any number range into a range of 0–1

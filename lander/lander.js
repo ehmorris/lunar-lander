@@ -4,10 +4,10 @@ import {
   randomBetween,
   randomBool,
   getVectorVelocity,
-  getDisplayVelocity,
+  velocityInMPH,
   getAngleDeltaUpright,
   getAngleDeltaUprightWithSign,
-  getDisplayHeight,
+  heightInFeet,
   percentProgress,
 } from "../helpers/helpers.js";
 import {
@@ -42,13 +42,12 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   let _rotatingLeft;
   let _rotatingRight;
 
-  let _crashed;
-  let _landed;
+  let _gameEndData;
   let _flipConfetti;
   let _lastRotation;
   let _lastRotationAngle;
   let _rotationCount;
-  let _maxSpeed;
+  let _maxVelocity;
   let _maxHeight;
   let _engineUsed;
   let _engineUsedPreviousFrame;
@@ -74,13 +73,12 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _rotatingLeft = false;
     _rotatingRight = false;
 
-    _crashed = false;
-    _landed = false;
+    _gameEndData = false;
     _flipConfetti = [];
     _lastRotation = 1;
     _lastRotationAngle = Math.PI * 2;
     _rotationCount = 0;
-    _maxSpeed = 0;
+    _maxVelocity = { ..._velocity };
     _maxHeight = _position.y;
     _engineUsed = 0;
     _engineUsedPreviousFrame = false;
@@ -89,6 +87,63 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _babySoundPlayed = false;
   };
   resetProps();
+
+  const _setGameEndData = (landed, timeSinceStart) => {
+    _gameEndData = {
+      landed,
+      speed: velocityInMPH(_velocity),
+      angle: getAngleDeltaUpright(_angle).toFixed(1),
+      durationInSeconds: Intl.NumberFormat().format(
+        Math.round(timeSinceStart / 1000)
+      ),
+      rotations: Intl.NumberFormat().format(_rotationCount),
+      maxSpeed: velocityInMPH(_maxVelocity),
+      maxHeight: heightInFeet(_maxHeight, _groundedHeight),
+      engineUsed: Intl.NumberFormat().format(_engineUsed),
+      boostersUsed: Intl.NumberFormat().format(_boostersUsed),
+      speedPercent: percentProgress(
+        0,
+        CRASH_VELOCITY,
+        getVectorVelocity(_velocity)
+      ),
+      anglePercent: percentProgress(
+        0,
+        CRASH_ANGLE,
+        getAngleDeltaUpright(_angle)
+      ),
+    };
+
+    if (landed) {
+      const score = scoreLanding(
+        getAngleDeltaUpright(_angle),
+        getVectorVelocity(_velocity)
+      );
+
+      _gameEndData.score = score.toFixed(1);
+      _gameEndData.description = landingScoreDescription(score);
+      _gameEndData.confetti = makeConfetti(state, Math.round(score));
+
+      _angle = Math.PI * 2;
+      _velocity = { x: 0, y: 0 };
+      _rotationVelocity = 0;
+    } else {
+      const score = scoreCrash(
+        getAngleDeltaUpright(_angle),
+        getVectorVelocity(_velocity)
+      );
+
+      _gameEndData.score = score.toFixed(1);
+      _gameEndData.description = crashScoreDescription(score);
+      _gameEndData.explosion = makeExplosion(
+        state,
+        _position,
+        _velocity,
+        _angle
+      );
+    }
+
+    onGameEnd(_gameEndData);
+  };
 
   const _updateProps = (timeSinceStart) => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
@@ -132,8 +187,8 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
       // Log new max speed and height
       if (_position.y < _maxHeight) _maxHeight = _position.y;
 
-      if (getDisplayVelocity(_velocity) > _maxSpeed) {
-        _maxSpeed = getDisplayVelocity(_velocity);
+      if (getVectorVelocity(_velocity) > getVectorVelocity(_maxVelocity)) {
+        _maxVelocity = { ..._velocity };
       }
 
       // Log engine and booster usage
@@ -156,69 +211,18 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
       }
 
       // Play easter egg baby sound
-      if (getDisplayVelocity(_velocity) > 400 && !_babySoundPlayed) {
+      if (getVectorVelocity(_velocity) > 20 && !_babySoundPlayed) {
         state.get("audioManager").playBaby();
         _babySoundPlayed = true;
-      } else if (getDisplayVelocity(_velocity) < 400 && _babySoundPlayed) {
+      } else if (getVectorVelocity(_velocity) < 20 && _babySoundPlayed) {
         _babySoundPlayed = false;
       }
-    }
-    // Just landed or crashed, game over
-    else {
-      const landed =
-        !_landed &&
+    } else if (!_gameEndData) {
+      _setGameEndData(
         getVectorVelocity(_velocity) < CRASH_VELOCITY &&
-        getAngleDeltaUpright(_angle) < CRASH_ANGLE;
-      const crashed = !_landed && !_crashed;
-      const speedInMPH = getDisplayVelocity(_velocity);
-      const angleInDeg = getAngleDeltaUpright(_angle);
-      const score = landed
-        ? scoreLanding(angleInDeg, speedInMPH, _rotationCount)
-        : scoreCrash(angleInDeg, speedInMPH, _rotationCount);
-
-      const commonStats = {
-        landed,
-        score: score.toFixed(1),
-        speed: speedInMPH.toFixed(1),
-        angle: angleInDeg.toFixed(1),
-        durationInSeconds: Math.round(timeSinceStart / 1000),
-        rotations: _rotationCount,
-        maxSpeed: _maxSpeed.toFixed(1),
-        maxHeight: getDisplayHeight(_maxHeight, _groundedHeight),
-        engineUsed: _engineUsed,
-        boostersUsed: _boostersUsed,
-      };
-
-      if (landed) {
-        _landed = {
-          ...commonStats,
-          description: landingScoreDescription(score),
-          speedPercent: percentProgress(
-            0,
-            CRASH_VELOCITY,
-            getVectorVelocity(_velocity)
-          ),
-          anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
-          confetti: makeConfetti(state, Math.round(score)),
-        };
-        _angle = Math.PI * 2;
-        _velocity = { x: 0, y: 0 };
-        _rotationVelocity = 0;
-        onGameEnd(_landed);
-      } else if (crashed) {
-        _crashed = {
-          ...commonStats,
-          description: crashScoreDescription(score),
-          speedPercent: percentProgress(
-            0,
-            CRASH_VELOCITY,
-            getVectorVelocity(_velocity)
-          ),
-          anglePercent: percentProgress(0, CRASH_ANGLE, angleInDeg),
-          explosion: makeExplosion(state, _position, _velocity, _angle),
-        };
-        onGameEnd(_crashed);
-      }
+          getAngleDeltaUpright(_angle) < CRASH_ANGLE,
+        timeSinceStart
+      );
     }
   };
 
@@ -230,21 +234,25 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
       : Math.min(_position.x + LANDER_WIDTH * 2, canvasWidth - textWidth);
     const yPosBasis = Math.max(_position.y, 30);
     const lineHeight = 14;
-
-    CTX.save();
-    CTX.fillStyle =
+    const rotatingLeft = _rotationVelocity < 0;
+    const speedColor =
       getVectorVelocity(_velocity) > CRASH_VELOCITY
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
-    CTX.fillText(
-      `${getDisplayVelocity(_velocity).toFixed(1)} MPH`,
-      xPosBasis,
-      yPosBasis - lineHeight
-    );
-    CTX.fillStyle =
+    const angleColor =
       getAngleDeltaUpright(_angle) > CRASH_ANGLE
         ? "rgb(255, 0, 0)"
         : "rgb(0, 255, 0)";
+
+    // Draw HUD text
+    CTX.save();
+    CTX.fillStyle = speedColor;
+    CTX.fillText(
+      `${velocityInMPH(_velocity)} MPH`,
+      xPosBasis,
+      yPosBasis - lineHeight
+    );
+    CTX.fillStyle = angleColor;
     CTX.fillText(
       `${getAngleDeltaUprightWithSign(_angle).toFixed(1)}°`,
       xPosBasis,
@@ -252,11 +260,53 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     );
     CTX.fillStyle = "#ffffff";
     CTX.fillText(
-      `${getDisplayHeight(_position.y, _groundedHeight)} FT`,
+      `${heightInFeet(_position.y, _groundedHeight)} FT`,
       xPosBasis,
       yPosBasis + lineHeight
     );
     CTX.restore();
+
+    // Draw hud rotation direction arrow
+    const arrowHeight = 7;
+    const arrowWidth = 6;
+    const arrowTextMargin = 3;
+    const arrowVerticalOffset = -3;
+    if (rotatingLeft) {
+      CTX.save();
+      CTX.strokeStyle = angleColor;
+      CTX.beginPath();
+      CTX.moveTo(
+        xPosBasis - arrowWidth - arrowTextMargin,
+        yPosBasis + arrowVerticalOffset
+      );
+      CTX.lineTo(
+        xPosBasis - arrowTextMargin,
+        yPosBasis + arrowVerticalOffset - arrowHeight / 2
+      );
+      CTX.lineTo(
+        xPosBasis - arrowTextMargin,
+        yPosBasis + arrowVerticalOffset + arrowHeight / 2
+      );
+      CTX.closePath();
+      CTX.stroke();
+      CTX.restore();
+    } else {
+      CTX.save();
+      CTX.strokeStyle = angleColor;
+      CTX.beginPath();
+      CTX.moveTo(
+        xPosBasis - arrowWidth - arrowTextMargin,
+        yPosBasis + arrowVerticalOffset - arrowHeight / 2
+      );
+      CTX.lineTo(xPosBasis - arrowTextMargin, yPosBasis + arrowVerticalOffset);
+      CTX.lineTo(
+        xPosBasis - arrowWidth - arrowTextMargin,
+        yPosBasis + arrowVerticalOffset + arrowHeight / 2
+      );
+      CTX.closePath();
+      CTX.stroke();
+      CTX.restore();
+    }
   };
 
   const _drawLander = () => {
@@ -360,11 +410,16 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
     if (_flipConfetti.length > 0) _flipConfetti.forEach((c) => c.draw());
 
-    if (_landed) _landed.confetti.draw();
-
-    // Don't draw the lander after crashing
-    if (_crashed) _crashed.explosion.draw();
-    else _drawLander();
+    if (_gameEndData) {
+      if (_gameEndData.landed) {
+        _gameEndData.confetti.draw();
+        _drawLander();
+      } else {
+        _gameEndData.explosion.draw();
+      }
+    } else {
+      _drawLander();
+    }
 
     // Draw speed and angle text beside lander, even after crashing
     _drawHUD();
