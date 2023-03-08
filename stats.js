@@ -84,11 +84,15 @@ https://ehmorris.com/lander/`;
   };
 
   function showShareSheet() {
-    navigator.share({ text: shareText });
+    try {
+      navigator.share({ text: shareText });
+    } catch {}
   }
 
   function copyShareStats() {
-    navigator.clipboard.writeText(shareText);
+    try {
+      navigator.clipboard.writeText(shareText);
+    } catch {}
   }
 
   function resetOnSpace({ code }) {
