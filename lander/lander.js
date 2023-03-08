@@ -222,11 +222,11 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     }
   };
 
-  const _drawSideBySideStats = () => {
+  const _drawHUD = () => {
     const textWidth = CTX.measureText("100.0 MPH").width + 2;
-    const staticPosition = getVectorVelocity(_velocity) > 10;
+    const staticPosition = getVectorVelocity(_velocity) > 7;
     const xPosBasis = staticPosition
-      ? 8
+      ? canvasWidth / 2 - textWidth / 2
       : Math.min(_position.x + LANDER_WIDTH * 2, canvasWidth - textWidth);
     const yPosBasis = Math.max(_position.y, 30);
     const lineHeight = 14;
@@ -329,6 +329,19 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     }
 
     CTX.restore();
+
+    // Draw cursor when offscreen
+    if (_position.y < 0) {
+      CTX.save();
+      CTX.fillStyle = "white";
+      CTX.beginPath();
+      CTX.moveTo(_position.x, 1);
+      CTX.lineTo(_position.x + 6, 9);
+      CTX.lineTo(_position.x - 6, 9);
+      CTX.closePath();
+      CTX.fill();
+      CTX.restore();
+    }
   };
 
   const draw = (timeSinceStart) => {
@@ -354,7 +367,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     else _drawLander();
 
     // Draw speed and angle text beside lander, even after crashing
-    _drawSideBySideStats();
+    _drawHUD();
   };
 
   return {
