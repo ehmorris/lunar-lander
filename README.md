@@ -19,7 +19,6 @@ See `launch.json` for running.
 ### Game Ideas
 
 - Bigger "small" font size on large screens
-- Update instruction wording for keyboard
 - Fix HUD at a lower velocity, show smaller cursor for x position when offscreen
 - Use number formatting https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat
 - Show rotation velocity / direction in HUD. Help users to stabilize.
