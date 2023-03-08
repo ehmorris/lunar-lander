@@ -1,34 +1,48 @@
 export const makeTallyManger = () => {
-  let _landingTotal = localStorage.getItem("landingTotal")
-    ? parseInt(localStorage.getItem("landingTotal"))
-    : 0;
-  let _crashTotal = localStorage.getItem("crashTotal")
-    ? parseInt(localStorage.getItem("crashTotal"))
-    : 0;
+  let _landingTotal = 0;
+  let _crashTotal = 0;
+
+  const getLandingTotalStorage = () => {
+    try {
+      return localStorage.getItem("landingTotal")
+        ? localStorage.getItem("landingTotal")
+        : 0;
+    } catch {
+      return _landingTotal;
+    }
+  };
+
+  const getCrashTotalStorage = () => {
+    try {
+      return localStorage.getItem("crashTotal")
+        ? localStorage.getItem("crashTotal")
+        : 0;
+    } catch {
+      return _crashTotal;
+    }
+  };
+
+  _landingTotal = parseInt(getLandingTotalStorage());
+  _crashTotal = parseInt(getCrashTotalStorage());
 
   const storeLanding = () => {
     _landingTotal++;
-    localStorage.setItem("landingTotal", _landingTotal);
+    try {
+      localStorage.setItem("landingTotal", _landingTotal);
+    } catch {}
   };
 
   const storeCrash = () => {
     _crashTotal++;
-    localStorage.setItem("crashTotal", _crashTotal);
+    try {
+      localStorage.setItem("crashTotal", _crashTotal);
+    } catch {}
   };
 
-  const _getLandingTotal = () =>
-    localStorage.getItem("landingTotal")
-      ? localStorage.getItem("landingTotal")
-      : _landingTotal;
-
-  const _getCrashTotal = () =>
-    localStorage.getItem("crashTotal")
-      ? localStorage.getItem("crashTotal")
-      : _crashTotal;
-
   const updateDisplay = () => {
-    document.querySelector("#landingTotal").textContent = _getLandingTotal();
-    document.querySelector("#crashTotal").textContent = _getCrashTotal();
+    document.querySelector("#landingTotal").textContent =
+      getLandingTotalStorage();
+    document.querySelector("#crashTotal").textContent = getCrashTotalStorage();
   };
   updateDisplay();
 

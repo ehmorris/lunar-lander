@@ -10,9 +10,13 @@ export const manageInstructions = (onCloseInstructions) => {
   let _rightRotationDone = false;
   let _engineAndRotationDone = false;
 
-  // Save this to a variable so that when we access it in a loop, we're
-  // not calling localStorage.getItem 60 times per second
-  let _hasClosedInstructionsVar = localStorage.getItem("closedInstructions");
+  let _hasClosedInstructionsVar = (() => {
+    try {
+      return localStorage.getItem("closedInstructions");
+    } catch {
+      return false;
+    }
+  })();
 
   // Using an approximation. controls.getHasKeyboard() can't be used here
   // because the user is unlikely to have used the keyboard when the page has
@@ -37,7 +41,9 @@ export const manageInstructions = (onCloseInstructions) => {
     // and a keyboard
     if (!_hasClosedInstructionsVar) {
       document.querySelector("#instructions").classList.remove("show");
-      localStorage.setItem("closedInstructions", true);
+      try {
+        localStorage.setItem("closedInstructions", true);
+      } catch {}
       _hasClosedInstructionsVar = true;
       onCloseInstructions();
     }
