@@ -1,4 +1,8 @@
-import { CRASH_VELOCITY, CRASH_ANGLE } from "./constants.js";
+import {
+  CRASH_VELOCITY,
+  CRASH_ANGLE,
+  VELOCITY_MULTIPLIER,
+} from "./constants.js";
 import { progress } from "./helpers.js";
 
 export const landingScoreDescription = (score) => {
@@ -78,9 +82,15 @@ export const crashScoreDescription = (score) => {
 // speed: 12
 export const scoreLanding = (angle, speed) => {
   // This is 1mph (unconverted) and a 0deg angle
-  const bestPossibleCombo = 0.05;
-  const worstPossibleCombo = CRASH_ANGLE + CRASH_VELOCITY;
-  return progress(worstPossibleCombo, bestPossibleCombo, angle + speed) * 100;
+  const bestPossibleCombo = 1;
+  const worstPossibleCombo = CRASH_ANGLE + CRASH_VELOCITY * VELOCITY_MULTIPLIER;
+  return (
+    progress(
+      worstPossibleCombo,
+      bestPossibleCombo,
+      angle + speed * VELOCITY_MULTIPLIER
+    ) * 100
+  );
 };
 
 export const scoreCrash = (angle, speed) => {
