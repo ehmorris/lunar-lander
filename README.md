@@ -40,6 +40,7 @@ See `launch.json` for running.
 
 ### Bugs
 
+- Press a finger in the center, then press another and move it to the left. The center touch is cancelled. This is a touchmove regression, probably due to the touches array.
 - Make play speed consistent regardless of frame rate
   - On some screens the refresh rate is 120, on others 60. This changes the speed of play. The game is twice as fast on a new MacBook as on an iPhone. The animations are procedural, so to accomplish this, forces like thrust and gravity will have to be modified based on time elpased between frames. Unsure how to do this.
   - The gameplay target is the experience on a MacBook with a 120hz refresh rate. Phones could possibly be slower, or shorter screens in general - but this should be controlled and not incidental
