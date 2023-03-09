@@ -18,6 +18,7 @@ See `launch.json` for running.
 
 ### Game Ideas
 
+- Daily challenge
 - Move mobile booster controls to one side so they're easier to tap?
 - Add rings / bonus point areas to hit before landing
 - Make terrain land-able
