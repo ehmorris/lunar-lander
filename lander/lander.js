@@ -1,4 +1,4 @@
-import { makeExplosion } from "./explosion.js";
+import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
 import {
   randomBetween,
@@ -134,7 +134,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
       _gameEndData.score = score.toFixed(1);
       _gameEndData.description = crashScoreDescription(score);
-      _gameEndData.explosion = makeExplosion(
+      _gameEndData.explosion = makeLanderExplosion(
         state,
         _position,
         _velocity,

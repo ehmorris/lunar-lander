@@ -10,6 +10,7 @@ import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
+import { launchAstroid } from "./astroids.js";
 
 // SETUP
 
@@ -42,6 +43,7 @@ const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
 let randomConfetti = [];
+let astroids = [];
 
 // INSTRUCTIONS SHOW/HIDE
 
@@ -65,6 +67,10 @@ const animationObject = animate((timeSinceStart) => {
   if (instructions.hasClosedInstructions()) {
     landerControls.drawTouchOverlay();
     lander.draw(timeSinceStart);
+
+    if (astroids.length > 0) {
+      astroids.forEach((a) => a.draw());
+    }
   } else {
     toyLander.draw();
   }
@@ -116,5 +122,11 @@ document.addEventListener("keydown", ({ key }) => {
         y: randomBetween(0, canvasHeight),
       })
     );
+  }
+});
+
+document.addEventListener("keydown", ({ key }) => {
+  if (key === "m") {
+    astroids.push(launchAstroid(appState));
   }
 });
