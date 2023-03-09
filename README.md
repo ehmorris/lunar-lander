@@ -19,6 +19,7 @@ See `launch.json` for running.
 ### Game Ideas
 
 - Daily challenge
+- [Galaxy texture in background like this](https://pixabay.com/photos/milky-way-stars-night-sky-2695569/)
 - Move mobile booster controls to one side so they're easier to tap?
 - Add rings / bonus point areas to hit before landing
 - Make terrain land-able
