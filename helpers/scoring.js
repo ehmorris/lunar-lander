@@ -81,7 +81,6 @@ export const crashScoreDescription = (score) => {
 // angle: 11
 // speed: 12
 export const scoreLanding = (angle, speed) => {
-  // This is 1mph (unconverted) and a 0deg angle
   const bestPossibleCombo = 1;
   const worstPossibleCombo = CRASH_ANGLE + CRASH_VELOCITY * VELOCITY_MULTIPLIER;
   return (
@@ -94,8 +93,16 @@ export const scoreLanding = (angle, speed) => {
 };
 
 export const scoreCrash = (angle, speed) => {
-  // This number is 720mph (36 in unconverted speed) + 180 (worst possible angle)
-  const bestPossibleCombo = 216;
-  const worstPossibleCombo = Math.min(CRASH_VELOCITY, CRASH_ANGLE);
-  return progress(worstPossibleCombo, bestPossibleCombo, angle + speed) * 100;
+  const bestPossibleCombo = 900;
+  const worstPossibleCombo = Math.min(
+    CRASH_VELOCITY * VELOCITY_MULTIPLIER,
+    CRASH_ANGLE
+  );
+  return (
+    progress(
+      worstPossibleCombo,
+      bestPossibleCombo,
+      angle + speed * VELOCITY_MULTIPLIER
+    ) * 100
+  );
 };
