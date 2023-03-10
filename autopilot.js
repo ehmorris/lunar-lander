@@ -44,7 +44,9 @@ const autopilot = {
       let angleInTurns = turnModulo(landerStats.angle / Turn);
       let projectedAngleInTurns = turnModulo(landerStats.projectedAngle / Turn);
 
-      let angleDiff = turnModulo(angleInTurns - projectedAngleInTurns);
+      let targetAngleInTurns = clamp(projectedAngleInTurns, -0.125, 0.125);
+
+      let angleDiff = turnModulo(angleInTurns - targetAngleInTurns);
 
       let targetAngularVelocity = -angleDiff * 5;
       let angularVelocityDiff =
