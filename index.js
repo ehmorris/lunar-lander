@@ -17,6 +17,7 @@ import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
 import { launchAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
+import "./autopilot.js";
 
 // SETUP
 
