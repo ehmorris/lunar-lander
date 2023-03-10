@@ -46,6 +46,7 @@ const toyLander = makeToyLander(
 );
 const toyLanderControls = makeControls(appState, toyLander, audioManager);
 const lander = makeLander(appState, onGameEnd, onResetXPos);
+window.lander = lander;
 const landerControls = makeControls(appState, lander, audioManager);
 const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
