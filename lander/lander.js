@@ -33,6 +33,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
   const _thrust = 0.01;
   const _groundedHeight = canvasHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
+  window.landerStats.groundedHeight = _groundedHeight;
 
   let _position;
   let _velocity;
@@ -74,6 +75,9 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _rotatingRight = false;
 
     _gameEndData = false;
+    window.landerStats.gameEndData = _gameEndData;
+    window.autopilot.step();
+
     _flipConfetti = [];
     _lastRotation = 1;
     _lastRotationAngle = Math.PI * 2;
@@ -112,6 +116,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         getAngleDeltaUpright(_angle)
       ),
     };
+    window.landerStats.gameEndData = _gameEndData;
 
     if (landed) {
       const score = scoreLanding(
@@ -224,6 +229,11 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         timeSinceStart
       );
     }
+
+    window.landerStats.position = _position;
+    window.landerStats.velocity = _velocity;
+    window.landerStats.angle = _angle;
+    window.landerStats.rotationVelocity = _rotationVelocity;
   };
 
   const _drawHUD = () => {
@@ -397,7 +407,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   const draw = (timeSinceStart) => {
     _updateProps(timeSinceStart);
 
-    if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
+    if (true || (!_engineOn && !_rotatingLeft && !_rotatingRight)) {
       drawTrajectory(
         state,
         _position,
