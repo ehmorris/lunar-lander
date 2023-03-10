@@ -83,7 +83,16 @@ const autopilot = {
           Math.abs(xVelocity) > 0.005 && xVelocity > 0 !== angleInTurns > 0;
       }
 
+      let deathSpiralRecovery = false;
+      if (autopilot.algorithmImprovedCheckbox.checked) {
+        if (Math.abs(landerStats.rotationVelocity) > 1) {
+          engineFacingOppositeOfXVelocity = false;
+          deathSpiralRecovery = Math.abs(angleInTurns) < 0.25;
+        }
+      }
+
       if (
+        deathSpiralRecovery ||
         engineFacingOppositeOfXVelocity ||
         (velocity > targetVelocity && Math.abs(angleInTurns) < 0.25)
       ) {
@@ -107,7 +116,9 @@ const autopilot = {
 
         "|",
 
-        ...(engineFacingOppositeOfXVelocity
+        ...(deathSpiralRecovery
+          ? ["death spiral recovery"]
+          : engineFacingOppositeOfXVelocity
           ? ["reducing x velocity:", xVelocity.toFixed(2).padStart(5, " ")]
           : [
               "y velocity:",
