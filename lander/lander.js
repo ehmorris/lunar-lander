@@ -77,6 +77,8 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _gameEndData = false;
     window.landerStats.gameEndData = _gameEndData;
     window.autopilot.step();
+    let hint = document.querySelector("#autopilot-links");
+    if (hint instanceof Element) hint.className = "";
 
     _flipConfetti = [];
     _lastRotation = 1;
