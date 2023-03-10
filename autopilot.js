@@ -17,7 +17,8 @@ global.landerStats = landerStats;
 const Turn = Math.PI * 2;
 
 function turnModulo(angleInTurns) {
-  return ((angleInTurns + 0.5) % 1) - 0.5;
+  // https://stackoverflow.com/q/4467539
+  return ((((angleInTurns + 0.5) % 1) + 1) % 1) - 0.5;
 }
 
 function clamp(value, min, max) {
@@ -84,7 +85,7 @@ const autopilot = {
 
       if (
         engineFacingOppositeOfXVelocity ||
-        (velocity > targetVelocity && Math.abs(angleInTurns) < 0.45)
+        (velocity > targetVelocity && Math.abs(angleInTurns) < 0.25)
       ) {
         lander.engineOn();
       } else {
