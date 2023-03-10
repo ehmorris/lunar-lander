@@ -28,6 +28,9 @@ const autopilot = {
   checkbox: /** @type {HTMLInputElement} */ (
     document.querySelector("#autopilot")
   ),
+  algorithmImprovedCheckbox: /** @type {HTMLInputElement} */ (
+    document.querySelector("#autopilot-algorithm-improved")
+  ),
   step() {
     const lander = global.lander;
 
@@ -60,14 +63,29 @@ const autopilot = {
       let altitude = landerStats.groundedHeight - landerStats.position.y;
 
       let velocity = landerStats.velocity.y;
-      let targetVelocity = clamp(
-        (150 / landerStats.landerHeight) ** 1.2 * 0.02 * (altitude / 3.5) +
-          0.03,
-        0,
-        altitude > 10 ? altitude / 160 : Infinity
-      );
+      let targetVelocity;
+      if (autopilot.algorithmImprovedCheckbox.checked) {
+        targetVelocity = (altitude / 160) ** 0.5;
+      } else {
+        targetVelocity = clamp(
+          (150 / landerStats.landerHeight) ** 1.2 * 0.02 * (altitude / 3.5) +
+            0.03,
+          0,
+          altitude > 10 ? altitude / 160 : Infinity
+        );
+      }
 
-      if (velocity > targetVelocity && Math.abs(angleInTurns) < 0.45) {
+      let xVelocity = landerStats.velocity.x;
+      let engineFacingOppositeOfXVelocity = false;
+      if (autopilot.algorithmImprovedCheckbox.checked) {
+        engineFacingOppositeOfXVelocity =
+          Math.abs(xVelocity) > 0.005 && xVelocity > 0 !== angleInTurns > 0;
+      }
+
+      if (
+        engineFacingOppositeOfXVelocity ||
+        (velocity > targetVelocity && Math.abs(angleInTurns) < 0.45)
+      ) {
         lander.engineOn();
       } else {
         lander.engineOff();
@@ -77,21 +95,25 @@ const autopilot = {
         "[autopilot]",
 
         "altitude:",
-        altitude.toFixed(1),
-
-        "|",
-
-        "y velocity:",
-        velocity.toFixed(2).padStart(5, " "),
-        "->",
-        targetVelocity.toFixed(2).padStart(5, " "),
+        altitude.toExponential(3).padStart(5, " "),
 
         "|",
 
         "angular velocity:",
         landerStats.rotationVelocity.toFixed(2).padStart(5, " "),
         "->",
-        targetAngularVelocity.toFixed(2).padStart(5, " ")
+        targetAngularVelocity.toFixed(2).padStart(5, " "),
+
+        "|",
+
+        ...(engineFacingOppositeOfXVelocity
+          ? ["reducing x velocity:", xVelocity.toFixed(2).padStart(5, " ")]
+          : [
+              "y velocity:",
+              velocity.toFixed(2).padStart(5, " "),
+              "->",
+              targetVelocity.toFixed(2).padStart(5, " "),
+            ])
       );
     }
 

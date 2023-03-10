@@ -107,6 +107,34 @@
         <span style="visibility: hidden">Au</span>
         ▲ press here to toggle autopilot!
       </div>
+      <div id="autopilot-details">
+        <span style="visibility: hidden">with</span>
+        <span>autopilot algorithm:</span>
+        <label>
+          <input
+            type="radio"
+            name="autopilot-algorithm"
+            id="autopilot-algorithm-original"
+          />
+          <a
+            title="Orient the rocket parallel to the trajectory line, and apply engine to brake. (Typically scores 99-102.)"
+            >original</a
+          >
+        </label>
+        &middot;
+        <label>
+          <input
+            type="radio"
+            name="autopilot-algorithm"
+            id="autopilot-algorithm-improved"
+            checked
+          />
+          <a
+            title="Use engine to reduce x-velocity until the trajectory line is vertical. (Typically scores 101-104.)"
+            >improved</a
+          >
+        </label>
+      </div>
     </div>
     <div class="game"></div>
     <div id="endGameStats" class="fullSizeContainer">
