@@ -111,4 +111,6 @@ global.autopilot = autopilot;
 autopilot.checkbox.addEventListener("click", () => {
   autopilot.checkbox.blur();
   autopilot.step();
+
+  document.querySelector("#autopilot-hint").className = "hidden";
 });

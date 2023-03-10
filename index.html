@@ -44,12 +44,70 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <link rel="stylesheet" type="text/css" href="./style.css" />
+    <style>
+      #game-title {
+        position: absolute;
+        z-index: 1;
+        margin: 0px 10px;
+      }
+
+      #game-title > *,
+      #game-title a {
+        display: block;
+      }
+
+      #game-title a {
+        color: unset;
+        text-decoration: unset;
+        display: inline-block;
+      }
+
+      #game-title a:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      #autopilot {
+        display: none;
+      }
+
+      #autopilot + * {
+        text-shadow: 0 0 8px red, 0 0 14px red;
+        transition: text-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+      }
+
+      #autopilot:checked + * {
+        color: #aeffae;
+        text-shadow: 0 0 20px #8eff8e, 0 0 20px #8eff8e;
+      }
+
+      #autopilot-hint {
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+      }
+
+      #autopilot-hint.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      #instructions {
+        padding-top: calc(8vmin + 40px);
+      }
+    </style>
   </head>
   <body>
-    <label style="position: relative; z-index: 1">
-      <input type="checkbox" id="autopilot" tabindex="-1" />
-      <span>Autopilot</span>
-    </label>
+    <div id="game-title">
+      <em>
+        <label>
+          <input type="checkbox" id="autopilot" tabindex="-1" />
+          <a>Autopilot</a></label
+        >
+      </em>
+      <div id="autopilot-hint">
+        <span style="visibility: hidden">Au</span>
+        ▲ press here to toggle autopilot!
+      </div>
+    </div>
     <div class="game"></div>
     <div id="endGameStats" class="fullSizeContainer">
       <div>
