@@ -10,6 +10,7 @@ import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
+import "./autopilot.js";
 
 // SETUP
 
