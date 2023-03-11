@@ -54,7 +54,13 @@
       #game-title {
         position: absolute;
         z-index: 1;
-        margin: 0px 10px;
+        margin: 6px 6px;
+        font-size: clamp(6px, 2.5vw, 18px);
+        -webkit-text-size-adjust: 100%;
+        text-shadow: 0 0 8px #000000aa;
+      }
+      #game-title:focus {
+        outline: none;
       }
 
       #game-title > *,
@@ -73,12 +79,17 @@
         cursor: pointer;
       }
 
-      #autopilot {
+      input[type="checkbox"],
+      input[type="radio"] {
         display: none;
       }
 
       #autopilot + * {
         text-shadow: 0 0 8px red, 0 0 14px red;
+      }
+
+      input[type="checkbox"] + *,
+      input[type="radio"] + * {
         transition: text-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
       }
 
@@ -87,32 +98,113 @@
         text-shadow: 0 0 20px #8eff8e, 0 0 20px #8eff8e;
       }
 
-      #autopilot-hint {
+      #autopilot-links {
         transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
       }
 
-      #autopilot-hint.hidden {
+      #autopilot-links.hidden {
         opacity: 0;
         visibility: hidden;
+        pointer-events: none;
       }
 
-      #instructions {
-        padding-top: calc(8vmin + 40px);
+      #autopilot-hint {
+        transition: visibility 0.5s ease-in-out;
+      }
+
+      #autopilot-hint.hidden {
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      #autopilot-details {
+        color: #8484f2;
+        margin-top: -0.7em;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      #autopilot-details input:checked + * {
+        color: #b6b6eb;
+        text-shadow: 0 0 20px #8484f2, 0 0 10px #8484f2, 0 0 10px #8484f2;
+      }
+
+      #game-title .autopilot-link {
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      #game-title:hover .autopilot-link {
+        visibility: visible;
+        pointer-events: all;
+        opacity: 1;
+      }
+
+      #game-title:hover #autopilot-links.hidden + #autopilot-details,
+      #game-title:focus #autopilot-links.hidden + #autopilot-details {
+        visibility: visible;
+        pointer-events: all;
+        opacity: 1;
+      }
+
+      .fullSizeContainer {
+        z-index: 2;
+      }
+
+      .fullSizeContainer::after {
+        content: " ";
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+        background: transparent;
+
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: -50vw;
+        right: -50vw;
+        z-index: -1;
       }
     </style>
   </head>
   <body>
-    <div id="game-title">
-      <em>
+    <div id="game-title" tabindex="-1">
+      <span>
         <label>
           <input type="checkbox" id="autopilot" tabindex="-1" />
           <a>Autopilot</a></label
         >
-      </em>
-      <div id="autopilot-hint">
+      </span>
+      <div id="autopilot-links">
         <span style="visibility: hidden">Au</span>
-        ▲ press here to toggle autopilot!
+        <span id="autopilot-hint">👆 press here to toggle autopilot!</span>
       </div>
+      <form id="autopilot-details">
+        <span style="visibility: hidden">A</span>
+        <label>
+          <input type="radio" name="autopilot-mode" value="" checked />
+          <a>off</a>
+        </label>
+        &middot;
+        <label>
+          <input type="radio" name="autopilot-mode" value="v1" />
+          <a
+            title="Orient the rocket parallel to the trajectory line, and apply engine to brake. (Typically scores 99-102.)"
+            >algorithm v1</a
+          >
+        </label>
+        &middot;
+        <label>
+          <input type="radio" name="autopilot-mode" value="v2" />
+          <a
+            title="Use engine to reduce x-velocity until the trajectory line is vertical. (Typically scores 101-104.)"
+            >algorithm v2</a
+          >
+        </label>
+      </form>
     </div>
     <div class="game"></div>
     <div id="endGameStats" class="fullSizeContainer">
