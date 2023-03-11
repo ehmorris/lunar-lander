@@ -5,11 +5,12 @@ export const showStatsAndResetControl = (
   data,
   hasKeyboard
 ) => {
-  const tryAgainButtonDelay = 1500;
+  const buttonDelayTime = 1500;
   const canShowShareSheet = navigator.canShare;
   const showStats = () => {
     document.querySelector("#endGameStats").classList.add("show");
     document.querySelector("#tryAgain").classList.add("loading");
+    document.querySelector("#randomStart").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
 
@@ -31,6 +32,7 @@ Max speed: ${data.maxSpeed}mph
 Max height: ${data.maxHeight}ft
 Engine used: ${data.engineUsed} times
 Boosters used: ${data.boostersUsed} times
+Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}
 https://ehmorris.com/lander/`;
 
   const shareText = `${
@@ -85,6 +87,10 @@ ${shareTextSecondaryInfo}`;
     document.querySelector("#maxHeight").textContent = data.maxHeight;
     document.querySelector("#engineUsed").textContent = data.engineUsed;
     document.querySelector("#boostersUsed").textContent = data.boostersUsed;
+    document.querySelector("#canvasWidth").textContent =
+      state.get("canvasWidth");
+    document.querySelector("#canvasHeight").textContent =
+      state.get("canvasHeight");
 
     if (state.get("challengeManager").isChallengeOn()) {
       document.querySelector("#statsChallengeText").classList.add("show");
@@ -136,9 +142,11 @@ ${shareTextSecondaryInfo}`;
     setTimeout(() => {
       document.querySelector("#tryAgain").classList.remove("loading");
       document.querySelector("#tryAgain").addEventListener("click", tryAgain);
-    }, tryAgainButtonDelay);
-
-    document.querySelector("#randomStart").addEventListener("click", randomize);
+      document.querySelector("#randomStart").classList.remove("loading");
+      document
+        .querySelector("#randomStart")
+        .addEventListener("click", randomize);
+    }, buttonDelayTime);
 
     if (canShowShareSheet) {
       document
@@ -155,9 +163,8 @@ ${shareTextSecondaryInfo}`;
       // in that area for thrust
       setTimeout(() => {
         document.addEventListener("keydown", tryAgainOnSpace);
-      }, tryAgainButtonDelay);
-
-      document.addEventListener("keydown", randomizeOnR);
+        document.addEventListener("keydown", randomizeOnR);
+      }, buttonDelayTime);
     }
   };
 
