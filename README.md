@@ -2,11 +2,15 @@
 
 A plain JavaScript, HTML, and CSS game with no dependencies.
 
-Code and design: Edwin Morris
+---
 
-Music and sound: Max Kotelchuck
+**Code and design: Edwin Morris**
 
-Thanks to [this guide](http://students.cs.ucl.ac.uk/schoolslab/projects/HT5/) for help with the basics.
+**Music and sound: Max Kotelchuck**
+
+Thanks to all Github contributors
+
+And thanks to [this guide](http://students.cs.ucl.ac.uk/schoolslab/projects/HT5/) for help with the basics
 
 # Running
 
