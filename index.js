@@ -10,6 +10,7 @@ import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
+import { makeChallengeManager } from "./challenge.js";
 
 // SETUP
 
@@ -19,13 +20,15 @@ const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
   height: window.innerHeight,
   attachNode: ".game",
 });
+const challengeManager = makeChallengeManager();
 
 const appState = makeStateManager()
   .set("CTX", CTX)
   .set("canvasWidth", canvasWidth)
   .set("canvasHeight", canvasHeight)
   .set("canvasElement", canvasElement)
-  .set("audioManager", audioManager);
+  .set("audioManager", audioManager)
+  .set("challengeManager", challengeManager);
 
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
@@ -50,6 +53,7 @@ if (!instructions.hasClosedInstructions()) {
   toyLanderControls.attachEventListeners();
 } else {
   landerControls.attachEventListeners();
+  challengeManager.populateCornerInfo();
 }
 
 // MAIN ANIMATION LOOP
@@ -79,10 +83,12 @@ const animationObject = animate((timeSinceStart) => {
 function onCloseInstructions() {
   toyLanderControls.detachEventListeners();
   landerControls.attachEventListeners();
+  challengeManager.populateCornerInfo();
 }
 
 function onGameEnd(data) {
   showStatsAndResetControl(
+    appState,
     lander,
     animationObject,
     data,

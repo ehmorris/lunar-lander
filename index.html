@@ -54,7 +54,12 @@
     <div id="endGameStats" class="fullSizeContainer">
       <div>
         <h1 id="description"></h1>
-        <h3><span id="score"></span> point <span id="type"></span></h3>
+        <h3 class="spaceBetween">
+          <span class="stateChallengeText show" id="statsChallengeText"
+            >Daily Challenge <span id="statsChallengeNumber"></span
+          ></span>
+          <span><span id="score"></span> point <span id="type"></span></span>
+        </h3>
       </div>
       <div class="meterAndLabel">
         <div class="label">Speed</div>
@@ -97,10 +102,22 @@
           <span class="tableLabel">Boosters Used</span>
           <span class="tableValue"><span id="boostersUsed"></span> TIMES</span>
         </div>
+        <div class="tableRow">
+          <span class="tableLabel">Game Size</span>
+          <span class="tableValue">
+            <span id="canvasWidth"></span>&#215<span id="canvasHeight"></span>
+          </span>
+        </div>
       </div>
       <div class="buttonContainer">
-        <div class="button loading" id="reset">
-          <span id="resetText">Reset</span>
+        <div class="button loading" id="tryAgain">
+          <span id="tryAgainText">Challenge</span>
+          <svg class="buttonAnimatedBorder">
+            <rect width="100%" height="100%"></rect>
+          </svg>
+        </div>
+        <div class="button loading" id="randomStart">
+          <span id="randomStartText">Randomize</span>
           <svg class="buttonAnimatedBorder">
             <rect width="100%" height="100%"></rect>
           </svg>
@@ -152,7 +169,11 @@
         </div>
       </div>
     </div>
-    <div id="tally" class="cornerInfo">
+    <div id="cornerChallenge" class="topLeftCorner show">
+      Daily Challenge <span id="cornerChallengeNumber"></span>
+    </div>
+    <div id="cornerRandom" class="topLeftCorner">Random Start</div>
+    <div id="tally" class="topRightCorner">
       L<span id="landingTotal"></span> C<span id="crashTotal"></span>
     </div>
     <script src="index.js" type="module"></script>
