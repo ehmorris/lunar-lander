@@ -2,6 +2,7 @@ import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
 import {
   randomBetween,
+  seededRandomBetween,
   randomBool,
   getVectorVelocity,
   velocityInMPH,
@@ -25,6 +26,9 @@ import {
   CRASH_ANGLE,
 } from "../helpers/constants.js";
 import { drawLanderGradient } from "./gradient.js";
+import { makeSeededRandom } from "../helpers/seededrandom.js";
+
+const seededRandom = makeSeededRandom();
 
 export const makeLander = (state, onGameEnd, onResetXPos) => {
   const CTX = state.get("CTX");
@@ -55,20 +59,29 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   let _boostersUsedPreviousFrame;
   let _babySoundPlayed;
 
-  const resetProps = () => {
+  const resetProps = ({ challenge }) => {
+    challenge
+      ? seededRandom.setDailyChallengeSeed()
+      : seededRandom.setRandomSeed();
+
     _position = {
-      x: randomBetween(canvasWidth * 0.33, canvasWidth * 0.66),
+      x: seededRandomBetween(
+        canvasWidth * 0.33,
+        canvasWidth * 0.66,
+        seededRandom
+      ),
       y: LANDER_HEIGHT * 2,
     };
     _velocity = {
-      x: randomBetween(
+      x: seededRandomBetween(
         -_thrust * (canvasWidth / 10),
-        _thrust * (canvasWidth / 10)
+        _thrust * (canvasWidth / 10),
+        seededRandom
       ),
-      y: randomBetween(0, _thrust * (canvasWidth / 10)),
+      y: seededRandomBetween(0, _thrust * (canvasWidth / 10), seededRandom),
     };
-    _rotationVelocity = randomBetween(-0.1, 0.1);
-    _angle = randomBetween(Math.PI * 1.5, Math.PI * 2.5);
+    _rotationVelocity = seededRandomBetween(-0.2, 0.2, seededRandom);
+    _angle = seededRandomBetween(Math.PI * 1.5, Math.PI * 2.5, seededRandom);
     _engineOn = false;
     _rotatingLeft = false;
     _rotatingRight = false;
@@ -86,7 +99,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _boostersUsedPreviousFrame = false;
     _babySoundPlayed = false;
   };
-  resetProps();
+  resetProps({ challenge: true });
 
   const _setGameEndData = (landed, timeSinceStart) => {
     _gameEndData = {

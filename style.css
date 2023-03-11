@@ -28,6 +28,11 @@ li.strikethrough {
   color: rgba(255, 255, 255, 0.25);
 }
 
+.spaceBetween {
+  display: flex;
+  justify-content: space-between;
+}
+
 .fullSizeContainer {
   display: none;
   position: absolute;
@@ -39,7 +44,7 @@ li.strikethrough {
   flex-direction: column;
   justify-content: center;
   height: 100svh;
-  grid-gap: clamp(12px, 2vmin, 18px);
+  grid-gap: clamp(8px, 2vmin, 18px);
   box-sizing: border-box;
   width: 100%;
   touch-action: manipulation;
@@ -56,7 +61,7 @@ li.strikethrough {
 }
 
 .fullSizeContainer h1 {
-  font-size: clamp(32px, 8vmin, 62px);
+  font-size: clamp(26px, 7vmin, 62px);
   font-weight: 900;
   line-height: 1.1;
   color: white;
@@ -78,7 +83,7 @@ li.strikethrough {
 .fullSizeContainer h3 {
   margin: 0.15em 0 0;
   font-weight: 400;
-  font-size: clamp(20px, 4vmin, 32px);
+  font-size: clamp(18px, 4vmin, 32px);
 }
 
 @media screen and (max-width: 640px) {
@@ -151,8 +156,17 @@ li.strikethrough {
   border-radius: var(--cursor-size);
 }
 
+.stateChallengeText {
+  display: none;
+  font-weight: 600;
+}
+
+.stateChallengeText.show {
+  display: inline;
+}
+
 .statsTable {
-  margin: 18px 0 22px;
+  margin: 16px 0 20px;
   font-size: var(--stats-font-size);
   text-transform: uppercase;
   row-gap: clamp(8px, 2vmin, 16px);
@@ -194,8 +208,7 @@ li.strikethrough {
   flex-wrap: wrap;
   box-sizing: border-box;
   justify-content: center;
-  column-gap: clamp(12px, 4vmin, 22px);
-  row-gap: 12px;
+  grid-gap: clamp(12px, 4vmin, 22px);
 }
 
 .button {
@@ -203,7 +216,7 @@ li.strikethrough {
   text-align: center;
   color: white;
   flex: 1;
-  padding: 12px;
+  padding: clamp(10px, 2vmin, 20px);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   transition: all 0.6s ease-out;
@@ -274,7 +287,23 @@ li.strikethrough {
   stroke: white;
 }
 
-.cornerInfo {
+.topLeftCorner {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  top: 2px;
+  left: 6px;
+  font-size: var(--stats-font-size);
+  text-transform: uppercase;
+}
+
+.topLeftCorner.show {
+  display: block;
+}
+
+.topRightCorner {
   position: absolute;
   pointer-events: none;
   user-select: none;
