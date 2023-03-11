@@ -1,36 +1,35 @@
-// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
-const sfc32 = (a, b, c, d) => {
-  return function () {
-    a >>>= 0;
-    b >>>= 0;
-    c >>>= 0;
-    d >>>= 0;
-    var t = (a + b) | 0;
-    a = b ^ (b >>> 9);
-    b = (c + (c << 3)) | 0;
-    c = (c << 21) | (c >>> 11);
-    d = (d + 1) | 0;
-    t = (t + d) | 0;
-    c = (c + t) | 0;
-    return (t >>> 0) / 4294967296;
+// https://stackoverflow.com/a/29450606
+const createRandomNumberGenerator = (seed) => {
+  let mask = 0xffffffff;
+  let m_w = (123456789 + seed) & mask;
+  let m_z = (987654321 - seed) & mask;
+
+  return () => {
+    m_z = (36969 * (m_z & 65535) + (m_z >>> 16)) & mask;
+    m_w = (18000 * (m_w & 65535) + (m_w >>> 16)) & mask;
+
+    let result = ((m_z << 16) + (m_w & 65535)) >>> 0;
+    result /= 4294967296;
+    return result;
   };
 };
 
 export const makeSeededRandom = () => {
   const today = new Date(Date.now());
-  const seed = `${today.getDay()} ${today.getMonth()} ${today.getYear()}`;
+  const seed = parseInt(
+    `${today.getDay()}${today.getMonth()}${today.getYear()}`
+  );
   let seededRandom;
 
   const setDailyChallengeSeed = () => {
-    seededRandom = sfc32(0x9e3779b9, 0x243f6a88, 0xb7e15162, seed);
+    seededRandom = createRandomNumberGenerator(seed);
   };
 
   const setRandomSeed = () => {
-    seededRandom = sfc32(
-      0x9e3779b9,
-      0x243f6a88,
-      0xb7e15162,
-      `${Math.random()} seed ${Math.random()}`
+    seededRandom = createRandomNumberGenerator(
+      parseInt(
+        `${Math.round(Math.random() * 1000)}${Math.round(Math.random() * 1000)}`
+      )
     );
   };
 

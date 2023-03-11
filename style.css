@@ -156,6 +156,15 @@ li.strikethrough {
   border-radius: var(--cursor-size);
 }
 
+.stateChallengeText {
+  display: none;
+  font-weight: 600;
+}
+
+.stateChallengeText.show {
+  display: inline;
+}
+
 .statsTable {
   margin: 18px 0 22px;
   font-size: var(--stats-font-size);
@@ -280,6 +289,7 @@ li.strikethrough {
 }
 
 .topLeftCorner {
+  display: none;
   position: absolute;
   pointer-events: none;
   user-select: none;
@@ -288,6 +298,10 @@ li.strikethrough {
   left: 6px;
   font-size: var(--stats-font-size);
   text-transform: uppercase;
+}
+
+.topLeftCorner.show {
+  display: block;
 }
 
 .topRightCorner {

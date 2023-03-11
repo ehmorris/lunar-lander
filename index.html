@@ -55,7 +55,9 @@
       <div>
         <h1 id="description"></h1>
         <h3 class="spaceBetween">
-          <span>Daily Challenge <span id="statsChallengeNumber"></span></span>
+          <span class="stateChallengeText show" id="statsChallengeText"
+            >Daily Challenge <span id="statsChallengeNumber"></span
+          ></span>
           <span><span id="score"></span> point <span id="type"></span></span>
         </h3>
       </div>
@@ -161,9 +163,10 @@
         </div>
       </div>
     </div>
-    <div id="tally" class="topLeftCorner">
+    <div id="cornerChallenge" class="topLeftCorner show">
       Daily Challenge <span id="cornerChallengeNumber"></span>
     </div>
+    <div id="cornerRandom" class="topLeftCorner">Random Start</div>
     <div id="tally" class="topRightCorner">
       L<span id="landingTotal"></span> C<span id="crashTotal"></span>
     </div>

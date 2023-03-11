@@ -1,6 +1,5 @@
-import { getChallengeNumber } from "./helpers/helpers.js";
-
 export const showStatsAndResetControl = (
+  state,
   lander,
   animationObject,
   data,
@@ -13,12 +12,18 @@ export const showStatsAndResetControl = (
     document.querySelector("#tryAgain").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
-  const shareText = `Lander Daily Challenge #${getChallengeNumber()}
+
+  const shareTextChallengeInfo = `Lander Daily Challenge #${state
+    .get("challengeManager")
+    .getChallengeNumber()}
 Score: ${data.score} point ${data.landed ? "landing" : "crash"}
 
-${data.description}
+${data.description}`;
 
-Speed: ${data.speed}mph
+  const shareTextRandomInfo = `${data.description}
+Score: ${data.score} point ${data.landed ? "landing" : "crash"}`;
+
+  const shareTextSecondaryInfo = `Speed: ${data.speed}mph
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds} seconds
 Flips: ${data.rotations}
@@ -27,6 +32,14 @@ Max height: ${data.maxHeight}ft
 Engine used: ${data.engineUsed} times
 Boosters used: ${data.boostersUsed} times
 https://ehmorris.com/lander/`;
+
+  const shareText = `${
+    state.get("challengeManager").isChallengeOn()
+      ? shareTextChallengeInfo
+      : shareTextRandomInfo
+  }
+
+${shareTextSecondaryInfo}`;
 
   const hideStats = () => {
     document
@@ -58,8 +71,9 @@ https://ehmorris.com/lander/`;
   const populateStats = (data) => {
     document.querySelector("#description").textContent = data.description;
     document.querySelector("#score").textContent = data.score;
-    document.querySelector("#statsChallengeNumber").textContent =
-      getChallengeNumber();
+    document.querySelector("#statsChallengeNumber").textContent = state
+      .get("challengeManager")
+      .getChallengeNumber();
     document.querySelector("#type").textContent = data.landed
       ? "landing"
       : "crash";
@@ -71,6 +85,12 @@ https://ehmorris.com/lander/`;
     document.querySelector("#maxHeight").textContent = data.maxHeight;
     document.querySelector("#engineUsed").textContent = data.engineUsed;
     document.querySelector("#boostersUsed").textContent = data.boostersUsed;
+
+    if (state.get("challengeManager").isChallengeOn()) {
+      document.querySelector("#statsChallengeText").classList.add("show");
+    } else {
+      document.querySelector("#statsChallengeText").classList.remove("show");
+    }
 
     if (hasKeyboard) {
       document.querySelector("#tryAgainText").textContent = "Challenge (Space)";
@@ -161,6 +181,7 @@ https://ehmorris.com/lander/`;
 
   function tryAgain() {
     lander.resetProps({ challenge: true });
+    state.get("challengeManager").challengeOn();
     animationObject.resetStartTime();
     resetMeter("speed");
     resetMeter("angle");
@@ -170,6 +191,7 @@ https://ehmorris.com/lander/`;
 
   function randomize() {
     lander.resetProps({ challenge: false });
+    state.get("challengeManager").challengeOff();
     animationObject.resetStartTime();
     resetMeter("speed");
     resetMeter("angle");
