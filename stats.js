@@ -14,34 +14,22 @@ export const showStatsAndResetControl = (
   };
   const canCopyText = navigator && navigator.clipboard;
 
-  const shareTextChallengeInfo = `Lander Daily Challenge #${state
-    .get("challengeManager")
-    .getChallengeNumber()}
-Score: ${data.score} point ${data.landed ? "landing" : "crash"}
+  const shareTextFirstLines = state.get("challengeManager").isChallengeOn()
+    ? `Daily Challenge #${state.get("challengeManager").getChallengeNumber()}
+${data.score} point ${data.landed ? "landing" : "crash"}`
+    : `${data.score} point ${data.landed ? "landing" : "crash"}`;
 
-${data.description}`;
+  const shareText = `${shareTextFirstLines}
 
-  const shareTextRandomInfo = `${data.description}
-Score: ${data.score} point ${data.landed ? "landing" : "crash"}`;
-
-  const shareTextSecondaryInfo = `Speed: ${data.speed}mph
-Angle: ${data.angle}°
-Time: ${data.durationInSeconds} seconds
-Flips: ${data.rotations}
-Max speed: ${data.maxSpeed}mph
-Max height: ${data.maxHeight}ft
-Engine used: ${data.engineUsed} times
-Boosters used: ${data.boostersUsed} times
-Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}
-https://ehmorris.com/lander/`;
-
-  const shareText = `${
-    state.get("challengeManager").isChallengeOn()
-      ? shareTextChallengeInfo
-      : shareTextRandomInfo
+${data.speed}mph | ${data.angle}° | ${data.rotations} flip${
+    data.rotations === 1 ? "" : "s"
   }
+${data.description}
 
-${shareTextSecondaryInfo}`;
+https://ehmorris.com/lander/
+${data.durationInSeconds} seconds
+Max: ${data.maxSpeed}mph | ${data.maxHeight}ft
+Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
 
   const hideStats = () => {
     document
