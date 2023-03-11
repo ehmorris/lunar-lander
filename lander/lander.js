@@ -434,7 +434,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _timeSinceStart = timeSinceStart;
     _updateProps();
 
-    if (true || (!_engineOn && !_rotatingLeft && !_rotatingRight)) {
+    if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
       drawTrajectory(
         state,
         _position,

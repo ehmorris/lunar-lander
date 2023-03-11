@@ -53,6 +53,8 @@
     <style>
       #game-title {
         position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
         z-index: 1;
         margin: 6px 6px;
         font-size: clamp(6px, 2.5vw, 18px);
@@ -175,12 +177,11 @@
       <span>
         <label>
           <input type="checkbox" id="autopilot" tabindex="-1" />
-          <a>Autopilot</a></label
-        >
+          <a>Autopilot</a>
+        </label>
       </span>
       <div id="autopilot-links">
         <span style="visibility: hidden">Au</span>
-        <span id="autopilot-hint">👆 press here to toggle autopilot!</span>
       </div>
       <form id="autopilot-details">
         <span style="visibility: hidden">A</span>
@@ -188,21 +189,9 @@
           <input type="radio" name="autopilot-mode" value="" checked />
           <a>off</a>
         </label>
-        &middot;
-        <label>
-          <input type="radio" name="autopilot-mode" value="v1" />
-          <a
-            title="Orient the rocket parallel to the trajectory line, and apply engine to brake. (Typically scores 99-102.)"
-            >algorithm v1</a
-          >
-        </label>
-        &middot;
         <label>
           <input type="radio" name="autopilot-mode" value="v2" />
-          <a
-            title="Use engine to reduce x-velocity until the trajectory line is vertical. (Typically scores 101-104.)"
-            >algorithm v2</a
-          >
+          <a>algorithm v2</a>
         </label>
       </form>
     </div>

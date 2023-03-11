@@ -47,11 +47,6 @@ export const drawTrajectory = (
       );
     }
 
-    if (index === 2) {
-      let dy = projectedYPosition - currentPosition.y;
-      let dx = projectedXPosition - currentPosition.x;
-      window.landerStats.projectedAngle = Math.atan(-dx / dy);
-    }
     index++;
   }
 

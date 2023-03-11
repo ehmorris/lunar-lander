@@ -1,5 +1,3 @@
-// @ts-check
-
 const global = /** @type {any} */ (window);
 
 const landerStats = {
