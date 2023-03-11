@@ -38,6 +38,9 @@ export const randomBool = (probability = 0.5) => Math.random() >= probability;
 
 export const randomBetween = (min, max) => Math.random() * (max - min) + min;
 
+export const seededRandomBetween = (min, max, seededRandom) =>
+  seededRandom.getSeededRandom() * (max - min) + min;
+
 export const getVectorVelocity = (velocity) =>
   Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
 
@@ -112,4 +115,9 @@ export const simpleBallisticUpdate = (
   }
 
   return [newPosition, newVelocity, newRotationVelocity, newAngle];
+};
+
+export const getChallengeNumber = () => {
+  const challengeStartDate = 1678338000000;
+  return Math.floor((Date.now() - challengeStartDate) / (1000 * 3600 * 24));
 };

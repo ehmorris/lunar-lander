@@ -10,6 +10,7 @@ import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
+import { getChallengeNumber } from "./helpers/helpers.js";
 
 // SETUP
 
@@ -42,6 +43,9 @@ const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
 let randomConfetti = [];
+
+document.querySelector("#cornerChallengeNumber").textContent =
+  getChallengeNumber();
 
 // INSTRUCTIONS SHOW/HIDE
 

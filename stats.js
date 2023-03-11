@@ -1,19 +1,23 @@
+import { getChallengeNumber } from "./helpers/helpers.js";
+
 export const showStatsAndResetControl = (
   lander,
   animationObject,
   data,
   hasKeyboard
 ) => {
-  const resetButtonDelay = 1500;
+  const tryAgainButtonDelay = 1500;
   const canShowShareSheet = navigator.canShare;
   const showStats = () => {
     document.querySelector("#endGameStats").classList.add("show");
-    document.querySelector("#reset").classList.add("loading");
+    document.querySelector("#tryAgain").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
-  const shareText = `${data.description}
-
+  const shareText = `Lander Daily Challenge #${getChallengeNumber()}
 Score: ${data.score} point ${data.landed ? "landing" : "crash"}
+
+${data.description}
+
 Speed: ${data.speed}mph
 Angle: ${data.angle}°
 Time: ${data.durationInSeconds} seconds
@@ -54,6 +58,8 @@ https://ehmorris.com/lander/`;
   const populateStats = (data) => {
     document.querySelector("#description").textContent = data.description;
     document.querySelector("#score").textContent = data.score;
+    document.querySelector("#statsChallengeNumber").textContent =
+      getChallengeNumber();
     document.querySelector("#type").textContent = data.landed
       ? "landing"
       : "crash";
@@ -67,7 +73,8 @@ https://ehmorris.com/lander/`;
     document.querySelector("#boostersUsed").textContent = data.boostersUsed;
 
     if (hasKeyboard) {
-      document.querySelector("#resetText").textContent = "Reset (Spacebar)";
+      document.querySelector("#tryAgainText").textContent = "Challenge (Space)";
+      document.querySelector("#randomStartText").textContent = "Randomize (R)";
     }
 
     if (canShowShareSheet) {
@@ -95,17 +102,23 @@ https://ehmorris.com/lander/`;
     } catch {}
   }
 
-  function resetOnSpace({ code }) {
-    if (code === "Space") resetGame();
+  function tryAgainOnSpace({ code }) {
+    if (code === "Space") tryAgain();
+  }
+
+  function randomizeOnR({ code }) {
+    if (code === "KeyR") randomize();
   }
 
   const attachEventListeners = () => {
     // Delay showing the reset button in case the user is actively tapping
     // in that area for thrust
     setTimeout(() => {
-      document.querySelector("#reset").classList.remove("loading");
-      document.querySelector("#reset").addEventListener("click", resetGame);
-    }, resetButtonDelay);
+      document.querySelector("#tryAgain").classList.remove("loading");
+      document.querySelector("#tryAgain").addEventListener("click", tryAgain);
+    }, tryAgainButtonDelay);
+
+    document.querySelector("#randomStart").addEventListener("click", randomize);
 
     if (canShowShareSheet) {
       document
@@ -121,13 +134,18 @@ https://ehmorris.com/lander/`;
       // Delay showing the reset button in case the user is actively tapping
       // in that area for thrust
       setTimeout(() => {
-        document.addEventListener("keydown", resetOnSpace);
-      }, resetButtonDelay);
+        document.addEventListener("keydown", tryAgainOnSpace);
+      }, tryAgainButtonDelay);
+
+      document.addEventListener("keydown", randomizeOnR);
     }
   };
 
   const detachEventListeners = () => {
-    document.querySelector("#reset").removeEventListener("click", resetGame);
+    document.querySelector("#tryAgain").removeEventListener("click", tryAgain);
+    document
+      .querySelector("#randomStart")
+      .removeEventListener("click", randomize);
 
     if (canShowShareSheet) {
       document
@@ -136,12 +154,22 @@ https://ehmorris.com/lander/`;
     }
 
     if (hasKeyboard) {
-      document.removeEventListener("keydown", resetOnSpace);
+      document.removeEventListener("keydown", tryAgainOnSpace);
+      document.removeEventListener("keydown", randomizeOnR);
     }
   };
 
-  function resetGame() {
-    lander.resetProps();
+  function tryAgain() {
+    lander.resetProps({ challenge: true });
+    animationObject.resetStartTime();
+    resetMeter("speed");
+    resetMeter("angle");
+    hideStats();
+    detachEventListeners();
+  }
+
+  function randomize() {
+    lander.resetProps({ challenge: false });
     animationObject.resetStartTime();
     resetMeter("speed");
     resetMeter("angle");

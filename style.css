@@ -28,6 +28,11 @@ li.strikethrough {
   color: rgba(255, 255, 255, 0.25);
 }
 
+.spaceBetween {
+  display: flex;
+  justify-content: space-between;
+}
+
 .fullSizeContainer {
   display: none;
   position: absolute;
@@ -78,7 +83,7 @@ li.strikethrough {
 .fullSizeContainer h3 {
   margin: 0.15em 0 0;
   font-weight: 400;
-  font-size: clamp(20px, 4vmin, 32px);
+  font-size: clamp(18px, 4vmin, 32px);
 }
 
 @media screen and (max-width: 640px) {
@@ -274,7 +279,18 @@ li.strikethrough {
   stroke: white;
 }
 
-.cornerInfo {
+.topLeftCorner {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  top: 2px;
+  left: 6px;
+  font-size: var(--stats-font-size);
+  text-transform: uppercase;
+}
+
+.topRightCorner {
   position: absolute;
   pointer-events: none;
   user-select: none;
