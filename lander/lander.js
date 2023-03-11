@@ -80,7 +80,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
       ),
       y: seededRandomBetween(0, _thrust * (canvasWidth / 10), seededRandom),
     };
-    _rotationVelocity = seededRandomBetween(-0.15, 0.15, seededRandom);
+    _rotationVelocity = seededRandomBetween(-0.2, 0.2, seededRandom);
     _angle = seededRandomBetween(Math.PI * 1.5, Math.PI * 2.5, seededRandom);
     _engineOn = false;
     _rotatingLeft = false;
