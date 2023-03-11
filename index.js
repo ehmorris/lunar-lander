@@ -133,6 +133,6 @@ document.addEventListener("keydown", ({ key }) => {
 
 document.addEventListener("keydown", ({ key }) => {
   if (key === "m") {
-    astroids.push(launchAstroid(appState));
+    astroids.push(launchAstroid(appState, lander.getPosition, lander.destroy));
   }
 });

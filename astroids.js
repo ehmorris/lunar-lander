@@ -4,8 +4,9 @@ import {
   simpleBallisticUpdate,
 } from "../helpers/helpers.js";
 import { makeExplosion } from "./lander/explosion.js";
+import { LANDER_WIDTH, LANDER_HEIGHT } from "./helpers/constants.js";
 
-export const launchAstroid = (state) => {
+export const launchAstroid = (state, getLanderPosition, onLanderCollision) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
@@ -27,7 +28,7 @@ export const launchAstroid = (state) => {
   let _impact = false;
 
   const draw = () => {
-    if (_position.y < _groundedHeight) {
+    if (!_impact && _position.y < _groundedHeight) {
       [_position, _velocity, _rotationVelocity, _angle] = simpleBallisticUpdate(
         _position,
         _velocity,
@@ -37,6 +38,26 @@ export const launchAstroid = (state) => {
         _rotationVelocity,
         canvasWidth
       );
+
+      const landerPosition = getLanderPosition();
+      const impactXPadding = LANDER_WIDTH;
+      const impactYPadding = LANDER_HEIGHT;
+      if (
+        _position.x > landerPosition.x - impactXPadding &&
+        _position.x < landerPosition.x + impactXPadding &&
+        _position.y > landerPosition.y - impactYPadding &&
+        _position.y < landerPosition.y + impactYPadding
+      ) {
+        onLanderCollision();
+        _impact = makeExplosion(
+          state,
+          _position,
+          _velocity,
+          "red",
+          _size / 2,
+          Math.floor(_size)
+        );
+      }
 
       CTX.save();
       CTX.fillStyle = "red";
