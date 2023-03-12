@@ -53,24 +53,34 @@ export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
           state,
           _position,
           _velocity,
-          "red",
+          "gray",
           _size / 2,
           Math.floor(_size)
         );
       }
 
       CTX.save();
-      CTX.fillStyle = "red";
+      CTX.fillStyle = "gray";
       CTX.translate(_position.x, _position.y);
       CTX.rotate(_angle);
-      CTX.fillRect(-_size / 2, -_size / 2, _size, _size);
+      CTX.beginPath();
+      CTX.moveTo(-_size * 0.5, 0);
+      CTX.lineTo(-_size * 0.4, -_size * 0.4);
+      CTX.lineTo(0, -_size * 0.5);
+      CTX.lineTo(_size * 0.4, -_size * 0.4);
+      CTX.lineTo(_size * 0.5, 0);
+      CTX.lineTo(_size * 0.3, _size * 0.3);
+      CTX.lineTo(0, _size * 0.5);
+      CTX.lineTo(-_size * 0.35, _size * 0.4);
+      CTX.closePath();
+      CTX.fill();
       CTX.restore();
     } else if (!_impact) {
       _impact = makeExplosion(
         state,
         _position,
         _velocity,
-        "red",
+        "gray",
         _size / 2,
         Math.floor(_size)
       );
