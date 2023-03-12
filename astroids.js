@@ -16,7 +16,7 @@ export const launchAstroid = (state, getLanderPosition, onLanderCollision) => {
   const _leftOfScreen = randomBool();
 
   let _position = {
-    x: _leftOfScreen ? -_size : canvasWidth + _size,
+    x: _leftOfScreen ? -_size * 2 : canvasWidth + _size * 2,
     y: randomBetween(0, canvasHeight / 2),
   };
   let _velocity = {
@@ -48,7 +48,7 @@ export const launchAstroid = (state, getLanderPosition, onLanderCollision) => {
         _position.y > landerPosition.y - impactYPadding &&
         _position.y < landerPosition.y + impactYPadding
       ) {
-        onLanderCollision();
+        onLanderCollision(_velocity);
         _impact = makeExplosion(
           state,
           _position,

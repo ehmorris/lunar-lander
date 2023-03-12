@@ -118,6 +118,10 @@ function onResetXPos() {
   terrain.reGenerate();
 }
 
+function onAstroidImpact(astroidVelocity) {
+  lander.destroy(astroidVelocity);
+}
+
 // EXTRAS
 
 document.addEventListener("keydown", ({ key }) => {
@@ -133,6 +137,6 @@ document.addEventListener("keydown", ({ key }) => {
 
 document.addEventListener("keydown", ({ key }) => {
   if (key === "m") {
-    astroids.push(launchAstroid(appState, lander.getPosition, lander.destroy));
+    astroids.push(launchAstroid(appState, lander.getPosition, onAstroidImpact));
   }
 });
