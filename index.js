@@ -45,8 +45,16 @@ const landerControls = makeControls(appState, lander, audioManager);
 const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
-let randomConfetti = [];
+const asteroidCountdown = randomBetween(2000, 15000);
 let asteroids = [];
+let randomConfetti = [];
+
+const backgroundGradient = CTX.createLinearGradient(0, 0, 0, canvasHeight);
+backgroundGradient.addColorStop(0, "#000");
+backgroundGradient.addColorStop(
+  0.5,
+  getComputedStyle(document.body).getPropertyValue("--background-color")
+);
 
 // INSTRUCTIONS SHOW/HIDE
 
@@ -61,20 +69,17 @@ if (!instructions.hasClosedInstructions()) {
 // MAIN ANIMATION LOOP
 
 const animationObject = animate((timeSinceStart) => {
-  CTX.fillStyle = getComputedStyle(document.body).getPropertyValue(
-    "--background-color"
-  );
+  CTX.fillStyle = backgroundGradient;
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
   stars.draw();
   terrain.draw();
 
   if (instructions.hasClosedInstructions()) {
     landerControls.drawTouchOverlay();
-    lander.draw(timeSinceStart);
 
     if (asteroids.length > 0) {
       asteroids.forEach((a) => a.draw());
-    } else if (timeSinceStart > 10_000) {
+    } else if (timeSinceStart > asteroidCountdown) {
       asteroids = [
         launchAsteroid(appState, lander.getPosition, onAsteroidImpact),
       ];
@@ -83,6 +88,8 @@ const animationObject = animate((timeSinceStart) => {
     if (randomConfetti.length > 0) {
       randomConfetti.forEach((c) => c.draw());
     }
+
+    lander.draw(timeSinceStart);
   } else {
     toyLander.draw();
   }
