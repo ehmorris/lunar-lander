@@ -1,4 +1,4 @@
-import { makeExplosion } from "./explosion.js";
+import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
 import {
   randomBetween,
@@ -46,6 +46,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   let _rotatingLeft;
   let _rotatingRight;
 
+  let _timeSinceStart;
   let _gameEndData;
   let _flipConfetti;
   let _lastRotation;
@@ -86,6 +87,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _rotatingLeft = false;
     _rotatingRight = false;
 
+    _timeSinceStart = 0;
     _gameEndData = false;
     _flipConfetti = [];
     _lastRotation = 1;
@@ -101,13 +103,13 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   };
   resetProps({ challenge: true });
 
-  const _setGameEndData = (landed, timeSinceStart) => {
+  const _setGameEndData = (landed) => {
     _gameEndData = {
       landed,
       speed: velocityInMPH(_velocity),
       angle: getAngleDeltaUpright(_angle).toFixed(1),
       durationInSeconds: Intl.NumberFormat().format(
-        Math.round(timeSinceStart / 1000)
+        Math.round(_timeSinceStart / 1000)
       ),
       rotations: Intl.NumberFormat().format(_rotationCount),
       maxSpeed: velocityInMPH(_maxVelocity),
@@ -147,7 +149,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
       _gameEndData.score = score.toFixed(1);
       _gameEndData.description = crashScoreDescription(score);
-      _gameEndData.explosion = makeExplosion(
+      _gameEndData.explosion = makeLanderExplosion(
         state,
         _position,
         _velocity,
@@ -158,7 +160,14 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     onGameEnd(_gameEndData);
   };
 
-  const _updateProps = (timeSinceStart) => {
+  const destroy = (asteroidVelocity) => {
+    const averageXVelocity = (_velocity.x + asteroidVelocity.x) / 2;
+    const averageYVelocity = (_velocity.y + asteroidVelocity.y) / 2;
+    _velocity = { x: averageXVelocity, y: averageYVelocity };
+    _setGameEndData(false);
+  };
+
+  const _updateProps = () => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
 
     // Is above ground
@@ -233,8 +242,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     } else if (!_gameEndData) {
       _setGameEndData(
         getVectorVelocity(_velocity) < CRASH_VELOCITY &&
-          getAngleDeltaUpright(_angle) < CRASH_ANGLE,
-        timeSinceStart
+          getAngleDeltaUpright(_angle) < CRASH_ANGLE
       );
     }
   };
@@ -408,7 +416,8 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   };
 
   const draw = (timeSinceStart) => {
-    _updateProps(timeSinceStart);
+    _timeSinceStart = timeSinceStart;
+    _updateProps();
 
     if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
       drawTrajectory(
@@ -440,7 +449,9 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
   return {
     draw,
+    destroy,
     resetProps,
+    getPosition: () => _position,
     engineOn: () => (_engineOn = true),
     engineOff: () => (_engineOn = false),
     rotateLeft: () => (_rotatingLeft = true),
