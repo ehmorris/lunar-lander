@@ -2,7 +2,7 @@ import {
   randomBool,
   randomBetween,
   simpleBallisticUpdate,
-} from "../helpers/helpers.js";
+} from "./helpers/helpers.js";
 import { makeExplosion } from "./lander/explosion.js";
 import { LANDER_WIDTH, LANDER_HEIGHT } from "./helpers/constants.js";
 
