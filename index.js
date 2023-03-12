@@ -10,7 +10,7 @@ import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
-import { launchAstroid } from "./astroids.js";
+import { launchAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
 
 // SETUP
@@ -46,7 +46,7 @@ const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
 let randomConfetti = [];
-let astroids = [];
+let asteroids = [];
 
 // INSTRUCTIONS SHOW/HIDE
 
@@ -72,8 +72,8 @@ const animationObject = animate((timeSinceStart) => {
     landerControls.drawTouchOverlay();
     lander.draw(timeSinceStart);
 
-    if (astroids.length > 0) {
-      astroids.forEach((a) => a.draw());
+    if (asteroids.length > 0) {
+      asteroids.forEach((a) => a.draw());
     }
   } else {
     toyLander.draw();
@@ -118,8 +118,8 @@ function onResetXPos() {
   terrain.reGenerate();
 }
 
-function onAstroidImpact(astroidVelocity) {
-  lander.destroy(astroidVelocity);
+function onAsteroidImpact(asteroidVelocity) {
+  lander.destroy(asteroidVelocity);
 }
 
 // EXTRAS
@@ -137,6 +137,8 @@ document.addEventListener("keydown", ({ key }) => {
 
 document.addEventListener("keydown", ({ key }) => {
   if (key === "m") {
-    astroids.push(launchAstroid(appState, lander.getPosition, onAstroidImpact));
+    asteroids.push(
+      launchAsteroid(appState, lander.getPosition, onAsteroidImpact)
+    );
   }
 });

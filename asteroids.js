@@ -6,7 +6,7 @@ import {
 import { makeExplosion } from "./lander/explosion.js";
 import { LANDER_WIDTH, LANDER_HEIGHT } from "./helpers/constants.js";
 
-export const launchAstroid = (state, getLanderPosition, onLanderCollision) => {
+export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
