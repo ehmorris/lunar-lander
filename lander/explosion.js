@@ -19,9 +19,10 @@ export const makeExplosion = (
   const canvasHeight = state.get("canvasHeight");
 
   const _makeRandomExplosionPiece = (position, velocity) => {
-    const _size = size;
+    const _width = randomBetween(size / 4, size);
+    const _height = randomBetween(size / 4, size);
     const _rotationDirection = randomBool();
-    const _groundedHeight = canvasHeight - _size + _size / 2;
+    const _groundedHeight = canvasHeight - _height + _height / 2;
 
     let _position = { ...position };
     let _velocity = {
@@ -46,7 +47,7 @@ export const makeExplosion = (
       CTX.fillStyle = fill;
       CTX.translate(_position.x, _position.y);
       CTX.rotate(_angle);
-      CTX.fillRect(-_size / 2, -_size / 2, _size, _size);
+      CTX.fillRect(-_width / 2, -_height / 2, _width, _height);
       CTX.restore();
     };
 
