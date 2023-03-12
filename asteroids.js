@@ -16,12 +16,12 @@ export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const _leftOfScreen = randomBool();
 
   let _position = {
-    x: _leftOfScreen ? -_size * 2 : canvasWidth + _size * 2,
+    x: _leftOfScreen ? 0 : canvasWidth,
     y: randomBetween(0, canvasHeight / 2),
   };
   let _velocity = {
-    x: _leftOfScreen ? randomBetween(1, 10) : randomBetween(-1, -10),
-    y: randomBetween(-1, 4),
+    x: _leftOfScreen ? randomBetween(4, 10) : randomBetween(-4, -10),
+    y: randomBetween(1, 4),
   };
   let _rotationVelocity = 0.1;
   let _angle = Math.PI * 2;

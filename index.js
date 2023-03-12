@@ -74,13 +74,17 @@ const animationObject = animate((timeSinceStart) => {
 
     if (asteroids.length > 0) {
       asteroids.forEach((a) => a.draw());
+    } else if (timeSinceStart > 10_000) {
+      asteroids = [
+        launchAsteroid(appState, lander.getPosition, onAsteroidImpact),
+      ];
+    }
+
+    if (randomConfetti.length > 0) {
+      randomConfetti.forEach((c) => c.draw());
     }
   } else {
     toyLander.draw();
-  }
-
-  if (randomConfetti.length > 0) {
-    randomConfetti.forEach((c) => c.draw());
   }
 });
 
@@ -98,7 +102,8 @@ function onGameEnd(data) {
     lander,
     animationObject,
     data,
-    landerControls.getHasKeyboard()
+    landerControls.getHasKeyboard(),
+    onResetGame
   );
 
   if (data.landed) {
@@ -110,7 +115,11 @@ function onGameEnd(data) {
   }
 
   tally.updateDisplay();
+}
+
+function onResetGame() {
   randomConfetti = [];
+  asteroids = [];
 }
 
 function onResetXPos() {

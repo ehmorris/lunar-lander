@@ -3,7 +3,8 @@ export const showStatsAndResetControl = (
   lander,
   animationObject,
   data,
-  hasKeyboard
+  hasKeyboard,
+  onReset
 ) => {
   const buttonDelayTime = 1500;
   const canShowShareSheet = navigator.canShare;
@@ -182,6 +183,7 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
     resetMeter("angle");
     hideStats();
     detachEventListeners();
+    onReset();
   }
 
   function randomize() {
@@ -192,6 +194,7 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
     resetMeter("angle");
     hideStats();
     detachEventListeners();
+    onReset();
   }
 
   populateStats(data);
