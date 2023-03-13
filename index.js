@@ -1,4 +1,9 @@
-import { animate, generateCanvas, randomBetween } from "./helpers/helpers.js";
+import {
+  animate,
+  generateCanvas,
+  randomBetween,
+  randomBool,
+} from "./helpers/helpers.js";
 import { makeLander } from "./lander/lander.js";
 import { makeToyLander } from "./lander/toylander.js";
 import { makeStarfield } from "./starfield.js";
@@ -45,7 +50,8 @@ const landerControls = makeControls(appState, lander, audioManager);
 const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
-const asteroidCountdown = randomBetween(2000, 15000);
+let sendAsteroid = randomBool();
+let asteroidCountdown = randomBetween(2000, 15000);
 let asteroids = [];
 let randomConfetti = [];
 
@@ -79,7 +85,7 @@ const animationObject = animate((timeSinceStart) => {
 
     if (asteroids.length > 0) {
       asteroids.forEach((a) => a.draw());
-    } else if (timeSinceStart > asteroidCountdown) {
+    } else if (sendAsteroid && timeSinceStart > asteroidCountdown) {
       asteroids = [
         launchAsteroid(appState, lander.getPosition, onAsteroidImpact),
       ];
@@ -127,6 +133,8 @@ function onGameEnd(data) {
 function onResetGame() {
   randomConfetti = [];
   asteroids = [];
+  sendAsteroid = randomBool();
+  asteroidCountdown = randomBetween(2000, 15000);
 }
 
 function onResetXPos() {
