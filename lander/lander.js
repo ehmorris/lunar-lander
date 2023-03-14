@@ -107,11 +107,14 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _gameEndData = {
       landed,
       speed: velocityInMPH(_velocity),
-      angle: getAngleDeltaUpright(_angle).toFixed(1),
+      angle: Intl.NumberFormat().format(
+        getAngleDeltaUpright(_angle).toFixed(1)
+      ),
       durationInSeconds: Intl.NumberFormat().format(
         Math.round(_timeSinceStart / 1000)
       ),
-      rotations: Intl.NumberFormat().format(_rotationCount),
+      rotationsInt: _rotationCount,
+      rotationsFormatted: Intl.NumberFormat().format(_rotationCount),
       maxSpeed: velocityInMPH(_maxVelocity),
       maxHeight: heightInFeet(_maxHeight, _groundedHeight),
       engineUsed: Intl.NumberFormat().format(_engineUsed),
@@ -134,7 +137,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         getVectorVelocity(_velocity)
       );
 
-      _gameEndData.score = score.toFixed(1);
+      _gameEndData.score = Intl.NumberFormat().format(score.toFixed(1));
       _gameEndData.description = landingScoreDescription(score);
       _gameEndData.confetti = makeConfetti(state, Math.round(score));
 
@@ -147,7 +150,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         getVectorVelocity(_velocity)
       );
 
-      _gameEndData.score = score.toFixed(1);
+      _gameEndData.score = Intl.NumberFormat().format(score.toFixed(1));
       _gameEndData.description = crashScoreDescription(score);
       _gameEndData.explosion = makeLanderExplosion(
         state,

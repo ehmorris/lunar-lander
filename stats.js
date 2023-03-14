@@ -22,8 +22,8 @@ ${data.score} point ${data.landed ? "landing" : "crash"}`
 
   const shareText = `${shareTextFirstLines}
 
-${data.speed}mph | ${data.angle}° | ${data.rotations} flip${
-    data.rotations === 1 ? "" : "s"
+${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
+    data.rotationsInt === 1 ? "" : "s"
   }
 ${data.description}
 
@@ -71,7 +71,7 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
     populateMeter("speed", data.speedPercent, data.speed);
     populateMeter("angle", data.anglePercent, data.angle);
     document.querySelector("#duration").textContent = data.durationInSeconds;
-    document.querySelector("#rotations").textContent = data.rotations;
+    document.querySelector("#rotations").textContent = data.rotationsFormatted;
     document.querySelector("#maxSpeed").textContent = data.maxSpeed;
     document.querySelector("#maxHeight").textContent = data.maxHeight;
     document.querySelector("#engineUsed").textContent = data.engineUsed;
