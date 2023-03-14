@@ -2,7 +2,7 @@ body {
   --stats-font-size: clamp(12px, 2vmin, 16px);
   --background-color: #02071e;
   margin: 0;
-  background: var(--background-color);
+  background: #000;
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
@@ -156,12 +156,11 @@ li.strikethrough {
   border-radius: var(--cursor-size);
 }
 
-.stateChallengeText {
+.statsChallengeText {
   display: none;
-  font-weight: 600;
 }
 
-.stateChallengeText.show {
+.statsChallengeText.show {
   display: inline;
 }
 
