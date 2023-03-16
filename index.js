@@ -17,7 +17,7 @@ import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
 import { launchAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
-import "./autopilot.js";
+import { makeAutopilot } from "./autopilot.js";
 
 // SETUP
 
@@ -47,8 +47,8 @@ const toyLander = makeToyLander(
 );
 const toyLanderControls = makeControls(appState, toyLander, audioManager);
 const lander = makeLander(appState, onGameEnd, onResetXPos);
-window.lander = lander;
 const landerControls = makeControls(appState, lander, audioManager);
+const autopilot = makeAutopilot(lander);
 const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
@@ -71,6 +71,7 @@ if (!instructions.hasClosedInstructions()) {
   toyLanderControls.attachEventListeners();
 } else {
   landerControls.attachEventListeners();
+  autopilot.attachEventListeners();
   challengeManager.populateCornerInfo();
 }
 
@@ -108,6 +109,7 @@ const animationObject = animate((timeSinceStart) => {
 function onCloseInstructions() {
   toyLanderControls.detachEventListeners();
   landerControls.attachEventListeners();
+  autopilot.attachEventListeners();
   challengeManager.populateCornerInfo();
 }
 

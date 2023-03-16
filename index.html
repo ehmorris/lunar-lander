@@ -50,151 +50,8 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <link rel="stylesheet" type="text/css" href="./style.css" />
-    <style>
-      #game-title {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1;
-        margin: 6px 6px;
-        font-size: clamp(6px, 2.5vw, 18px);
-        -webkit-text-size-adjust: 100%;
-        text-shadow: 0 0 8px #000000aa;
-      }
-      #game-title:focus {
-        outline: none;
-      }
-
-      #game-title > *,
-      #game-title a {
-        display: block;
-      }
-
-      #game-title a {
-        color: unset;
-        text-decoration: unset;
-        display: inline-block;
-      }
-
-      #game-title a:hover {
-        text-decoration: underline;
-        cursor: pointer;
-      }
-
-      input[type="checkbox"],
-      input[type="radio"] {
-        display: none;
-      }
-
-      #autopilot + * {
-        text-shadow: 0 0 8px red, 0 0 14px red;
-      }
-
-      input[type="checkbox"] + *,
-      input[type="radio"] + * {
-        transition: text-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
-      }
-
-      #autopilot:checked + * {
-        color: #aeffae;
-        text-shadow: 0 0 20px #8eff8e, 0 0 20px #8eff8e;
-      }
-
-      #autopilot-links {
-        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-      }
-
-      #autopilot-links.hidden {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-      }
-
-      #autopilot-hint {
-        transition: visibility 0.5s ease-in-out;
-      }
-
-      #autopilot-hint.hidden {
-        visibility: hidden;
-        pointer-events: none;
-      }
-
-      #autopilot-details {
-        color: #8484f2;
-        margin-top: -0.7em;
-        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-      }
-
-      #autopilot-details input:checked + * {
-        color: #b6b6eb;
-        text-shadow: 0 0 20px #8484f2, 0 0 10px #8484f2, 0 0 10px #8484f2;
-      }
-
-      #game-title .autopilot-link {
-        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-        visibility: hidden;
-        pointer-events: none;
-        opacity: 0;
-      }
-
-      #game-title:hover .autopilot-link {
-        visibility: visible;
-        pointer-events: all;
-        opacity: 1;
-      }
-
-      #game-title:hover #autopilot-links.hidden + #autopilot-details,
-      #game-title:focus #autopilot-links.hidden + #autopilot-details {
-        visibility: visible;
-        pointer-events: all;
-        opacity: 1;
-      }
-
-      .fullSizeContainer {
-        z-index: 2;
-      }
-
-      .fullSizeContainer::after {
-        content: " ";
-        -webkit-backdrop-filter: blur(3px);
-        backdrop-filter: blur(3px);
-        background: transparent;
-
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: -50vw;
-        right: -50vw;
-        z-index: -1;
-      }
-    </style>
   </head>
   <body>
-    <div id="game-title" tabindex="-1">
-      <span>
-        <label>
-          <input type="checkbox" id="autopilot" tabindex="-1" />
-          <a>Autopilot</a>
-        </label>
-      </span>
-      <div id="autopilot-links">
-        <span style="visibility: hidden">Au</span>
-      </div>
-      <form id="autopilot-details">
-        <span style="visibility: hidden">A</span>
-        <label>
-          <input type="radio" name="autopilot-mode" value="" checked />
-          <a>off</a>
-        </label>
-        <label>
-          <input type="radio" name="autopilot-mode" value="v2" />
-          <a>algorithm v2</a>
-        </label>
-      </form>
-    </div>
     <div class="game"></div>
     <div id="endGameStats" class="fullSizeContainer">
       <div>
@@ -250,7 +107,7 @@
         <div class="tableRow">
           <span class="tableLabel">Game Size</span>
           <span class="tableValue">
-            <span id="canvasWidth"></span>&#215<span id="canvasHeight"></span>
+            <span id="canvasWidth"></span>&#215;<span id="canvasHeight"></span>
           </span>
         </div>
       </div>
@@ -320,6 +177,10 @@
     <div id="cornerRandom" class="topLeftCorner">Random Start</div>
     <div id="tally" class="topRightCorner">
       L<span id="landingTotal"></span> C<span id="crashTotal"></span>
+    </div>
+    <div id="cornerChallenge" class="topCenter">
+      Autopilot <span id="autopilotKeyboardShortcut">(P)</span>
+      <span id="autopilotStatus">OFF</span>
     </div>
     <script src="index.js" type="module"></script>
     <script>

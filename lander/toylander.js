@@ -14,7 +14,6 @@ export const makeToyLander = (
 
   const _toyLanderWidth = Math.min(canvasWidth, canvasHeight) / 7;
   const _toyLanderHeight = _toyLanderWidth * 2;
-  window.landerStats.landerHeight = _toyLanderHeight;
   const _toyLanderBoosterLengthMin = _toyLanderWidth / 4;
   const _toyLanderBoosterLengthMax = _toyLanderWidth * 1.25;
   const _toyLanderEngineLengthMin = _toyLanderHeight / 4;
