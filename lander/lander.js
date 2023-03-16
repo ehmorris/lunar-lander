@@ -89,7 +89,6 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
     _timeSinceStart = 0;
     _gameEndData = false;
-
     _flipConfetti = [];
     _lastRotation = 1;
     _lastRotationAngle = Math.PI * 2;
