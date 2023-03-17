@@ -164,10 +164,12 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   };
 
   const destroy = (asteroidVelocity) => {
-    const averageXVelocity = (_velocity.x + asteroidVelocity.x) / 2;
-    const averageYVelocity = (_velocity.y + asteroidVelocity.y) / 2;
-    _velocity = { x: averageXVelocity, y: averageYVelocity };
-    _setGameEndData(false);
+    if (!_gameEndData) {
+      const averageXVelocity = (_velocity.x + asteroidVelocity.x) / 2;
+      const averageYVelocity = (_velocity.y + asteroidVelocity.y) / 2;
+      _velocity = { x: averageXVelocity, y: averageYVelocity };
+      _setGameEndData(false);
+    }
   };
 
   const _updateProps = () => {
