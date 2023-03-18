@@ -12,9 +12,11 @@ export const makeTerrain = (state) => {
   let landingSurfaces = [];
   let terrain = [];
 
+  // Divide the canvas into three spans with some margin between the spans
+  // and between the spans and the edge of the canvas. This array will be
+  // `pop()`d by `generateLandingSurface()`, so it's shuffled to prevent the
+  // large surface from always being in one region of the screen.
   const generateLandingZonesList = () => {
-    // Divide points into three sections with a little margin between.
-    // Landing zones shouldn't start or end at the edge of the screen.
     landingZones = [
       { minPoint: 1, maxPoint: Math.floor(numPoints / 3) },
       {
@@ -31,15 +33,22 @@ export const makeTerrain = (state) => {
   };
 
   const generateLandingSurface = (widthUnit) => {
+    // Determine how many points are needed to at least be as wide as the
+    // lander, and then use that as a basis for the passed width unit
     const minWidthInPoints = Math.ceil(
       LANDER_WIDTH / (canvasWidth / numPoints)
     );
     const landingZone = landingZones.pop();
     const landingZoneWidth = landingZone.maxPoint - landingZone.minPoint;
+
+    // Ensure the surface is no wider than the zone
     const widthInPoints = Math.min(
       minWidthInPoints * widthUnit,
       landingZoneWidth
     );
+
+    // Only create an offset startPoint if there's enough width to render
+    // the widthInPoints
     const startPoint =
       widthInPoints === landingZoneWidth
         ? landingZone.minPoint
@@ -75,8 +84,6 @@ export const makeTerrain = (state) => {
   };
 
   const reGenerate = () => {
-    // Generate three non-overlapping spans from which
-    // generateLandingSurface pops a value
     generateLandingZonesList();
 
     // One narrow and one wide landing zone
