@@ -1,4 +1,4 @@
-import { randomBetween, shuffleArray } from "./helpers/helpers.js";
+import { seededShuffleArray, seededRandomBetween } from "./helpers/helpers.js";
 import { LANDER_WIDTH } from "./helpers/constants.js";
 
 export const makeTerrain = (state) => {
@@ -29,10 +29,12 @@ export const makeTerrain = (state) => {
       },
     ];
 
-    shuffleArray(landingZones);
+    seededShuffleArray(landingZones, state.get("seededRandom"));
   };
 
   const generateLandingSurface = (widthUnit) => {
+    const seededRandom = state.get("seededRandom");
+
     // Determine how many points are needed to at least be as wide as the
     // lander, and then use that as a basis for the passed width unit
     const minWidthInPoints = Math.ceil(
@@ -53,16 +55,17 @@ export const makeTerrain = (state) => {
       widthInPoints === landingZoneWidth
         ? landingZone.minPoint
         : Math.floor(
-            randomBetween(
+            seededRandomBetween(
               landingZone.minPoint,
-              landingZone.maxPoint - widthInPoints
+              landingZone.maxPoint - widthInPoints,
+              seededRandom
             )
           );
 
     return {
       startPoint,
       widthInPoints,
-      height: randomBetween(minHeight, maxHeight),
+      height: seededRandomBetween(minHeight, maxHeight, seededRandom),
     };
   };
 
@@ -105,7 +108,11 @@ export const makeTerrain = (state) => {
       } else {
         terrain.push({
           x: index * (canvasWidth / numPoints),
-          y: randomBetween(minHeight, maxHeight),
+          y: seededRandomBetween(
+            minHeight,
+            maxHeight,
+            state.get("seededRandom")
+          ),
         });
       }
     }

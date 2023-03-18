@@ -26,9 +26,6 @@ import {
   CRASH_ANGLE,
 } from "../helpers/constants.js";
 import { drawLanderGradient } from "./gradient.js";
-import { makeSeededRandom } from "../helpers/seededrandom.js";
-
-const seededRandom = makeSeededRandom();
 
 export const makeLander = (state, onGameEnd, onResetXPos) => {
   const CTX = state.get("CTX");
@@ -60,10 +57,8 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   let _boostersUsedPreviousFrame;
   let _babySoundPlayed;
 
-  const resetProps = ({ challenge }) => {
-    challenge
-      ? seededRandom.setDailyChallengeSeed()
-      : seededRandom.setRandomSeed();
+  const resetProps = () => {
+    const seededRandom = state.get("seededRandom");
 
     _position = {
       x: seededRandomBetween(
@@ -101,7 +96,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _boostersUsedPreviousFrame = false;
     _babySoundPlayed = false;
   };
-  resetProps({ challenge: true });
+  resetProps();
 
   const _setGameEndData = (landed) => {
     _gameEndData = {
