@@ -22,11 +22,12 @@ import { makeSeededRandom } from "../helpers/seededrandom.js";
 // SETUP
 
 const audioManager = makeAudioManager();
-const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
-  width: window.innerWidth,
-  height: window.innerHeight,
-  attachNode: ".game",
-});
+const [CTX, canvasWidth, canvasHeight, canvasElement, scaleFactor] =
+  generateCanvas({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    attachNode: ".game",
+  });
 const challengeManager = makeChallengeManager();
 const seededRandom = makeSeededRandom();
 
@@ -39,12 +40,15 @@ const appState = makeStateManager()
   .set("canvasWidth", canvasWidth)
   .set("canvasHeight", canvasHeight)
   .set("canvasElement", canvasElement)
+  .set("scaleFactor", scaleFactor)
   .set("audioManager", audioManager)
   .set("challengeManager", challengeManager)
   .set("seededRandom", seededRandom);
 
-const stars = makeStarfield(appState);
 const terrain = makeTerrain(appState);
+appState.set("terrain", terrain);
+
+const stars = makeStarfield(appState);
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
   appState,
@@ -54,12 +58,7 @@ const toyLander = makeToyLander(
   () => instructions.setEngineAndRotationDone()
 );
 const toyLanderControls = makeControls(appState, toyLander, audioManager);
-const lander = makeLander(
-  appState,
-  terrain.getLandingData,
-  onGameEnd,
-  onResetXPos
-);
+const lander = makeLander(appState, onGameEnd, onResetXPos);
 const landerControls = makeControls(appState, lander, audioManager);
 const tally = makeTallyManger();
 
