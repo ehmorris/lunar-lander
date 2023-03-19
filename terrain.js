@@ -10,7 +10,7 @@ export const makeTerrain = (state) => {
   const numPoints = Math.max(canvasWidth / 60, 20);
   let landingZones = [];
   let landingSurfaces = [];
-  let terrain = [];
+  let terrainPath2D;
 
   // Divide the canvas into three spans with some margin between the spans
   // and between the spans and the edge of the canvas. This array will be
@@ -77,6 +77,7 @@ export const makeTerrain = (state) => {
         x: startPoint * (canvasWidth / numPoints),
         width: widthInPoints * (canvasWidth / numPoints),
         height,
+        terrainPath2D,
       });
     });
 
@@ -88,12 +89,15 @@ export const makeTerrain = (state) => {
 
   const reGenerate = () => {
     generateLandingZonesList();
-
-    // One narrow and one wide landing zone
     landingSurfaces = [generateLandingSurface(4), generateLandingSurface(1)];
-    terrain = [];
 
+    const path = new Path2D();
+    path.moveTo(0, canvasHeight);
+    path.lineTo(0, maxHeight);
+
+    // Draw terrain from left to right
     for (let index = 1; index < numPoints; index++) {
+      // Get landing surface if we've reached its x position
       const landingSurface = landingSurfaces.find(
         (surface) =>
           index >= surface.startPoint &&
@@ -101,39 +105,31 @@ export const makeTerrain = (state) => {
       );
 
       if (landingSurface) {
-        terrain.push({
-          x: index * (canvasWidth / numPoints),
-          y: landingSurface.height,
-        });
+        path.lineTo(index * (canvasWidth / numPoints), landingSurface.height);
       } else {
-        terrain.push({
-          x: index * (canvasWidth / numPoints),
-          y: seededRandomBetween(
-            minHeight,
-            maxHeight,
-            state.get("seededRandom")
-          ),
-        });
+        path.lineTo(
+          index * (canvasWidth / numPoints),
+          seededRandomBetween(minHeight, maxHeight, state.get("seededRandom"))
+        );
       }
     }
+
+    path.lineTo(canvasWidth, maxHeight);
+    path.lineTo(canvasWidth, canvasHeight);
+    path.closePath();
+
+    return path;
   };
-  reGenerate();
+
+  terrainPath2D = reGenerate();
 
   const draw = () => {
     CTX.save();
     CTX.fillStyle = "gray";
-    CTX.beginPath();
-    CTX.moveTo(0, canvasHeight);
-    CTX.lineTo(0, maxHeight);
-    terrain.forEach((point) => {
-      CTX.lineTo(point.x, point.y);
-    });
-    CTX.lineTo(canvasWidth, maxHeight);
-    CTX.lineTo(canvasWidth, canvasHeight);
-    CTX.closePath();
-    CTX.fill();
+    CTX.fill(terrainPath2D);
     CTX.restore();
 
+    // Highlight landing zones in white
     landingSurfaces.forEach((surfaces) => {
       CTX.save();
       CTX.lineWidth = 2;
