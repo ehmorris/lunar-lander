@@ -118,10 +118,10 @@ export const makeTerrain = (state) => {
     path.lineTo(canvasWidth, canvasHeight);
     path.closePath();
 
-    return path;
+    terrainPath2D = path;
   };
 
-  terrainPath2D = reGenerate();
+  reGenerate();
 
   const draw = () => {
     CTX.save();
