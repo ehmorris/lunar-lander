@@ -77,11 +77,11 @@ export const makeTerrain = (state) => {
         x: startPoint * (canvasWidth / numPoints),
         width: widthInPoints * (canvasWidth / numPoints),
         height,
-        terrainPath2D,
       });
     });
 
     return {
+      terrainPath2D,
       terrainHeight: maxHeight,
       landingSurfaces: landingSurfacesInPixels,
     };
