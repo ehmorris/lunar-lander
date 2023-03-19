@@ -27,7 +27,7 @@ import { makeConfetti } from "./confetti.js";
 import { drawTrajectory } from "./trajectory.js";
 import { drawLanderGradient } from "./gradient.js";
 
-export const makeLander = (state, onGameEnd, onResetXPos) => {
+export const makeLander = (state, getLandingData, onGameEnd, onResetXPos) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
@@ -169,9 +169,10 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
   const _updateProps = () => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
+    const aboveGround = _position.y < _groundedHeight;
 
     // Is above ground
-    if (_position.y < _groundedHeight) {
+    if (aboveGround) {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += 0.01;
       if (_rotatingLeft) _rotationVelocity -= 0.01;

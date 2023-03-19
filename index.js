@@ -43,6 +43,8 @@ const appState = makeStateManager()
   .set("challengeManager", challengeManager)
   .set("seededRandom", seededRandom);
 
+const stars = makeStarfield(appState);
+const terrain = makeTerrain(appState);
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
   appState,
@@ -52,11 +54,15 @@ const toyLander = makeToyLander(
   () => instructions.setEngineAndRotationDone()
 );
 const toyLanderControls = makeControls(appState, toyLander, audioManager);
-const lander = makeLander(appState, onGameEnd, onResetXPos);
+const lander = makeLander(
+  appState,
+  terrain.getLandingData,
+  onGameEnd,
+  onResetXPos
+);
 const landerControls = makeControls(appState, lander, audioManager);
-const stars = makeStarfield(appState);
-const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
+
 let sendAsteroid = randomBool();
 let asteroidCountdown = randomBetween(2000, 15000);
 let asteroids = [];
