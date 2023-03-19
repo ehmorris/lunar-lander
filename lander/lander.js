@@ -1,5 +1,3 @@
-import { makeLanderExplosion } from "./explosion.js";
-import { makeConfetti } from "./confetti.js";
 import {
   randomBetween,
   seededRandomBetween,
@@ -17,7 +15,6 @@ import {
   landingScoreDescription,
   crashScoreDescription,
 } from "../helpers/scoring.js";
-import { drawTrajectory } from "./trajectory.js";
 import {
   GRAVITY,
   LANDER_WIDTH,
@@ -25,6 +22,9 @@ import {
   CRASH_VELOCITY,
   CRASH_ANGLE,
 } from "../helpers/constants.js";
+import { makeLanderExplosion } from "./explosion.js";
+import { makeConfetti } from "./confetti.js";
+import { drawTrajectory } from "./trajectory.js";
 import { drawLanderGradient } from "./gradient.js";
 
 export const makeLander = (state, onGameEnd, onResetXPos) => {
