@@ -8,6 +8,7 @@ import {
   getAngleDeltaUprightWithSign,
   heightInFeet,
   percentProgress,
+  isAboveTerrain,
 } from "../helpers/helpers.js";
 import {
   scoreLanding,
@@ -30,12 +31,12 @@ import { drawLanderGradient } from "./gradient.js";
 export const makeLander = (state, onGameEnd, onResetXPos) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
-  const scaleFactor = state.get("scaleFactor");
-  const terrainLandingData = state.get("terrain").getLandingData();
 
   // Use grounded height to approximate distance from ground
   const _groundedHeight =
-    terrainLandingData.terrainMinHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
+    state.get("terrain").getLandingData().terrainMinHeight -
+    LANDER_HEIGHT +
+    LANDER_HEIGHT / 2;
   const _thrust = 0.01;
 
   let _position;
@@ -171,23 +172,16 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   };
 
   const _updateProps = () => {
-    _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
+    _position.y = _position.y + _velocity.y;
 
-    const aboveGround =
-      _position.y < terrainLandingData.terrainHeight ||
-      (_position.y >= terrainLandingData.terrainHeight &&
-        !CTX.isPointInPath(
-          terrainLandingData.terrainPath2D,
-          _position.x * scaleFactor,
-          (_position.y + LANDER_HEIGHT / 2) * scaleFactor
-        ));
-
-    // Debug square
-    CTX.fillStyle = "red";
-    CTX.fillRect(_position.x, _position.y + LANDER_HEIGHT / 2, 4, 4);
-
-    // Is above ground
-    if (aboveGround) {
+    if (
+      isAboveTerrain(
+        CTX,
+        { x: _position.x, y: _position.y + LANDER_HEIGHT / 2 },
+        state.get("terrain"),
+        state.get("scaleFactor")
+      )
+    ) {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += 0.01;
       if (_rotatingLeft) _rotationVelocity -= 0.01;

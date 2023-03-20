@@ -2,6 +2,7 @@ import {
   randomBool,
   randomBetween,
   simpleBallisticUpdate,
+  isAboveTerrain,
 } from "./helpers/helpers.js";
 import { makeExplosion } from "./lander/explosion.js";
 import { LANDER_WIDTH, LANDER_HEIGHT } from "./helpers/constants.js";
@@ -12,7 +13,6 @@ export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const canvasHeight = state.get("canvasHeight");
   const _size = randomBetween(12, 30);
   const _rotationDirection = randomBool();
-  const _groundedHeight = canvasHeight - _size + _size / 2;
   const _leftOfScreen = randomBool();
 
   let _position = {
@@ -28,15 +28,22 @@ export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
   let _impact = false;
 
   const draw = () => {
-    if (!_impact && _position.y < _groundedHeight) {
+    if (
+      !_impact &&
+      isAboveTerrain(
+        CTX,
+        _position,
+        state.get("terrain"),
+        state.get("scaleFactor")
+      )
+    ) {
       [_position, _velocity, _rotationVelocity, _angle] = simpleBallisticUpdate(
+        state,
         _position,
         _velocity,
         _angle,
-        _groundedHeight,
         _rotationDirection,
-        _rotationVelocity,
-        canvasWidth
+        _rotationVelocity
       );
 
       const landerPosition = getLanderPosition();
