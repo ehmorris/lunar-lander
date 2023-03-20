@@ -83,6 +83,7 @@ export const makeTerrain = (state) => {
     return {
       terrainPath2D,
       terrainHeight: maxHeight,
+      terrainMinHeight: minHeight,
       landingSurfaces: landingSurfacesInPixels,
     };
   };

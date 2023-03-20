@@ -30,10 +30,13 @@ import { drawLanderGradient } from "./gradient.js";
 export const makeLander = (state, onGameEnd, onResetXPos) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
-  const canvasHeight = state.get("canvasHeight");
+  const scaleFactor = state.get("scaleFactor");
+  const terrainLandingData = state.get("terrain").getLandingData();
 
+  // Use grounded height to approximate distance from ground
+  const _groundedHeight =
+    terrainLandingData.terrainMinHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
   const _thrust = 0.01;
-  const _groundedHeight = canvasHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
 
   let _position;
   let _velocity;
@@ -169,7 +172,19 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
 
   const _updateProps = () => {
     _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
-    const aboveGround = _position.y < _groundedHeight;
+
+    const aboveGround =
+      _position.y < terrainLandingData.terrainHeight ||
+      (_position.y >= terrainLandingData.terrainHeight &&
+        !CTX.isPointInPath(
+          terrainLandingData.terrainPath2D,
+          _position.x * scaleFactor,
+          (_position.y + LANDER_HEIGHT / 2) * scaleFactor
+        ));
+
+    // Debug square
+    CTX.fillStyle = "red";
+    CTX.fillRect(_position.x, _position.y + LANDER_HEIGHT / 2, 4, 4);
 
     // Is above ground
     if (aboveGround) {

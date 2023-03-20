@@ -15,7 +15,7 @@ export const drawTrajectory = (
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
-  const landingData = state.get("terrain").getLandingData();
+  const terrainLandingData = state.get("terrain").getLandingData();
   const scaleFactor = state.get("scaleFactor");
   let projectedXPosition = currentPosition.x;
   let projectedYPosition = currentPosition.y;
@@ -41,7 +41,7 @@ export const drawTrajectory = (
   // Draw the line in two segments: above the max terrainHeight, where we
   // don't have to do any terrain detection; and below the max terrainHeight,
   // where we have to call isPointInPath
-  while (projectedYPosition < landingData.terrainHeight) {
+  while (projectedYPosition < terrainLandingData.terrainHeight) {
     incrementValues();
 
     if (index % 2) {
@@ -52,12 +52,12 @@ export const drawTrajectory = (
 
   // Draw line between max terrain height and actual terrain
   while (
-    projectedYPosition >= landingData.terrainHeight &&
+    projectedYPosition >= terrainLandingData.terrainHeight &&
     projectedYPosition <= canvasHeight &&
     projectedXPosition <= canvasWidth &&
     projectedXPosition >= 0 &&
     !CTX.isPointInPath(
-      landingData.terrainPath2D,
+      terrainLandingData.terrainPath2D,
       projectedXPosition * scaleFactor,
       projectedYPosition * scaleFactor
     )
