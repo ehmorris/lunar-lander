@@ -250,10 +250,20 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         _babySoundPlayed = false;
       }
     } else if (!_gameEndData) {
-      _setGameEndData(
+      const inLandingArea = state
+        .get("terrain")
+        .getLandingData()
+        .landingSurfaces.some(
+          ({ x, width }) =>
+            _position.x - LANDER_WIDTH / 2 >= x &&
+            _position.x + LANDER_WIDTH / 2 <= x + width
+        );
+      const didLand =
         getVectorVelocity(_velocity) < CRASH_VELOCITY &&
-          getAngleDeltaUpright(_angle) < CRASH_ANGLE
-      );
+        getAngleDeltaUpright(_angle) < CRASH_ANGLE &&
+        inLandingArea;
+
+      _setGameEndData(didLand);
     }
   };
 
