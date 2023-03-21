@@ -38,7 +38,7 @@ export const makeTerrain = (state) => {
     // Determine how many points are needed to at least be as wide as the
     // lander, and then use that as a basis for the passed width unit
     const minWidthInPoints = Math.ceil(
-      LANDER_WIDTH / (canvasWidth / numPoints)
+      (LANDER_WIDTH * 1.5) / (canvasWidth / numPoints)
     );
     const landingZone = landingZones.pop();
     const landingZoneWidth = landingZone.maxPoint - landingZone.minPoint;
@@ -72,11 +72,10 @@ export const makeTerrain = (state) => {
   const getLandingData = () => {
     let landingSurfacesInPixels = [];
 
-    landingSurfaces.forEach(({ startPoint, widthInPoints, height }) => {
+    landingSurfaces.forEach(({ startPoint, widthInPoints }) => {
       landingSurfacesInPixels.push({
         x: startPoint * (canvasWidth / numPoints),
         width: widthInPoints * (canvasWidth / numPoints),
-        height,
       });
     });
 
