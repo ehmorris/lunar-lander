@@ -15,14 +15,11 @@ export const makeExplosion = (
   amount
 ) => {
   const CTX = state.get("CTX");
-  const canvasWidth = state.get("canvasWidth");
-  const canvasHeight = state.get("canvasHeight");
 
   const _makeRandomExplosionPiece = (position, velocity) => {
     const _width = randomBetween(size / 4, size);
     const _height = randomBetween(size / 4, size);
     const _rotationDirection = randomBool();
-    const _groundedHeight = canvasHeight - _height + _height / 2;
 
     let _position = { ...position };
     let _velocity = {
@@ -34,13 +31,12 @@ export const makeExplosion = (
 
     const draw = () => {
       [_position, _velocity, _rotationVelocity, _angle] = simpleBallisticUpdate(
+        state,
         _position,
         _velocity,
         _angle,
-        _groundedHeight,
         _rotationDirection,
-        _rotationVelocity,
-        canvasWidth
+        _rotationVelocity
       );
 
       CTX.save();
@@ -67,13 +63,10 @@ export const makeExplosion = (
 
 export const makeLanderExplosion = (state, position, velocity, angle) => {
   const CTX = state.get("CTX");
-  const canvasWidth = state.get("canvasWidth");
-  const canvasHeight = state.get("canvasHeight");
 
   const _makeLanderChunk = (drawInstructions, yOffset) => {
     const _rotationDirection = randomBool();
     const _height = LANDER_HEIGHT / 3 + yOffset;
-    const _groundedHeight = canvasHeight - _height + _height / 2;
 
     let _position = { ...position };
     let _velocity = { ...velocity };
@@ -82,13 +75,12 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
 
     const draw = () => {
       [_position, _velocity, _rotationVelocity, _angle] = simpleBallisticUpdate(
+        state,
         _position,
         _velocity,
         _angle,
-        _groundedHeight,
         _rotationDirection,
-        _rotationVelocity,
-        canvasWidth
+        _rotationVelocity
       );
 
       // In order to render three separate pieces in the same location as the

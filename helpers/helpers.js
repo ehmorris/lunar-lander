@@ -14,7 +14,7 @@ export const generateCanvas = ({ width, height, attachNode }) => {
 
   document.querySelector(attachNode).appendChild(element);
 
-  return [context, width, height, element];
+  return [context, width, height, element, scale];
 };
 
 export const animate = (drawFunc) => {
@@ -79,27 +79,46 @@ export const progress = (start, end, current) =>
 export const percentProgress = (start, end, current) =>
   Math.max(0, Math.min(((current - start) / (end - start)) * 100, 100));
 
+export const isAboveTerrain = (CTX, position, terrain, scaleFactor) => {
+  const terrainLandingData = terrain.getLandingData();
+
+  return (
+    position.y < terrainLandingData.terrainHeight ||
+    (position.y >= terrainLandingData.terrainHeight &&
+      !CTX.isPointInPath(
+        terrainLandingData.terrainPath2D,
+        position.x * scaleFactor,
+        position.y * scaleFactor
+      ))
+  );
+};
+
 export const simpleBallisticUpdate = (
+  state,
   currentPosition,
   currentVelocity,
   currentAngle,
-  groundedHeight,
   rotationDirection,
-  currentRotationVelocity,
-  canvasWidth
+  currentRotationVelocity
 ) => {
+  const CTX = state.get("CTX");
+  const canvasWidth = state.get("canvasWidth");
   const newPosition = { ...currentPosition };
   const newVelocity = { ...currentVelocity };
   let newRotationVelocity;
   let newAngle = currentAngle;
 
-  newPosition.y = Math.min(
-    currentPosition.y + currentVelocity.y,
-    groundedHeight + 1
-  );
+  newPosition.y = currentPosition.y + currentVelocity.y;
   newPosition.x = currentPosition.x + currentVelocity.x;
 
-  if (newPosition.y <= groundedHeight) {
+  if (
+    isAboveTerrain(
+      CTX,
+      newPosition,
+      state.get("terrain"),
+      state.get("scaleFactor")
+    )
+  ) {
     newRotationVelocity = rotationDirection
       ? currentRotationVelocity + randomBetween(0, 0.01)
       : currentRotationVelocity - randomBetween(0, 0.01);
@@ -115,4 +134,13 @@ export const simpleBallisticUpdate = (
   }
 
   return [newPosition, newVelocity, newRotationVelocity, newAngle];
+};
+
+export const seededShuffleArray = (array, seededRandom) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(seededRandom.getSeededRandom() * (i + 1));
+    const temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
 };

@@ -17,25 +17,38 @@ import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
 import { launchAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
+import { makeSeededRandom } from "../helpers/seededrandom.js";
 
 // SETUP
 
 const audioManager = makeAudioManager();
-const [CTX, canvasWidth, canvasHeight, canvasElement] = generateCanvas({
-  width: window.innerWidth,
-  height: window.innerHeight,
-  attachNode: ".game",
-});
+const [CTX, canvasWidth, canvasHeight, canvasElement, scaleFactor] =
+  generateCanvas({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    attachNode: ".game",
+  });
 const challengeManager = makeChallengeManager();
+const seededRandom = makeSeededRandom();
+
+challengeManager.isChallengeOn()
+  ? seededRandom.setDailyChallengeSeed()
+  : seededRandom.setRandomSeed();
 
 const appState = makeStateManager()
   .set("CTX", CTX)
   .set("canvasWidth", canvasWidth)
   .set("canvasHeight", canvasHeight)
   .set("canvasElement", canvasElement)
+  .set("scaleFactor", scaleFactor)
   .set("audioManager", audioManager)
-  .set("challengeManager", challengeManager);
+  .set("challengeManager", challengeManager)
+  .set("seededRandom", seededRandom);
 
+const terrain = makeTerrain(appState);
+appState.set("terrain", terrain);
+
+const stars = makeStarfield(appState);
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
   appState,
@@ -47,9 +60,8 @@ const toyLander = makeToyLander(
 const toyLanderControls = makeControls(appState, toyLander, audioManager);
 const lander = makeLander(appState, onGameEnd, onResetXPos);
 const landerControls = makeControls(appState, lander, audioManager);
-const stars = makeStarfield(appState);
-const terrain = makeTerrain(appState);
 const tally = makeTallyManger();
+
 let sendAsteroid = randomBool();
 let asteroidCountdown = randomBetween(2000, 15000);
 let asteroids = [];
@@ -131,15 +143,23 @@ function onGameEnd(data) {
 }
 
 function onResetGame() {
+  challengeManager.isChallengeOn()
+    ? seededRandom.setDailyChallengeSeed()
+    : seededRandom.setRandomSeed();
+
   randomConfetti = [];
   asteroids = [];
   sendAsteroid = randomBool();
   asteroidCountdown = randomBetween(2000, 15000);
+  stars.reGenerate();
+  terrain.reGenerate();
 }
 
 function onResetXPos() {
-  stars.reGenerate();
-  terrain.reGenerate();
+  if (!challengeManager.isChallengeOn()) {
+    stars.reGenerate();
+    terrain.reGenerate();
+  }
 }
 
 function onAsteroidImpact(asteroidVelocity) {

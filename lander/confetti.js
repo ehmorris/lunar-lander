@@ -38,7 +38,6 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
   const _makeConfettiPiece = (position, velocity) => {
     const _size = randomBetween(1, 6);
     const _rotationDirection = randomBool();
-    const _groundedHeight = canvasHeight - _size + _size / 2;
     const _color = `hsl(${randomBetween(0, 360)}, 100%, 50%)`;
 
     let _position = { ...position };
@@ -51,13 +50,12 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
 
     const draw = () => {
       [_position, _velocity, _rotationVelocity, _angle] = simpleBallisticUpdate(
+        state,
         _position,
         _velocity,
         _angle,
-        _groundedHeight,
         _rotationDirection,
-        _rotationVelocity,
-        canvasWidth
+        _rotationVelocity
       );
 
       CTX.save();
@@ -73,7 +71,6 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
 
   const _makeTwirlPiece = (position, velocity) => {
     const _size = randomBetween(4, 8);
-    const _groundedHeight = canvasHeight - _size + _size / 2;
     const _color = `hsl(${randomBetween(0, 360)}, 100%, 50%)`;
     const _rotationDirection = randomBool();
 
@@ -93,13 +90,12 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
 
     const draw = () => {
       [_position, _velocity, _rotationVelocity] = simpleBallisticUpdate(
+        state,
         _position,
         _velocity,
         0,
-        _groundedHeight,
         _rotationDirection,
-        _rotationVelocity,
-        canvasWidth
+        _rotationVelocity
       );
 
       const width =

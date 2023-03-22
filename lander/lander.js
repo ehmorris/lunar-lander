@@ -1,5 +1,3 @@
-import { makeLanderExplosion } from "./explosion.js";
-import { makeConfetti } from "./confetti.js";
 import {
   randomBetween,
   seededRandomBetween,
@@ -10,6 +8,7 @@ import {
   getAngleDeltaUprightWithSign,
   heightInFeet,
   percentProgress,
+  isAboveTerrain,
 } from "../helpers/helpers.js";
 import {
   scoreLanding,
@@ -17,7 +16,6 @@ import {
   landingScoreDescription,
   crashScoreDescription,
 } from "../helpers/scoring.js";
-import { drawTrajectory } from "./trajectory.js";
 import {
   GRAVITY,
   LANDER_WIDTH,
@@ -25,18 +23,21 @@ import {
   CRASH_VELOCITY,
   CRASH_ANGLE,
 } from "../helpers/constants.js";
+import { makeLanderExplosion } from "./explosion.js";
+import { makeConfetti } from "./confetti.js";
+import { drawTrajectory } from "./trajectory.js";
 import { drawLanderGradient } from "./gradient.js";
-import { makeSeededRandom } from "../helpers/seededrandom.js";
-
-const seededRandom = makeSeededRandom();
 
 export const makeLander = (state, onGameEnd, onResetXPos) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
-  const canvasHeight = state.get("canvasHeight");
 
+  // Use grounded height to approximate distance from ground
+  const _groundedHeight =
+    state.get("terrain").getLandingData().terrainMinHeight -
+    LANDER_HEIGHT +
+    LANDER_HEIGHT / 2;
   const _thrust = 0.01;
-  const _groundedHeight = canvasHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
 
   let _position;
   let _velocity;
@@ -60,10 +61,8 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   let _boostersUsedPreviousFrame;
   let _babySoundPlayed;
 
-  const resetProps = ({ challenge }) => {
-    challenge
-      ? seededRandom.setDailyChallengeSeed()
-      : seededRandom.setRandomSeed();
+  const resetProps = () => {
+    const seededRandom = state.get("seededRandom");
 
     _position = {
       x: seededRandomBetween(
@@ -101,7 +100,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _boostersUsedPreviousFrame = false;
     _babySoundPlayed = false;
   };
-  resetProps({ challenge: true });
+  resetProps();
 
   const _setGameEndData = (landed) => {
     _gameEndData = {
@@ -173,10 +172,16 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
   };
 
   const _updateProps = () => {
-    _position.y = Math.min(_position.y + _velocity.y, _groundedHeight);
+    _position.y = _position.y + _velocity.y;
 
-    // Is above ground
-    if (_position.y < _groundedHeight) {
+    if (
+      isAboveTerrain(
+        CTX,
+        { x: _position.x, y: _position.y + LANDER_HEIGHT / 2 },
+        state.get("terrain"),
+        state.get("scaleFactor")
+      )
+    ) {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += 0.01;
       if (_rotatingLeft) _rotationVelocity -= 0.01;
@@ -245,10 +250,20 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
         _babySoundPlayed = false;
       }
     } else if (!_gameEndData) {
-      _setGameEndData(
+      const inLandingArea = state
+        .get("terrain")
+        .getLandingData()
+        .landingSurfaces.some(
+          ({ x, width }) =>
+            _position.x - LANDER_WIDTH / 2 >= x &&
+            _position.x + LANDER_WIDTH / 2 <= x + width
+        );
+      const didLand =
         getVectorVelocity(_velocity) < CRASH_VELOCITY &&
-          getAngleDeltaUpright(_angle) < CRASH_ANGLE
-      );
+        getAngleDeltaUpright(_angle) < CRASH_ANGLE &&
+        inLandingArea;
+
+      _setGameEndData(didLand);
     }
   };
 
@@ -425,14 +440,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _updateProps();
 
     if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
-      drawTrajectory(
-        state,
-        _position,
-        _angle,
-        _velocity,
-        _rotationVelocity,
-        _groundedHeight
-      );
+      drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
     }
 
     if (_flipConfetti.length > 0) _flipConfetti.forEach((c) => c.draw());
