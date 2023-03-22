@@ -17,7 +17,7 @@ import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
 import { launchAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
-import { makeSeededRandom } from "../helpers/seededrandom.js";
+import { makeSeededRandom } from "./helpers/seededrandom.js";
 
 // SETUP
 
