@@ -5,8 +5,10 @@ export const makeTerrain = (state) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
-  const maxHeight = canvasHeight - canvasHeight / 10;
-  const minHeight = canvasHeight - 10;
+  const maxHeight = canvasHeight * 0.6;
+  const minHeight = canvasHeight * 0.9;
+  const landingMaxHeight = canvasHeight * 0.8;
+  const landingMinHeight = canvasHeight * 0.95;
   const numPoints = Math.max(canvasWidth / 60, 20);
   let landingZones = [];
   let landingSurfaces = [];
@@ -65,7 +67,11 @@ export const makeTerrain = (state) => {
     return {
       startPoint,
       widthInPoints,
-      height: seededRandomBetween(minHeight, maxHeight, seededRandom),
+      height: seededRandomBetween(
+        landingMinHeight,
+        landingMaxHeight,
+        seededRandom
+      ),
     };
   };
 
