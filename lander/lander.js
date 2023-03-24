@@ -28,7 +28,7 @@ import { makeConfetti } from "./confetti.js";
 import { drawTrajectory } from "./trajectory.js";
 import { drawLanderGradient } from "./gradient.js";
 
-export const makeLander = (state, onGameEnd, onResetXPos) => {
+export const makeLander = (state, onGameEnd) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
 
@@ -186,14 +186,9 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
       if (_rotatingRight) _rotationVelocity += 0.01;
       if (_rotatingLeft) _rotationVelocity -= 0.01;
 
-      if (_position.x < 0) {
-        _position.x = canvasWidth;
-        onResetXPos();
-      }
-      if (_position.x > canvasWidth) {
-        _position.x = 0;
-        onResetXPos();
-      }
+      if (_position.x < 0) _position.x = canvasWidth;
+
+      if (_position.x > canvasWidth) _position.x = 0;
 
       _position.x += _velocity.x;
       _angle += (Math.PI / 180) * _rotationVelocity;
@@ -439,7 +434,7 @@ export const makeLander = (state, onGameEnd, onResetXPos) => {
     _timeSinceStart = timeSinceStart;
     _updateProps();
 
-    if (!_engineOn && !_rotatingLeft && !_rotatingRight) {
+    if (!_gameEndData) {
       drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
     }
 

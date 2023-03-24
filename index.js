@@ -58,7 +58,7 @@ const toyLander = makeToyLander(
   () => instructions.setEngineAndRotationDone()
 );
 const toyLanderControls = makeControls(appState, toyLander, audioManager);
-const lander = makeLander(appState, onGameEnd, onResetXPos);
+const lander = makeLander(appState, onGameEnd);
 const landerControls = makeControls(appState, lander, audioManager);
 const tally = makeTallyManger();
 
@@ -153,13 +153,6 @@ function onResetGame() {
   asteroidCountdown = randomBetween(2000, 15000);
   stars.reGenerate();
   terrain.reGenerate();
-}
-
-function onResetXPos() {
-  if (!challengeManager.isChallengeOn()) {
-    stars.reGenerate();
-    terrain.reGenerate();
-  }
 }
 
 function onAsteroidImpact(asteroidVelocity) {
