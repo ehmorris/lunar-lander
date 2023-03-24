@@ -144,3 +144,15 @@ export const seededShuffleArray = (array, seededRandom) => {
     array[j] = temp;
   }
 };
+
+// cx, cy is origin coordinate, ex, ey is end coordinate of lineTo
+// Calculate this and store for each segment in the terrain and somehow
+// map to this when ballistic stuff is impacting surface
+// export const getLineAngle = (cx, cy, ex, ey) => {
+export const getLineAngle = (startCoordinate, endCoordinate) => {
+  var dy = endCoordinate.y - startCoordinate.y;
+  var dx = endCoordinate.x - startCoordinate.x;
+  var theta = Math.atan2(dy, dx);
+  theta *= 180 / Math.PI;
+  return theta;
+};

@@ -1,4 +1,8 @@
-import { seededShuffleArray, seededRandomBetween } from "./helpers/helpers.js";
+import {
+  seededShuffleArray,
+  seededRandomBetween,
+  getLineAngle,
+} from "./helpers/helpers.js";
 import { LANDER_WIDTH } from "./helpers/constants.js";
 
 export const makeTerrain = (state) => {
@@ -10,16 +14,17 @@ export const makeTerrain = (state) => {
   const landingMaxHeight = canvasHeight * 0.8;
   const landingMinHeight = canvasHeight * 0.95;
   const numPoints = Math.max(canvasWidth / 60, 20);
-  let landingZones = [];
+  let landingZoneSpans = [];
   let landingSurfaces = [];
+  let terrainPathArray = [];
   let terrainPath2D;
 
   // Divide the canvas into three spans with some margin between the spans
   // and between the spans and the edge of the canvas. This array will be
   // `pop()`d by `generateLandingSurface()`, so it's shuffled to prevent the
   // large surface from always being in one region of the screen.
-  const generateLandingZonesList = () => {
-    landingZones = [
+  const generateLandingZoneSpans = () => {
+    landingZoneSpans = [
       { minPoint: 1, maxPoint: Math.floor(numPoints / 3) },
       {
         minPoint: Math.floor(numPoints / 3) + 1,
@@ -31,7 +36,7 @@ export const makeTerrain = (state) => {
       },
     ];
 
-    seededShuffleArray(landingZones, state.get("seededRandom"));
+    seededShuffleArray(landingZoneSpans, state.get("seededRandom"));
   };
 
   const generateLandingSurface = (widthUnit) => {
@@ -42,7 +47,7 @@ export const makeTerrain = (state) => {
     const minWidthInPoints = Math.ceil(
       (LANDER_WIDTH * 1.5) / (canvasWidth / numPoints)
     );
-    const landingZone = landingZones.pop();
+    const landingZone = landingZoneSpans.pop();
     const landingZoneWidth = landingZone.maxPoint - landingZone.minPoint;
 
     // Ensure the surface is no wider than the zone
@@ -75,31 +80,14 @@ export const makeTerrain = (state) => {
     };
   };
 
-  const getLandingData = () => {
-    let landingSurfacesInPixels = [];
-
-    landingSurfaces.forEach(({ startPoint, widthInPoints }) => {
-      landingSurfacesInPixels.push({
-        x: startPoint * (canvasWidth / numPoints),
-        width: widthInPoints * (canvasWidth / numPoints),
-      });
-    });
-
-    return {
-      terrainPath2D,
-      terrainHeight: maxHeight,
-      terrainMinHeight: minHeight,
-      landingSurfaces: landingSurfacesInPixels,
-    };
-  };
-
   const reGenerate = () => {
-    generateLandingZonesList();
+    generateLandingZoneSpans();
     landingSurfaces = [generateLandingSurface(4), generateLandingSurface(1)];
 
     const path = new Path2D();
     path.moveTo(0, canvasHeight);
     path.lineTo(0, maxHeight);
+    terrainPathArray.push({ x: 0, y: maxHeight });
 
     // Draw terrain from left to right
     for (let index = 1; index < numPoints; index++) {
@@ -110,19 +98,19 @@ export const makeTerrain = (state) => {
           index <= surface.startPoint + surface.widthInPoints
       );
 
-      if (landingSurface) {
-        path.lineTo(index * (canvasWidth / numPoints), landingSurface.height);
-      } else {
-        path.lineTo(
-          index * (canvasWidth / numPoints),
-          seededRandomBetween(minHeight, maxHeight, state.get("seededRandom"))
-        );
-      }
+      const x = index * (canvasWidth / numPoints);
+      const y = landingSurface
+        ? landingSurface.height
+        : seededRandomBetween(minHeight, maxHeight, state.get("seededRandom"));
+
+      path.lineTo(x, y);
+      terrainPathArray.push({ x, y });
     }
 
     path.lineTo(canvasWidth, maxHeight);
     path.lineTo(canvasWidth, canvasHeight);
     path.closePath();
+    terrainPathArray.push({ x: canvasWidth, y: maxHeight });
 
     terrainPath2D = path;
   };
@@ -156,5 +144,30 @@ export const makeTerrain = (state) => {
     });
   };
 
-  return { draw, reGenerate, getLandingData };
+  const getLandingData = () => {
+    let landingSurfacesInPixels = [];
+
+    landingSurfaces.forEach(({ startPoint, widthInPoints }) => {
+      landingSurfacesInPixels.push({
+        x: startPoint * (canvasWidth / numPoints),
+        width: widthInPoints * (canvasWidth / numPoints),
+      });
+    });
+
+    return {
+      terrainPath2D,
+      terrainHeight: maxHeight,
+      terrainMinHeight: minHeight,
+      landingSurfaces: landingSurfacesInPixels,
+    };
+  };
+
+  const getSegmentAngleAtX = (x) => {
+    const segmentNumber = Math.floor(x / (canvasWidth / numPoints));
+    const segmentStart = terrainPathArray[segmentNumber];
+    const segmentEnd = terrainPathArray[segmentNumber + 1];
+    return getLineAngle(segmentStart, segmentEnd);
+  };
+
+  return { draw, reGenerate, getLandingData, getSegmentAngleAtX };
 };
