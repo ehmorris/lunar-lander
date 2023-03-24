@@ -1,9 +1,4 @@
-import {
-  GRAVITY,
-  LANDER_WIDTH,
-  LANDER_HEIGHT,
-  CRASH_ANGLE,
-} from "../helpers/constants.js";
+import { GRAVITY, LANDER_HEIGHT, CRASH_ANGLE } from "../helpers/constants.js";
 
 export const drawTrajectory = (
   state,
@@ -17,80 +12,91 @@ export const drawTrajectory = (
   const canvasHeight = state.get("canvasHeight");
   const terrainLandingData = state.get("terrain").getLandingData();
   const scaleFactor = state.get("scaleFactor");
-  let projectedXPosition = currentPosition.x;
-  let projectedYPosition = currentPosition.y;
-  let projectedAngle = currentAngle;
-  let projectedYVelocity = currentVelocity.y;
-  let index = 0;
 
-  const incrementValues = () => {
-    projectedYPosition = Math.min(
-      projectedYPosition + projectedYVelocity,
-      canvasHeight
-    );
-    projectedXPosition += currentVelocity.x;
-    projectedAngle += (Math.PI / 180) * currentRotationVelocity;
-    projectedYVelocity += GRAVITY;
+  // Iterate on ballistic properties until hitting the ground, and push these
+  // points into an array to draw later
+  const generateTrajectoryPoints = () => {
+    let projectedXPosition = currentPosition.x;
+    let projectedYPosition = currentPosition.y;
+    let projectedYVelocity = currentVelocity.y;
+    let projectedAngle = currentAngle;
+    const segments = [];
+
+    while (
+      projectedYPosition <= canvasHeight &&
+      projectedXPosition <= canvasWidth &&
+      projectedXPosition >= 0 &&
+      !CTX.isPointInPath(
+        terrainLandingData.terrainPath2D,
+        projectedXPosition * scaleFactor,
+        projectedYPosition * scaleFactor
+      )
+    ) {
+      segments.push({ x: projectedXPosition, y: projectedYPosition });
+
+      projectedYPosition = Math.min(
+        projectedYPosition + projectedYVelocity,
+        canvasHeight
+      );
+      projectedXPosition += currentVelocity.x;
+      projectedAngle += (Math.PI / 180) * currentRotationVelocity;
+      projectedYVelocity += GRAVITY;
+    }
+
+    return [
+      segments,
+      {
+        projectedXPosition,
+        projectedYPosition,
+        projectedYVelocity,
+        projectedAngle,
+      },
+    ];
   };
 
-  // Start trajectory line
-  CTX.save();
-  CTX.beginPath();
-  CTX.moveTo(projectedXPosition, projectedYPosition);
+  const [segments, lastSegment] = generateTrajectoryPoints();
 
-  // Draw the line in two segments: above the max terrainHeight, where we
-  // don't have to do any terrain detection; and below the max terrainHeight,
-  // where we have to call isPointInPath
-  while (projectedYPosition < terrainLandingData.terrainHeight) {
-    incrementValues();
+  if (segments.length > 20) {
+    CTX.save();
+    CTX.globalAlpha = 0.4;
 
-    if (index % 2) {
-      CTX.lineTo(projectedXPosition, projectedYPosition);
-    }
-    index++;
+    const gradientLength = Math.floor(segments.length / 2);
+    segments.forEach(({ x, y }, index) => {
+      if (segments.length > index + 1) {
+        const nextSegment = segments[index + 1];
+        CTX.beginPath();
+        CTX.moveTo(x, y);
+        CTX.lineTo(nextSegment.x, nextSegment.y);
+        CTX.strokeStyle = `rgba(255, 255, 255, ${index / gradientLength})`;
+        CTX.stroke();
+      }
+    });
+
+    // Draw landing zone angle indicator
+    const arrowSize = Math.max(
+      Math.min(lastSegment.projectedYVelocity * 4, 20),
+      2
+    );
+    const arrowLength = Math.max(
+      Math.min(lastSegment.projectedYVelocity * 30, 60),
+      5
+    );
+    CTX.globalAlpha = 1;
+    CTX.strokeStyle = "#fff";
+    CTX.translate(
+      lastSegment.projectedXPosition,
+      lastSegment.projectedYPosition
+    );
+    CTX.rotate(lastSegment.projectedAngle + Math.PI);
+    CTX.beginPath();
+    CTX.moveTo(0, 0);
+    CTX.lineTo(0, arrowLength);
+    CTX.lineTo(-arrowSize, arrowLength);
+    CTX.lineTo(0, arrowLength + arrowSize);
+    CTX.lineTo(arrowSize, arrowLength);
+    CTX.lineTo(0, arrowLength);
+    CTX.closePath();
+    CTX.stroke();
+    CTX.restore();
   }
-
-  // Draw line between max terrain height and actual terrain
-  while (
-    projectedYPosition >= terrainLandingData.terrainHeight &&
-    projectedYPosition <= canvasHeight &&
-    projectedXPosition <= canvasWidth &&
-    projectedXPosition >= 0 &&
-    !CTX.isPointInPath(
-      terrainLandingData.terrainPath2D,
-      projectedXPosition * scaleFactor,
-      projectedYPosition * scaleFactor
-    )
-  ) {
-    incrementValues();
-
-    if (index % 2) {
-      CTX.lineTo(projectedXPosition, projectedYPosition);
-    }
-    index++;
-  }
-
-  // Finish trajectory line
-  CTX.strokeStyle = "rgb(255, 255, 255, .25)";
-  CTX.stroke();
-
-  // Draw landing zone angle indicator
-  if (Math.abs((projectedAngle * 180) / Math.PI - 360) < CRASH_ANGLE) {
-    CTX.strokeStyle = "rgb(0, 255, 0)";
-  } else {
-    CTX.strokeStyle = "rgb(255, 0, 0)";
-  }
-  const arrowSize = Math.max(Math.min(projectedYVelocity * 4, 20), 2);
-  CTX.translate(projectedXPosition, projectedYPosition);
-  CTX.rotate(projectedAngle + Math.PI);
-  CTX.beginPath();
-  CTX.moveTo(0, 0);
-  CTX.lineTo(0, LANDER_HEIGHT);
-  CTX.lineTo(-arrowSize, LANDER_HEIGHT);
-  CTX.lineTo(0, LANDER_HEIGHT + arrowSize);
-  CTX.lineTo(arrowSize, LANDER_HEIGHT);
-  CTX.lineTo(0, LANDER_HEIGHT);
-  CTX.closePath();
-  CTX.stroke();
-  CTX.restore();
 };
