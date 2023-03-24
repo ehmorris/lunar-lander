@@ -103,8 +103,6 @@ export const makeLander = (state, onGameEnd) => {
   resetProps();
 
   const _setGameEndData = (landed) => {
-    console.log(state.get("terrain").getSegmentAngleAtX(_position.x));
-
     _gameEndData = {
       landed,
       speed: velocityInMPH(_velocity),

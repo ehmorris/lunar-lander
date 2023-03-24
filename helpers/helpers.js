@@ -93,6 +93,11 @@ export const isAboveTerrain = (CTX, position, terrain, scaleFactor) => {
   );
 };
 
+export const angleReflect = (incidenceAngle, surfaceAngle) => {
+  const a = surfaceAngle * 2 - incidenceAngle;
+  return a >= 360 ? a - 360 : a < 0 ? a + 360 : a;
+};
+
 export const simpleBallisticUpdate = (
   state,
   currentPosition,
@@ -128,6 +133,8 @@ export const simpleBallisticUpdate = (
     if (newPosition.x < 0) newPosition.x = canvasWidth;
     if (newPosition.x > canvasWidth) newPosition.x = 0;
   } else {
+    const terrainAngle = state.get("terrain").getSegmentAngleAtX(newPosition.x);
+    newAngle = terrainAngle;
     newVelocity.x = currentVelocity.x / randomBetween(1.5, 3);
     newVelocity.y = -currentVelocity.y / randomBetween(1.5, 3);
     newRotationVelocity = currentRotationVelocity / 2;
@@ -150,9 +157,9 @@ export const seededShuffleArray = (array, seededRandom) => {
 // map to this when ballistic stuff is impacting surface
 // export const getLineAngle = (cx, cy, ex, ey) => {
 export const getLineAngle = (startCoordinate, endCoordinate) => {
-  var dy = endCoordinate.y - startCoordinate.y;
-  var dx = endCoordinate.x - startCoordinate.x;
-  var theta = Math.atan2(dy, dx);
+  const dy = endCoordinate.y - startCoordinate.y;
+  const dx = endCoordinate.x - startCoordinate.x;
+  let theta = Math.atan2(dy, dx);
   theta *= 180 / Math.PI;
   return theta;
 };
