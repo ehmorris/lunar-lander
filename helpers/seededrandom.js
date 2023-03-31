@@ -25,19 +25,10 @@ export const makeSeededRandom = () => {
     seededRandom = createRandomNumberGenerator(seed);
   };
 
-  const setRandomSeed = () => {
-    seededRandom = createRandomNumberGenerator(
-      parseInt(
-        `${Math.round(Math.random() * 1000)}${Math.round(Math.random() * 1000)}`
-      )
-    );
-  };
-
   setDailyChallengeSeed();
 
   return {
     getSeededRandom: () => seededRandom(),
     setDailyChallengeSeed,
-    setRandomSeed,
   };
 };

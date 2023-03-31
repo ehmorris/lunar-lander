@@ -11,14 +11,13 @@ export const showStatsAndResetControl = (
   const showStats = () => {
     document.querySelector("#endGameStats").classList.add("show");
     document.querySelector("#tryAgain").classList.add("loading");
-    document.querySelector("#randomStart").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
 
-  const shareTextFirstLines = state.get("challengeManager").isChallengeOn()
-    ? `Daily Challenge #${state.get("challengeManager").getChallengeNumber()}
-${data.score} point ${data.landed ? "landing" : "crash"}`
-    : `${data.score} point ${data.landed ? "landing" : "crash"}`;
+  const shareTextFirstLines = `Daily Challenge #${state
+    .get("challengeManager")
+    .getChallengeNumber()}
+${data.score} point ${data.landed ? "landing" : "crash"}`;
 
   const shareText = `${shareTextFirstLines}
 
@@ -80,16 +79,11 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
       state.get("canvasWidth");
     document.querySelector("#canvasHeight").textContent =
       state.get("canvasHeight");
-
-    if (state.get("challengeManager").isChallengeOn()) {
-      document.querySelector("#statsChallengeText").classList.add("show");
-    } else {
-      document.querySelector("#statsChallengeText").classList.remove("show");
-    }
+    document.querySelector("#statsChallengeText").classList.add("show");
 
     if (hasKeyboard) {
-      document.querySelector("#tryAgainText").textContent = "Challenge (Space)";
-      document.querySelector("#randomStartText").textContent = "Randomize (R)";
+      document.querySelector("#tryAgainText").textContent =
+        "Play Again (Space)";
     }
 
     if (canShowShareSheet) {
@@ -121,20 +115,12 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
     if (code === "Space") tryAgain();
   }
 
-  function randomizeOnR({ code }) {
-    if (code === "KeyR") randomize();
-  }
-
   const attachEventListeners = () => {
     // Delay showing the reset button in case the user is actively tapping
     // in that area for thrust
     setTimeout(() => {
       document.querySelector("#tryAgain").classList.remove("loading");
       document.querySelector("#tryAgain").addEventListener("click", tryAgain);
-      document.querySelector("#randomStart").classList.remove("loading");
-      document
-        .querySelector("#randomStart")
-        .addEventListener("click", randomize);
     }, buttonDelayTime);
 
     if (canShowShareSheet) {
@@ -152,16 +138,12 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
       // in that area for thrust
       setTimeout(() => {
         document.addEventListener("keydown", tryAgainOnSpace);
-        document.addEventListener("keydown", randomizeOnR);
       }, buttonDelayTime);
     }
   };
 
   const detachEventListeners = () => {
     document.querySelector("#tryAgain").removeEventListener("click", tryAgain);
-    document
-      .querySelector("#randomStart")
-      .removeEventListener("click", randomize);
 
     if (canShowShareSheet) {
       document
@@ -171,24 +153,11 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
 
     if (hasKeyboard) {
       document.removeEventListener("keydown", tryAgainOnSpace);
-      document.removeEventListener("keydown", randomizeOnR);
     }
   };
 
   function tryAgain() {
-    lander.resetProps({ challenge: true });
-    state.get("challengeManager").challengeOn();
-    animationObject.resetStartTime();
-    resetMeter("speed");
-    resetMeter("angle");
-    hideStats();
-    detachEventListeners();
-    onReset();
-  }
-
-  function randomize() {
-    lander.resetProps({ challenge: false });
-    state.get("challengeManager").challengeOff();
+    lander.resetProps();
     animationObject.resetStartTime();
     resetMeter("speed");
     resetMeter("angle");

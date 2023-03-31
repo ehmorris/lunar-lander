@@ -41,6 +41,9 @@ export const randomBetween = (min, max) => Math.random() * (max - min) + min;
 export const seededRandomBetween = (min, max, seededRandom) =>
   seededRandom.getSeededRandom() * (max - min) + min;
 
+export const seededRandomBool = (seededRandom, probability = 0.5) =>
+  seededRandom.getSeededRandom() >= probability;
+
 export const getVectorVelocity = (velocity) =>
   Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
 
@@ -93,6 +96,14 @@ export const isAboveTerrain = (CTX, position, terrain, scaleFactor) => {
   );
 };
 
+export const getLineAngle = (startCoordinate, endCoordinate) => {
+  const dy = endCoordinate.y - startCoordinate.y;
+  const dx = endCoordinate.x - startCoordinate.x;
+  let theta = Math.atan2(dy, dx);
+  theta *= 180 / Math.PI;
+  return theta;
+};
+
 export const angleReflect = (incidenceAngle, surfaceAngle) => {
   const a = surfaceAngle * 2 - incidenceAngle;
   return a >= 360 ? a - 360 : a < 0 ? a + 360 : a;
@@ -129,16 +140,32 @@ export const simpleBallisticUpdate = (
       : currentRotationVelocity - randomBetween(0, 0.01);
     newAngle = currentAngle + (Math.PI / 180) * newRotationVelocity;
     newVelocity.y = currentVelocity.y + GRAVITY;
-
-    if (newPosition.x < 0) newPosition.x = canvasWidth;
-    if (newPosition.x > canvasWidth) newPosition.x = 0;
   } else {
+    // Generate the angle reflection of the current vector
     const terrainAngle = state.get("terrain").getSegmentAngleAtX(newPosition.x);
-    newAngle = terrainAngle;
-    newVelocity.x = currentVelocity.x / randomBetween(1.5, 3);
-    newVelocity.y = -currentVelocity.y / randomBetween(1.5, 3);
+    const currentAngle = getLineAngle(
+      { x: 0, y: 0 },
+      { x: currentVelocity.x, y: currentVelocity.y }
+    );
+    const newAngle = angleReflect(currentAngle, terrainAngle);
+
+    // Generate a new velocity moving in the direction of newAngle
+    // Slow the velocity down as well
+    newVelocity.x =
+      Math.cos((newAngle * Math.PI) / 180) / randomBetween(1.5, 3);
+    newVelocity.y =
+      Math.sin((newAngle * Math.PI) / 180) / randomBetween(1.5, 3);
+
+    // Recalculate position so we don't get stuck in the terrain
+    newPosition.y = currentPosition.y + currentVelocity.y;
+    newPosition.x = currentPosition.x + currentVelocity.x;
+
+    // Slow down rotation on impact
     newRotationVelocity = currentRotationVelocity / 2;
   }
+
+  if (newPosition.x < 0) newPosition.x = canvasWidth;
+  if (newPosition.x > canvasWidth) newPosition.x = 0;
 
   return [newPosition, newVelocity, newRotationVelocity, newAngle];
 };
@@ -150,16 +177,4 @@ export const seededShuffleArray = (array, seededRandom) => {
     array[i] = array[j];
     array[j] = temp;
   }
-};
-
-// cx, cy is origin coordinate, ex, ey is end coordinate of lineTo
-// Calculate this and store for each segment in the terrain and somehow
-// map to this when ballistic stuff is impacting surface
-// export const getLineAngle = (cx, cy, ex, ey) => {
-export const getLineAngle = (startCoordinate, endCoordinate) => {
-  const dy = endCoordinate.y - startCoordinate.y;
-  const dx = endCoordinate.x - startCoordinate.x;
-  let theta = Math.atan2(dy, dx);
-  theta *= 180 / Math.PI;
-  return theta;
 };

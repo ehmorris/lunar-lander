@@ -2,7 +2,8 @@ import {
   animate,
   generateCanvas,
   randomBetween,
-  randomBool,
+  seededRandomBetween,
+  seededRandomBool,
 } from "./helpers/helpers.js";
 import { makeLander } from "./lander/lander.js";
 import { makeToyLander } from "./lander/toylander.js";
@@ -15,7 +16,7 @@ import { makeAudioManager } from "./helpers/audio.js";
 import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
-import { launchAsteroid } from "./asteroids.js";
+import { makeAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
 import { makeSeededRandom } from "./helpers/seededrandom.js";
 
@@ -30,10 +31,6 @@ const [CTX, canvasWidth, canvasHeight, canvasElement, scaleFactor] =
   });
 const challengeManager = makeChallengeManager();
 const seededRandom = makeSeededRandom();
-
-challengeManager.isChallengeOn()
-  ? seededRandom.setDailyChallengeSeed()
-  : seededRandom.setRandomSeed();
 
 const appState = makeStateManager()
   .set("CTX", CTX)
@@ -62,9 +59,9 @@ const lander = makeLander(appState, onGameEnd);
 const landerControls = makeControls(appState, lander, audioManager);
 const tally = makeTallyManger();
 
-let sendAsteroid = randomBool();
-let asteroidCountdown = randomBetween(2000, 15000);
-let asteroids = [];
+let sendAsteroid = true; //seededRandomBool(seededRandom);
+let asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
+let asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
 let randomConfetti = [];
 
 const backgroundGradient = CTX.createLinearGradient(0, 0, 0, canvasHeight);
@@ -95,12 +92,8 @@ const animationObject = animate((timeSinceStart) => {
   if (instructions.hasClosedInstructions()) {
     landerControls.drawTouchOverlay();
 
-    if (asteroids.length > 0) {
+    if (sendAsteroid && timeSinceStart > asteroidCountdown) {
       asteroids.forEach((a) => a.draw());
-    } else if (sendAsteroid && timeSinceStart > asteroidCountdown) {
-      asteroids = [
-        launchAsteroid(appState, lander.getPosition, onAsteroidImpact),
-      ];
     }
 
     if (randomConfetti.length > 0) {
@@ -143,16 +136,13 @@ function onGameEnd(data) {
 }
 
 function onResetGame() {
-  challengeManager.isChallengeOn()
-    ? seededRandom.setDailyChallengeSeed()
-    : seededRandom.setRandomSeed();
-
+  seededRandom.setDailyChallengeSeed();
   randomConfetti = [];
-  asteroids = [];
-  sendAsteroid = randomBool();
-  asteroidCountdown = randomBetween(2000, 15000);
-  stars.reGenerate();
   terrain.reGenerate();
+  stars.reGenerate();
+  sendAsteroid = true; //seededRandomBool(seededRandom);
+  asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
+  asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
 }
 
 function onAsteroidImpact(asteroidVelocity) {
@@ -175,7 +165,7 @@ document.addEventListener("keydown", ({ key }) => {
 document.addEventListener("keydown", ({ key }) => {
   if (key === "m") {
     asteroids.push(
-      launchAsteroid(appState, lander.getPosition, onAsteroidImpact)
+      makeAsteroid(appState, lander.getPosition, onAsteroidImpact)
     );
   }
 });

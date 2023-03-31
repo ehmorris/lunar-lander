@@ -1,28 +1,31 @@
 import {
-  randomBool,
-  randomBetween,
+  seededRandomBool,
+  seededRandomBetween,
   simpleBallisticUpdate,
   isAboveTerrain,
 } from "./helpers/helpers.js";
 import { makeExplosion } from "./lander/explosion.js";
 import { LANDER_WIDTH, LANDER_HEIGHT } from "./helpers/constants.js";
 
-export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
+export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
+  const seededRandom = state.get("seededRandom");
   const _color = "gray";
-  const _size = randomBetween(12, 30);
-  const _rotationDirection = randomBool();
-  const _leftOfScreen = randomBool();
+  const _size = seededRandomBetween(12, 30, seededRandom);
+  const _rotationDirection = seededRandomBool(seededRandom);
+  const _leftOfScreen = seededRandomBool(seededRandom);
 
   let _position = {
     x: _leftOfScreen ? 0 : canvasWidth,
-    y: randomBetween(0, canvasHeight / 2),
+    y: seededRandomBetween(0, canvasHeight / 2, seededRandom),
   };
   let _velocity = {
-    x: _leftOfScreen ? randomBetween(4, 10) : randomBetween(-4, -10),
-    y: randomBetween(1, 4),
+    x: _leftOfScreen
+      ? seededRandomBetween(4, 10, seededRandom)
+      : seededRandomBetween(-4, -10, seededRandom),
+    y: seededRandomBetween(1, 4, seededRandom),
   };
   let _rotationVelocity = 0.1;
   let _angle = Math.PI * 2;
