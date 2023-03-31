@@ -31,6 +31,7 @@ import { drawLanderGradient } from "./gradient.js";
 export const makeLander = (state, onGameEnd) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
+  const audioManager = state.get("audioManager");
 
   // Use grounded height to approximate distance from ground
   const _groundedHeight =
@@ -170,6 +171,9 @@ export const makeLander = (state, onGameEnd) => {
       _engineOn = false;
       _rotatingLeft = false;
       _rotatingRight = false;
+      audioManager.stopEngineSound();
+      audioManager.stopBoosterSound1();
+      audioManager.stopBoosterSound2();
       _setGameEndData(false);
     }
   };
