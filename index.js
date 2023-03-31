@@ -115,6 +115,8 @@ function onCloseInstructions() {
 }
 
 function onGameEnd(data) {
+  landerControls.detachEventListeners();
+
   showStatsAndResetControl(
     appState,
     lander,
@@ -136,6 +138,7 @@ function onGameEnd(data) {
 }
 
 function onResetGame() {
+  landerControls.attachEventListeners();
   seededRandom.setDailyChallengeSeed();
   randomConfetti = [];
   terrain.reGenerate();

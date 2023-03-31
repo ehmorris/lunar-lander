@@ -167,6 +167,9 @@ export const makeLander = (state, onGameEnd) => {
       const averageXVelocity = (_velocity.x + asteroidVelocity.x) / 2;
       const averageYVelocity = (_velocity.y + asteroidVelocity.y) / 2;
       _velocity = { x: averageXVelocity, y: averageYVelocity };
+      _engineOn = false;
+      _rotatingLeft = false;
+      _rotatingRight = false;
       _setGameEndData(false);
     }
   };
@@ -245,6 +248,10 @@ export const makeLander = (state, onGameEnd) => {
         _babySoundPlayed = false;
       }
     } else if (!_gameEndData) {
+      _engineOn = false;
+      _rotatingLeft = false;
+      _rotatingRight = false;
+
       const inLandingArea = state
         .get("terrain")
         .getLandingData()
