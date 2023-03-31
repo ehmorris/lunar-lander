@@ -34,7 +34,7 @@ export const makeLander = (state, onGameEnd) => {
 
   // Use grounded height to approximate distance from ground
   const _groundedHeight =
-    state.get("terrain").getLandingData().terrainMinHeight -
+    state.get("terrain").getLandingData().terrainAvgHeight -
     LANDER_HEIGHT +
     LANDER_HEIGHT / 2;
   const _thrust = 0.01;
