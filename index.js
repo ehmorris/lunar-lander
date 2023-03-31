@@ -59,7 +59,7 @@ const lander = makeLander(appState, onGameEnd);
 const landerControls = makeControls(appState, lander, audioManager);
 const tally = makeTallyManger();
 
-let sendAsteroid = true; //seededRandomBool(seededRandom);
+let sendAsteroid = seededRandomBool(seededRandom);
 let asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
 let asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
 let randomConfetti = [];
@@ -140,7 +140,7 @@ function onResetGame() {
   randomConfetti = [];
   terrain.reGenerate();
   stars.reGenerate();
-  sendAsteroid = true; //seededRandomBool(seededRandom);
+  sendAsteroid = seededRandomBool(seededRandom);
   asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
   asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
 }
