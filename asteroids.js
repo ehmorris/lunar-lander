@@ -11,6 +11,7 @@ export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
+  const _color = "gray";
   const _size = randomBetween(12, 30);
   const _rotationDirection = randomBool();
   const _leftOfScreen = randomBool();
@@ -60,14 +61,14 @@ export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
           state,
           _position,
           _velocity,
-          "gray",
+          _color,
           _size / 2,
           Math.floor(_size)
         );
       }
 
       CTX.save();
-      CTX.fillStyle = "gray";
+      CTX.fillStyle = _color;
       CTX.translate(_position.x, _position.y);
       CTX.rotate(_angle);
       CTX.beginPath();
@@ -87,7 +88,7 @@ export const launchAsteroid = (state, getLanderPosition, onLanderCollision) => {
         state,
         _position,
         _velocity,
-        "gray",
+        _color,
         _size / 2,
         Math.floor(_size)
       );
