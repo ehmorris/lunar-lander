@@ -255,6 +255,9 @@ export const makeLander = (state, onGameEnd) => {
       _engineOn = false;
       _rotatingLeft = false;
       _rotatingRight = false;
+      audioManager.stopEngineSound();
+      audioManager.stopBoosterSound1();
+      audioManager.stopBoosterSound2();
 
       const inLandingArea = state
         .get("terrain")
