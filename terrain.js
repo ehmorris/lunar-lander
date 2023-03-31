@@ -11,7 +11,7 @@ export const makeTerrain = (state) => {
   const canvasHeight = state.get("canvasHeight");
   const seededRandom = state.get("seededRandom");
 
-  const targetHeight = canvasHeight * 0.85;
+  const targetHeight = canvasHeight * 0.8;
   const landingMaxHeight = targetHeight;
   const landingMinHeight = canvasHeight - 20;
   const numPoints = Math.max(Math.round(canvasWidth / 60), 20);
@@ -86,7 +86,7 @@ export const makeTerrain = (state) => {
     terrainPathArray = generateTerrainY(
       numPoints,
       targetHeight,
-      100,
+      canvasHeight / 10,
       0.75,
       seededRandom
     ).map((y, index) => {
