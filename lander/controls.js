@@ -116,19 +116,13 @@ export const makeControls = (state, lander, audioManager) => {
           touchPreviousData = touch;
         }
       });
+      const previousTouchZone = getTouchZone(touchPreviousData.clientX);
+      const currentTouchZone = getTouchZone(e.changedTouches[index].clientX);
 
-      if (touchPreviousData) {
-        const previousTouchZone = getTouchZone(touchPreviousData.clientX);
-        const currentTouchZone = getTouchZone(e.changedTouches[index].clientX);
-
-        if (previousTouchZone !== currentTouchZone) {
-          deactivateTouchZone(previousTouchZone);
-          activateTouchZone(currentTouchZone);
-          allActiveTouches.delete(touchPreviousData);
-          allActiveTouches.add(e.changedTouches[index]);
-        }
-      } else {
-        activateTouchZone(getTouchZone(e.changedTouches[index].clientX));
+      if (previousTouchZone !== currentTouchZone) {
+        deactivateTouchZone(previousTouchZone);
+        activateTouchZone(currentTouchZone);
+        allActiveTouches.delete(touchPreviousData);
         allActiveTouches.add(e.changedTouches[index]);
       }
     }
