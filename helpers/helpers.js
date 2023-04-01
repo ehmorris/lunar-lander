@@ -96,3 +96,8 @@ export const seededShuffleArray = (array, seededRandom) => {
     array[j] = temp;
   }
 };
+
+export const jitterCoordinate = ({ x, y }, jitterAmount = 1) => ({
+  x: x + randomBetween(-jitterAmount, jitterAmount),
+  y: y + randomBetween(-jitterAmount, jitterAmount),
+});

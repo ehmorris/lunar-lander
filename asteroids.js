@@ -10,11 +10,11 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const fill = "red";
   const size = seededRandomBetween(12, 30, seededRandom);
   const leftOfScreen = seededRandomBool(seededRandom);
-  let position = {
+  let startPosition = {
     x: leftOfScreen ? 0 : canvasWidth,
     y: seededRandomBetween(0, canvasHeight / 2, seededRandom),
   };
-  let velocity = {
+  let startVelocity = {
     x: leftOfScreen
       ? seededRandomBetween(4, 10, seededRandom)
       : seededRandomBetween(-4, -10, seededRandom),
@@ -23,11 +23,11 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
 
   let impact = false;
 
-  const onCollide = (collisionPoint) => {
+  const onCollide = (collisionPoint, collisionVelocity) => {
     impact = makeExplosion(
       state,
       collisionPoint,
-      velocity,
+      collisionVelocity,
       fill,
       size / 2,
       Math.floor(size)
@@ -36,8 +36,8 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
 
   const asteroid = makeParticle(
     state,
-    position,
-    velocity,
+    startPosition,
+    startVelocity,
     size,
     size,
     fill,
@@ -65,14 +65,15 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
       const landerPosition = getLanderPosition();
       const impactXPadding = LANDER_WIDTH;
       const impactYPadding = LANDER_HEIGHT;
+      const asteroidPosition = asteroid.getPosition();
       if (
-        position.x > landerPosition.x - impactXPadding &&
-        position.x < landerPosition.x + impactXPadding &&
-        position.y > landerPosition.y - impactYPadding &&
-        position.y < landerPosition.y + impactYPadding
+        asteroidPosition.x > landerPosition.x - impactXPadding &&
+        asteroidPosition.x < landerPosition.x + impactXPadding &&
+        asteroidPosition.y > landerPosition.y - impactYPadding &&
+        asteroidPosition.y < landerPosition.y + impactYPadding
       ) {
         onLanderCollision(velocity);
-        onCollide(position);
+        onCollide(asteroidPosition);
       }
 
       asteroid.draw();

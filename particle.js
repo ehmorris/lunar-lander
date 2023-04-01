@@ -18,15 +18,9 @@ export const makeParticle = (
   const friction = 0.5;
   const velocityThreshold = 2;
 
-  let position = {
-    x: startPosition.x + randomBetween(-0.5, 0.5),
-    y: startPosition.y + randomBetween(-0.5, 0.5),
-  };
+  let position = { ...startPosition };
   let positionLog = [];
-  let velocity = {
-    x: startVelocity.x + randomBetween(-0.5, 0.5),
-    y: startVelocity.y + randomBetween(-0.5, 0.5),
-  };
+  let velocity = { ...startVelocity };
   let rotationAngle = Math.PI * 2;
   let headingDeg = Math.atan2(velocity.y, velocity.x) * (180 / Math.PI);
   let stopped = false;
@@ -68,7 +62,7 @@ export const makeParticle = (
           y: position.y + velocity.y,
         };
 
-        onCollide(collisionPoint);
+        onCollide(collisionPoint, velocity);
       }
 
       // Track the last 20 positions to check for duplicates
@@ -104,7 +98,7 @@ export const makeParticle = (
     CTX.restore();
   };
 
-  return { draw };
+  return { draw, getPosition: () => position };
 };
 
 function angleReflect(incidenceAngle, surfaceAngle) {

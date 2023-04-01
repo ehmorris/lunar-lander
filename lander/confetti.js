@@ -1,4 +1,8 @@
-import { randomBetween, mirroredLoopingProgress } from "../helpers/helpers.js";
+import {
+  randomBetween,
+  mirroredLoopingProgress,
+  jitterCoordinate,
+} from "../helpers/helpers.js";
 import { makeParticle } from "../particle.js";
 
 export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
@@ -36,8 +40,8 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
       const size = randomBetween(1, 6);
       return makeParticle(
         state,
-        _startingPosition(index),
-        _startingVelocity(index),
+        jitterCoordinate(_startingPosition(index)),
+        jitterCoordinate(_startingVelocity(index)),
         size,
         size,
         `hsl(${randomBetween(0, 360)}, 100%, 50%)`
@@ -48,14 +52,14 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
     const size = randomBetween(4, 8);
     return makeParticle(
       state,
-      _startingPosition(index),
-      _startingVelocity(index),
+      jitterCoordinate(_startingPosition(index)),
+      jitterCoordinate(_startingVelocity(index)),
       size,
       size,
       `hsl(${randomBetween(0, 360)}, 100%, 50%)`,
       (CTX, position, velocity, _, fill) => {
         const twirlWidth =
-          mirroredLoopingProgress(0, 0.1, Math.abs(velocity.x)) * size;
+          mirroredLoopingProgress(0, 1, Math.abs(velocity.x)) * size;
         CTX.fillStyle = fill;
         CTX.translate(position.x, position.y);
         CTX.beginPath();
