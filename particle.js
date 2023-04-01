@@ -41,7 +41,7 @@ export const makeParticle = (
       y: position.y + velocity.y,
     };
 
-    if (prospectiveNextPosition.y >= landingData.terrainMaxHeight) {
+    if (prospectiveNextPosition.y >= landingData.terrainHeight) {
       const collisionPoint = isShapeInPath(
         CTX,
         scaleFactor,
