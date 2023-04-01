@@ -15,7 +15,7 @@ export const makeParticle = (
   const scaleFactor = state.get("scaleFactor");
   const terrain = state.get("terrain");
   const landingData = state.get("terrain").getLandingData();
-  const friction = 0.1;
+  const friction = 0.5;
   const velocityThreshold = 2;
 
   let position = {
