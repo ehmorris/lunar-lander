@@ -1,5 +1,5 @@
 import { GRAVITY } from "./helpers/constants.js";
-import { randomBetween } from "./helpers/helpers.js";
+import { randomBetween, randomBool } from "./helpers/helpers.js";
 
 export const makeParticle = (
   state,
@@ -15,20 +15,23 @@ export const makeParticle = (
   const scaleFactor = state.get("scaleFactor");
   const terrain = state.get("terrain");
   const landingData = state.get("terrain").getLandingData();
-  const friction = 0.5;
+  const friction = 0.3;
   const velocityThreshold = 2;
+  const rotationDirection = randomBool();
 
   let position = { ...startPosition };
   let positionLog = [];
   let velocity = { ...startVelocity };
   let rotationAngle = Math.PI * 2;
+  let rotationVelocity = 0;
   let headingDeg = Math.atan2(velocity.y, velocity.x) * (180 / Math.PI);
   let stopped = false;
 
   const update = () => {
     velocity.x = startVelocity.x + Math.cos((headingDeg * Math.PI) / 180);
     velocity.y += GRAVITY;
-    rotationAngle += velocity.x * friction;
+    rotationVelocity += rotationDirection ? 0.1 : -0.1;
+    rotationAngle = (rotationAngle + rotationVelocity) * friction;
 
     let prospectiveNextPosition = {
       x: position.x + velocity.x,
@@ -89,7 +92,14 @@ export const makeParticle = (
     CTX.save();
 
     if (customDraw) {
-      customDraw(CTX, position, velocity, rotationAngle, fill);
+      customDraw(
+        CTX,
+        position,
+        velocity,
+        rotationAngle,
+        fill,
+        rotationVelocity
+      );
     } else {
       CTX.fillStyle = fill;
       CTX.translate(position.x, position.y);

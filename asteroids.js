@@ -7,7 +7,7 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const seededRandom = state.get("seededRandom");
-  const fill = "red";
+  const fill = "#898482";
   const size = seededRandomBetween(12, 30, seededRandom);
   const leftOfScreen = seededRandomBool(seededRandom);
   let startPosition = {
@@ -23,11 +23,12 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
 
   let impact = false;
 
-  const onCollide = (collisionPoint, collisionVelocity) => {
+  const onImpact = (collisionPoint, collisionVelocity) => {
     impact = makeExplosion(
       state,
       collisionPoint,
-      collisionVelocity,
+      // Slow down velocity to prevent debris from going really high in the air
+      { x: collisionVelocity.x * 0.8, y: collisionVelocity.y * 0.2 },
       fill,
       size / 2,
       Math.floor(size)
@@ -57,7 +58,7 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
       CTX.closePath();
       CTX.fill();
     },
-    onCollide
+    onImpact
   );
 
   const draw = () => {
@@ -73,7 +74,7 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
         asteroidPosition.y < landerPosition.y + impactYPadding
       ) {
         onLanderCollision(asteroid.getVelocity());
-        onCollide(asteroidPosition, asteroid.getVelocity());
+        onImpact(asteroidPosition, asteroid.getVelocity());
       }
 
       asteroid.draw();

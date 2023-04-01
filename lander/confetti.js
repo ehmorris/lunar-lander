@@ -57,9 +57,9 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
       size,
       size,
       `hsl(${randomBetween(0, 360)}, 100%, 50%)`,
-      (CTX, position, velocity, _, fill) => {
+      (CTX, position, velocity, _, fill, rotationVelocity) => {
         const twirlWidth =
-          mirroredLoopingProgress(0, 1, Math.abs(velocity.x)) * size;
+          mirroredLoopingProgress(0, 3, Math.abs(rotationVelocity)) * size;
         CTX.fillStyle = fill;
         CTX.translate(position.x, position.y);
         CTX.beginPath();
