@@ -8,7 +8,6 @@ import {
   getAngleDeltaUprightWithSign,
   heightInFeet,
   percentProgress,
-  isAboveTerrain,
 } from "../helpers/helpers.js";
 import {
   scoreLanding,
@@ -34,10 +33,9 @@ export const makeLander = (state, onGameEnd) => {
   const audioManager = state.get("audioManager");
 
   // Use grounded height to approximate distance from ground
+  const _landingData = state.get("terrain").getLandingData();
   const _groundedHeight =
-    state.get("terrain").getLandingData().terrainAvgHeight -
-    LANDER_HEIGHT +
-    LANDER_HEIGHT / 2;
+    _landingData.terrainAvgHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
   const _thrust = 0.01;
 
   let _position;
@@ -182,12 +180,13 @@ export const makeLander = (state, onGameEnd) => {
     _position.y = _position.y + _velocity.y;
 
     if (
-      isAboveTerrain(
-        CTX,
-        { x: _position.x, y: _position.y + LANDER_HEIGHT / 2 },
-        state.get("terrain"),
-        state.get("scaleFactor")
-      )
+      _position.y + LANDER_HEIGHT / 2 < _landingData.terrainHeight ||
+      (_position.y + LANDER_HEIGHT / 2 >= _landingData.terrainHeight &&
+        !CTX.isPointInPath(
+          _landingData.terrainPath2D,
+          _position.x * state.get("scaleFactor"),
+          _position.y + (LANDER_HEIGHT / 2) * state.get("scaleFactor")
+        ))
     ) {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += 0.01;
@@ -259,14 +258,11 @@ export const makeLander = (state, onGameEnd) => {
       audioManager.stopBoosterSound1();
       audioManager.stopBoosterSound2();
 
-      const inLandingArea = state
-        .get("terrain")
-        .getLandingData()
-        .landingSurfaces.some(
-          ({ x, width }) =>
-            _position.x - LANDER_WIDTH / 2 >= x &&
-            _position.x + LANDER_WIDTH / 2 <= x + width
-        );
+      const inLandingArea = _landingData.landingSurfaces.some(
+        ({ x, width }) =>
+          _position.x - LANDER_WIDTH / 2 >= x &&
+          _position.x + LANDER_WIDTH / 2 <= x + width
+      );
       const didLand =
         getVectorVelocity(_velocity) < CRASH_VELOCITY &&
         getAngleDeltaUpright(_angle) < CRASH_ANGLE &&
