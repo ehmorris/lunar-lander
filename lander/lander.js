@@ -185,7 +185,7 @@ export const makeLander = (state, onGameEnd) => {
         !CTX.isPointInPath(
           _landingData.terrainPath2D,
           _position.x * state.get("scaleFactor"),
-          _position.y + (LANDER_HEIGHT / 2) * state.get("scaleFactor")
+          (_position.y + LANDER_HEIGHT / 2) * state.get("scaleFactor")
         ))
     ) {
       // Update ballistic properties
