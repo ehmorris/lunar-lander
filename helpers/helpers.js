@@ -77,6 +77,9 @@ export const mirroredLoopingProgress = (start, end, current) => {
     : loopedProgress;
 };
 
+export const transition = (start, end, progress) =>
+  start + (end - start) * progress;
+
 export const percentProgress = (start, end, current) =>
   Math.max(0, Math.min(((current - start) / (end - start)) * 100, 100));
 

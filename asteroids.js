@@ -1,4 +1,9 @@
-import { seededRandomBool, seededRandomBetween } from "./helpers/helpers.js";
+import {
+  seededRandomBool,
+  seededRandomBetween,
+  getVectorVelocity,
+  transition,
+} from "./helpers/helpers.js";
 import { makeExplosion } from "./lander/explosion.js";
 import { LANDER_WIDTH, LANDER_HEIGHT } from "./helpers/constants.js";
 import { makeParticle } from "./particle.js";
@@ -30,7 +35,9 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
       // Slow down velocity to prevent debris from going really high in the air
       { x: collisionVelocity.x * 0.8, y: collisionVelocity.y * 0.2 },
       fill,
-      size / 2,
+      // Smaller pieces for faster impacts (vaporized)
+      // Typical vector velocity range is .5–10
+      transition(15, 3, getVectorVelocity(collisionVelocity) / 10),
       Math.floor(size)
     );
   };
