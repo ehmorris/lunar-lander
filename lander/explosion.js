@@ -1,4 +1,4 @@
-import { randomBool, randomBetween } from "../helpers/helpers.js";
+import { randomBetween, jitterCoordinate } from "../helpers/helpers.js";
 import { LANDER_WIDTH, LANDER_HEIGHT } from "../helpers/constants.js";
 import { drawLanderGradient } from "./gradient.js";
 import { makeParticle } from "../particle.js";
@@ -16,8 +16,8 @@ export const makeExplosion = (
     .map(() =>
       makeParticle(
         state,
-        position,
-        velocity,
+        jitterCoordinate(position),
+        jitterCoordinate(velocity),
         randomBetween(size / 4, size),
         randomBetween(size / 4, size),
         fill
@@ -30,26 +30,16 @@ export const makeExplosion = (
 };
 
 export const makeLanderExplosion = (state, position, velocity, angle) => {
-  const CTX = state.get("CTX");
+  const gradient = drawLanderGradient(state.get("CTX"));
 
-  const _makeLanderChunk = (drawInstructions, yOffset) => {
-    const _rotationDirection = randomBool();
-
-    let _position = { ...position };
-    let _velocity = { ...velocity };
-    let _rotationVelocity = 0.1;
-    let _angle = 0;
-
-    const draw = () => {
-      [_position, _velocity, _rotationVelocity, _angle] = simpleBallisticUpdate(
-        state,
-        _position,
-        _velocity,
-        _angle,
-        _rotationDirection,
-        _rotationVelocity
-      );
-
+  const noseCone = makeParticle(
+    state,
+    position,
+    velocity,
+    LANDER_WIDTH,
+    LANDER_HEIGHT / 2,
+    gradient,
+    (CTX, position, _, rotationAngle, fill) => {
       // In order to render three separate pieces in the same location as the
       // single-piece lander, we have to render them all at the x and y
       // and rotation of the lander, then offset each piece on the y axis. We
@@ -60,50 +50,74 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
       // Step 1: move to lander position and rotation. This is the position
       // which will be updated by the ballistic update. This rotation is the
       // angle of the lander on crash and will not be updated.
-      CTX.save();
-      CTX.translate(_position.x, _position.y);
+      CTX.translate(position.x, position.y);
       CTX.rotate(angle);
 
       // Step 2: adjust this chunk to its own offset position and own axis of
       // rotation. This is the rotation that's updated by the ballistic update
-      CTX.fillStyle = drawLanderGradient(CTX);
-      CTX.translate(0, yOffset);
-      CTX.rotate(_angle);
+      CTX.fillStyle = fill;
+      CTX.translate(0, -LANDER_HEIGHT / 2 + 4);
+      CTX.rotate(rotationAngle);
       CTX.beginPath();
-      drawInstructions();
+      CTX.moveTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4 - 4);
+      CTX.lineTo(0, -LANDER_HEIGHT / 4 - 4);
+      CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 4 - 4);
       CTX.closePath();
       CTX.fill();
-      CTX.restore();
-    };
+    }
+  );
 
-    return { draw };
-  };
+  const chunk1 = makeParticle(
+    state,
+    position,
+    velocity,
+    LANDER_WIDTH,
+    LANDER_HEIGHT / 2,
+    gradient,
+    (CTX, position, _, rotationAngle, fill) => {
+      CTX.translate(position.x, position.y);
+      CTX.rotate(angle);
+      CTX.fillStyle = fill;
+      CTX.translate(0, LANDER_HEIGHT / 2);
+      CTX.rotate(rotationAngle);
+      CTX.beginPath();
+      CTX.moveTo(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
+      CTX.lineTo(LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
+      CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
+      CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
+      CTX.closePath();
+      CTX.fill();
+    }
+  );
 
-  const noseCone = _makeLanderChunk(() => {
-    CTX.moveTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4 - 4);
-    CTX.lineTo(0, -LANDER_HEIGHT / 4 - 4);
-    CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 4 - 4);
-  }, -LANDER_HEIGHT / 2 + 4);
-
-  const chunk1 = _makeLanderChunk(() => {
-    CTX.moveTo(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
-    CTX.lineTo(LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
-    CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
-    CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
-  }, LANDER_HEIGHT / 2);
-
-  const chunk2 = _makeLanderChunk(() => {
-    CTX.lineTo(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
-    CTX.lineTo(LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
-    CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
-    CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
-  }, 0);
+  const chunk2 = makeParticle(
+    state,
+    position,
+    velocity,
+    LANDER_WIDTH,
+    LANDER_HEIGHT / 2,
+    gradient,
+    (CTX, position, _, rotationAngle, fill) => {
+      CTX.translate(position.x, position.y);
+      CTX.rotate(angle);
+      CTX.fillStyle = fill;
+      CTX.translate(0, 0);
+      CTX.rotate(rotationAngle);
+      CTX.beginPath();
+      CTX.lineTo(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
+      CTX.lineTo(LANDER_WIDTH / 2, -LANDER_HEIGHT / 4);
+      CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
+      CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
+      CTX.closePath();
+      CTX.fill();
+    }
+  );
 
   const randomPieces = makeExplosion(
     state,
     position,
     velocity,
-    drawLanderGradient(CTX),
+    gradient,
     randomBetween(2, 20),
     32
   );

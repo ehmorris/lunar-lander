@@ -62,7 +62,9 @@ export const makeParticle = (
           y: position.y + velocity.y,
         };
 
-        onCollide(collisionPoint, velocity);
+        // Provide the point just prior to collision so particles reflect off
+        // terrain rather than getting stuck in it
+        onCollide(position, velocity);
       }
 
       // Track the last 20 positions to check for duplicates
@@ -98,7 +100,7 @@ export const makeParticle = (
     CTX.restore();
   };
 
-  return { draw, getPosition: () => position };
+  return { draw, getPosition: () => position, getVelocity: () => velocity };
 };
 
 function angleReflect(incidenceAngle, surfaceAngle) {

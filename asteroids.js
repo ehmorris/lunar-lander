@@ -72,8 +72,8 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
         asteroidPosition.y > landerPosition.y - impactYPadding &&
         asteroidPosition.y < landerPosition.y + impactYPadding
       ) {
-        onLanderCollision(velocity);
-        onCollide(asteroidPosition);
+        onLanderCollision(asteroid.getVelocity());
+        onCollide(asteroidPosition, asteroid.getVelocity());
       }
 
       asteroid.draw();
