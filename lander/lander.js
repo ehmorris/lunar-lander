@@ -442,9 +442,9 @@ export const makeLander = (state, onGameEnd) => {
 
   const draw = (timeSinceStart) => {
     _timeSinceStart = timeSinceStart;
-    _updateProps();
 
     if (!_gameEndData) {
+      _updateProps();
       drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
     }
 
