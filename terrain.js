@@ -134,7 +134,7 @@ export const makeTerrain = (state) => {
 
       CTX.save();
       CTX.fillStyle = "white";
-      CTX.font = "14px sans-serif";
+      CTX.font = "400 14px -apple-system, BlinkMacSystemFont, sans-serif";
       CTX.fillText(
         text,
         startPixel + widthInPixels / 2 - CTX.measureText(text).width / 2,
@@ -145,7 +145,6 @@ export const makeTerrain = (state) => {
       CTX.beginPath();
       CTX.moveTo(startPixel, surface.height);
       CTX.lineTo(startPixel + widthInPixels, surface.height);
-
       CTX.closePath();
       CTX.stroke();
       CTX.restore();

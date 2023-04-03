@@ -222,7 +222,7 @@ export const makeLander = (state, onGameEnd) => {
 
       // Record bonus points for increments of height and speed
       // Ints here are pixels / raw values, not MPH or FT
-      if (_position.y < _heightMilestone - 1400) {
+      if (_position.y < _heightMilestone - 3500) {
         _heightMilestone = _position.y;
         bonusPointsManager.addNamedPoint("newHeight");
       }
@@ -288,6 +288,7 @@ export const makeLander = (state, onGameEnd) => {
 
     // Draw HUD text
     CTX.save();
+    CTX.font = "400 10px -apple-system, BlinkMacSystemFont, sans-serif";
     CTX.fillStyle = speedColor;
     CTX.fillText(
       `${velocityInMPH(_velocity)} MPH`,
