@@ -31,6 +31,7 @@ export const makeLander = (state, onGameEnd) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const audioManager = state.get("audioManager");
+  const bonusPointsManager = state.get("bonusPointsManager");
 
   // Use grounded height to approximate distance from ground
   const _landingData = state.get("terrain").getLandingData();
@@ -53,11 +54,9 @@ export const makeLander = (state, onGameEnd) => {
   let _lastRotationAngle;
   let _rotationCount;
   let _maxVelocity;
+  let _velocityMilestone;
   let _maxHeight;
-  let _engineUsed;
-  let _engineUsedPreviousFrame;
-  let _boostersUsed;
-  let _boostersUsedPreviousFrame;
+  let _heightMilestone;
   let _babySoundPlayed;
 
   const resetProps = () => {
@@ -92,11 +91,9 @@ export const makeLander = (state, onGameEnd) => {
     _lastRotationAngle = Math.PI * 2;
     _rotationCount = 0;
     _maxVelocity = { ..._velocity };
+    _velocityMilestone = { x: 0, y: 0 };
     _maxHeight = _position.y;
-    _engineUsed = 0;
-    _engineUsedPreviousFrame = false;
-    _boostersUsed = 0;
-    _boostersUsedPreviousFrame = false;
+    _heightMilestone = 0;
     _babySoundPlayed = false;
   };
   resetProps();
@@ -115,8 +112,6 @@ export const makeLander = (state, onGameEnd) => {
       rotationsFormatted: Intl.NumberFormat().format(_rotationCount),
       maxSpeed: velocityInMPH(_maxVelocity),
       maxHeight: heightInFeet(_maxHeight, _groundedHeight),
-      engineUsed: Intl.NumberFormat().format(_engineUsed),
-      boostersUsed: Intl.NumberFormat().format(_boostersUsed),
       speedPercent: percentProgress(
         0,
         CRASH_VELOCITY,
@@ -211,6 +206,7 @@ export const makeLander = (state, onGameEnd) => {
         Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
         (rotations > _lastRotation || rotations < _lastRotation)
       ) {
+        bonusPointsManager.addNamedPoint("newRotation");
         _rotationCount++;
         _lastRotation = rotations;
         _lastRotationAngle = _angle;
@@ -224,23 +220,19 @@ export const makeLander = (state, onGameEnd) => {
         _maxVelocity = { ..._velocity };
       }
 
-      // Log engine and booster usage
-      if (!_engineUsedPreviousFrame && _engineOn) {
-        _engineUsed++;
-        _engineUsedPreviousFrame = true;
-      } else if (_engineUsedPreviousFrame && !_engineOn) {
-        _engineUsedPreviousFrame = false;
+      // Record bonus points for increments of height and speed
+      // Ints here are pixels / raw values, not MPH or FT
+      if (_position.y < _heightMilestone - 1400) {
+        _heightMilestone = _position.y;
+        bonusPointsManager.addNamedPoint("newHeight");
       }
 
-      if (!_boostersUsedPreviousFrame && (_rotatingLeft || _rotatingRight)) {
-        _boostersUsed++;
-        _boostersUsedPreviousFrame = true;
-      } else if (
-        _boostersUsedPreviousFrame &&
-        !_rotatingLeft &&
-        !_rotatingRight
+      if (
+        getVectorVelocity(_velocity) >
+        getVectorVelocity(_velocityMilestone) + 10
       ) {
-        _boostersUsedPreviousFrame = false;
+        _velocityMilestone = { ..._velocity };
+        bonusPointsManager.addNamedPoint("newSpeed");
       }
 
       // Play easter egg baby sound
@@ -258,15 +250,19 @@ export const makeLander = (state, onGameEnd) => {
       audioManager.stopBoosterSound1();
       audioManager.stopBoosterSound2();
 
-      const inLandingArea = _landingData.landingSurfaces.some(
+      const landingArea = _landingData.landingSurfaces.find(
         ({ x, width }) =>
           _position.x - LANDER_WIDTH / 2 >= x &&
           _position.x + LANDER_WIDTH / 2 <= x + width
       );
+
       const didLand =
         getVectorVelocity(_velocity) < CRASH_VELOCITY &&
         getAngleDeltaUpright(_angle) < CRASH_ANGLE &&
-        inLandingArea;
+        landingArea;
+
+      if (didLand)
+        bonusPointsManager.addMultiplier(landingArea.bonusMultiplier);
 
       _setGameEndData(didLand);
     }

@@ -40,7 +40,7 @@ export const makeTerrain = (state) => {
     seededShuffleArray(landingZoneSpans, seededRandom);
   };
 
-  const generateLandingSurface = (widthUnit) => {
+  const generateLandingSurface = (widthUnit, bonusMultiplier) => {
     // Determine how many points are needed to at least be as wide as the
     // lander, and then use that as a basis for the passed width unit
     const minWidthInPoints = Math.ceil(
@@ -76,12 +76,16 @@ export const makeTerrain = (state) => {
         landingMaxHeight,
         seededRandom
       ),
+      bonusMultiplier,
     };
   };
 
   const reGenerate = () => {
     generateLandingZoneSpans();
-    landingSurfaces = [generateLandingSurface(4), generateLandingSurface(1)];
+    landingSurfaces = [
+      generateLandingSurface(3, 1),
+      generateLandingSurface(1, 2),
+    ];
 
     terrainPathArray = generateTerrainY(
       numPoints,
@@ -123,20 +127,25 @@ export const makeTerrain = (state) => {
     CTX.restore();
 
     // Highlight landing zones in white
-    landingSurfaces.forEach((surfaces) => {
+    landingSurfaces.forEach((surface) => {
+      const startPixel = surface.startPoint * (canvasWidth / numPoints);
+      const widthInPixels = surface.widthInPoints * (canvasWidth / numPoints);
+      const text = `${surface.bonusMultiplier}\u00D7`;
+
       CTX.save();
+      CTX.fillStyle = "white";
+      CTX.font = "14px sans-serif";
+      CTX.fillText(
+        text,
+        startPixel + widthInPixels / 2 - CTX.measureText(text).width / 2,
+        surface.height - 10
+      );
       CTX.lineWidth = 2;
       CTX.strokeStyle = "white";
       CTX.beginPath();
-      CTX.moveTo(
-        surfaces.startPoint * (canvasWidth / numPoints),
-        surfaces.height
-      );
-      CTX.lineTo(
-        surfaces.startPoint * (canvasWidth / numPoints) +
-          surfaces.widthInPoints * (canvasWidth / numPoints),
-        surfaces.height
-      );
+      CTX.moveTo(startPixel, surface.height);
+      CTX.lineTo(startPixel + widthInPixels, surface.height);
+
       CTX.closePath();
       CTX.stroke();
       CTX.restore();
@@ -146,12 +155,15 @@ export const makeTerrain = (state) => {
   const getLandingData = () => {
     let landingSurfacesInPixels = [];
 
-    landingSurfaces.forEach(({ startPoint, widthInPoints }) => {
-      landingSurfacesInPixels.push({
-        x: startPoint * (canvasWidth / numPoints),
-        width: widthInPoints * (canvasWidth / numPoints),
-      });
-    });
+    landingSurfaces.forEach(
+      ({ startPoint, widthInPoints, bonusMultiplier }) => {
+        landingSurfacesInPixels.push({
+          x: startPoint * (canvasWidth / numPoints),
+          width: widthInPoints * (canvasWidth / numPoints),
+          bonusMultiplier,
+        });
+      }
+    );
 
     return {
       terrainPath2D,

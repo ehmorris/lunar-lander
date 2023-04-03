@@ -54,14 +54,12 @@
   <body>
     <div class="game"></div>
     <div id="endGameStats" class="fullSizeContainer">
-      <div>
-        <h1 id="description"></h1>
-        <h3 class="spaceBetween">
-          <span class="statsChallengeText show" id="statsChallengeText"
-            >Daily Challenge <span id="statsChallengeNumber"></span
-          ></span>
-          <span><span id="score"></span> point <span id="type"></span></span>
-        </h3>
+      <h1 id="description"></h1>
+      <div class="scoreContainer">
+        <span id="score"></span> point <span id="type"></span>
+        <span id="bonusPointsContainer" class="bonusPoints show">
+          +<span id="bonusPoints">0</span> bonus
+        </span>
       </div>
       <div class="meterAndLabel">
         <div class="label">Speed</div>
@@ -95,20 +93,6 @@
         <div class="tableRow">
           <span class="tableLabel">Max Height</span>
           <span class="tableValue"><span id="maxHeight"></span> FT</span>
-        </div>
-        <div class="tableRow">
-          <span class="tableLabel">Engine Used</span>
-          <span class="tableValue"><span id="engineUsed"></span> TIMES</span>
-        </div>
-        <div class="tableRow">
-          <span class="tableLabel">Boosters Used</span>
-          <span class="tableValue"><span id="boostersUsed"></span> TIMES</span>
-        </div>
-        <div class="tableRow">
-          <span class="tableLabel">Game Size</span>
-          <span class="tableValue">
-            <span id="canvasWidth"></span>&#215<span id="canvasHeight"></span>
-          </span>
         </div>
       </div>
       <div class="buttonContainer">

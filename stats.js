@@ -13,23 +13,19 @@ export const showStatsAndResetControl = (
     document.querySelector("#tryAgain").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
+  const bonusPoints = state.get("bonusPointsManager").getTotalPoints();
 
-  const shareTextFirstLines = `Daily Challenge #${state
+  const shareText = `Daily Challenge #${state
     .get("challengeManager")
     .getChallengeNumber()}
-${data.score} point ${data.landed ? "landing" : "crash"}`;
-
-  const shareText = `${shareTextFirstLines}
+${data.score} point ${data.landed ? "landing" : "crash"} +${bonusPoints} bonus
+${data.description}
 
 ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     data.rotationsInt === 1 ? "" : "s"
-  }
-${data.description}
+  } | ${data.durationInSeconds}s
 
-https://ehmorris.com/lander/
-${data.durationInSeconds} seconds
-Max: ${data.maxSpeed}mph | ${data.maxHeight}ft
-Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
+https://ehmorris.com/lander/`;
 
   const hideStats = () => {
     document
@@ -61,25 +57,24 @@ Game size: ${state.get("canvasWidth")}x${state.get("canvasHeight")}`;
   const populateStats = (data) => {
     document.querySelector("#description").textContent = data.description;
     document.querySelector("#score").textContent = data.score;
-    document.querySelector("#statsChallengeNumber").textContent = state
-      .get("challengeManager")
-      .getChallengeNumber();
     document.querySelector("#type").textContent = data.landed
       ? "landing"
       : "crash";
     populateMeter("speed", data.speedPercent, data.speed);
     populateMeter("angle", data.anglePercent, data.angle);
+
+    if (bonusPoints > 0) {
+      document.querySelector("#bonusPointsContainer").classList.add("show");
+      document.querySelector("#bonusPoints").textContent = bonusPoints;
+    } else {
+      document.querySelector("#bonusPointsContainer").classList.remove("show");
+    }
+
     document.querySelector("#duration").textContent = data.durationInSeconds;
     document.querySelector("#rotations").textContent = data.rotationsFormatted;
     document.querySelector("#maxSpeed").textContent = data.maxSpeed;
     document.querySelector("#maxHeight").textContent = data.maxHeight;
-    document.querySelector("#engineUsed").textContent = data.engineUsed;
-    document.querySelector("#boostersUsed").textContent = data.boostersUsed;
-    document.querySelector("#canvasWidth").textContent =
-      state.get("canvasWidth");
-    document.querySelector("#canvasHeight").textContent =
-      state.get("canvasHeight");
-    document.querySelector("#statsChallengeText").classList.add("show");
+    document.querySelector("#maxHeight").textContent = data.maxHeight;
 
     if (hasKeyboard) {
       document.querySelector("#tryAgainText").textContent =

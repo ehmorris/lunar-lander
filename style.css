@@ -28,11 +28,6 @@ li.strikethrough {
   color: rgba(255, 255, 255, 0.25);
 }
 
-.spaceBetween {
-  display: flex;
-  justify-content: space-between;
-}
-
 .fullSizeContainer {
   display: none;
   position: absolute;
@@ -78,12 +73,6 @@ li.strikethrough {
   line-height: 1.2;
   color: white;
   margin: 0 0 0.2em;
-}
-
-.fullSizeContainer h3 {
-  margin: 0.15em 0 0;
-  font-weight: 400;
-  font-size: clamp(18px, 4vmin, 32px);
 }
 
 @media screen and (max-width: 640px) {
@@ -156,11 +145,22 @@ li.strikethrough {
   border-radius: var(--cursor-size);
 }
 
-.statsChallengeText {
+.scoreContainer {
+  margin: 0 auto;
+  font-size: clamp(18px, 4vmin, 32px);
+  text-align: center;
+  border: 2px solid white;
+  border-radius: 100px;
+  padding: 2px clamp(8px, 2vmin, 22px);
+  color: white;
+  margin-top: 0.3em;
+}
+
+.bonusPoints {
   display: none;
 }
 
-.statsChallengeText.show {
+.bonusPoints.show {
   display: inline;
 }
 
@@ -240,7 +240,7 @@ li.strikethrough {
 @media (hover: hover) {
   .button:not(.loading):hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 14px #000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     background: rgba(255, 255, 255, 0.3);
   }
 }

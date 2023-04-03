@@ -19,6 +19,7 @@ import { makeTallyManger } from "./tally.js";
 import { makeAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
 import { makeSeededRandom } from "./helpers/seededrandom.js";
+import { makeBonusPointsManager } from "./bonuspoints.js";
 
 // SETUP
 
@@ -44,6 +45,9 @@ const appState = makeStateManager()
 
 const terrain = makeTerrain(appState);
 appState.set("terrain", terrain);
+
+const bonusPointsManager = makeBonusPointsManager(appState);
+appState.set("bonusPointsManager", bonusPointsManager);
 
 const stars = makeStarfield(appState);
 const instructions = manageInstructions(onCloseInstructions);
@@ -101,6 +105,7 @@ const animationObject = animate((timeSinceStart) => {
     }
 
     lander.draw(timeSinceStart);
+    bonusPointsManager.draw();
   } else {
     toyLander.draw();
   }
@@ -116,6 +121,7 @@ function onCloseInstructions() {
 
 function onGameEnd(data) {
   landerControls.detachEventListeners();
+  bonusPointsManager.hide();
 
   showStatsAndResetControl(
     appState,
@@ -146,6 +152,7 @@ function onResetGame() {
   sendAsteroid = seededRandomBool(seededRandom);
   asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
   asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
+  bonusPointsManager.reset();
 }
 
 function onAsteroidImpact(asteroidVelocity) {
