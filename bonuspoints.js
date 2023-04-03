@@ -34,7 +34,10 @@ export const makeBonusPointsManager = (state) => {
     timeOfLastPoint = Date.now();
   };
 
-  const reset = () => (totalPoints = 0);
+  const reset = () => {
+    hidden = false;
+    totalPoints = 0;
+  };
 
   const draw = () => {
     if (
