@@ -19,12 +19,11 @@ export const showStatsAndResetControl = (
     .getChallengeNumber()}
 ${data.scoreForDisplay} point ${data.landed ? "landing" : "crash"}
 ${data.scoreDescription}
+https://ehmorris.com/lander/
 
 ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     data.rotationsInt === 1 ? "" : "s"
-  } | ${data.durationInSeconds}s
-
-https://ehmorris.com/lander/`;
+  } | ${data.durationInSeconds}s`;
 
   const hideStats = () => {
     document

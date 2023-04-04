@@ -1,9 +1,3 @@
-import {
-  CRASH_ANGLE,
-  CRASH_VELOCITY,
-  VELOCITY_MULTIPLIER,
-} from "./helpers/constants.js";
-
 export const manageInstructions = (onCloseInstructions) => {
   let _engineDone = false;
   let _leftRotationDone = false;
@@ -25,10 +19,7 @@ export const manageInstructions = (onCloseInstructions) => {
 
   const show = () => {
     document.querySelector("#instructions").classList.add("show");
-    document.querySelector("#crashSpeed").textContent = `${
-      CRASH_VELOCITY * VELOCITY_MULTIPLIER
-    } MPH`;
-    document.querySelector("#crashAngle").textContent = `${CRASH_ANGLE}°`;
+
     if (likelyTouchDevice) {
       document.querySelector("#forKeyboard").remove();
     } else {

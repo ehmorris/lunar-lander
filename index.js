@@ -87,6 +87,7 @@ if (!instructions.hasClosedInstructions()) {
 } else {
   landerControls.attachEventListeners();
   challengeManager.populateCornerInfo();
+  terrain.setShowLandingSurfaces();
 }
 
 // MAIN ANIMATION LOOP
@@ -122,6 +123,7 @@ function onCloseInstructions() {
   toyLanderControls.detachEventListeners();
   landerControls.attachEventListeners();
   challengeManager.populateCornerInfo();
+  terrain.setShowLandingSurfaces();
 }
 
 function onGameEnd(data) {

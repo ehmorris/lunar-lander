@@ -19,6 +19,7 @@ export const makeTerrain = (state) => {
   let landingSurfaces = [];
   let terrainPathArray = [];
   let terrainPath2D;
+  let showLandingSurfaces = false;
 
   // Divide the canvas into three spans with some margin between the spans
   // and between the spans and the edge of the canvas. This array will be
@@ -126,31 +127,32 @@ export const makeTerrain = (state) => {
     CTX.fill(terrainPath2D);
     CTX.restore();
 
-    // Highlight landing zones in white
-    landingSurfaces.forEach((surface) => {
-      const startPixel = surface.startPoint * (canvasWidth / numPoints);
-      const widthInPixels = surface.widthInPoints * (canvasWidth / numPoints);
-      const text = `+${state
-        .get("bonusPointsManager")
-        .getPointValue(surface.name)}`;
+    if (showLandingSurfaces) {
+      landingSurfaces.forEach((surface) => {
+        const startPixel = surface.startPoint * (canvasWidth / numPoints);
+        const widthInPixels = surface.widthInPoints * (canvasWidth / numPoints);
+        const text = `+${state
+          .get("bonusPointsManager")
+          .getPointValue(surface.name)}`;
 
-      CTX.save();
-      CTX.fillStyle = "white";
-      CTX.font = "400 14px -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText(
-        text,
-        startPixel + widthInPixels / 2 - CTX.measureText(text).width / 2,
-        surface.height - 10
-      );
-      CTX.lineWidth = 2;
-      CTX.strokeStyle = "white";
-      CTX.beginPath();
-      CTX.moveTo(startPixel, surface.height);
-      CTX.lineTo(startPixel + widthInPixels, surface.height);
-      CTX.closePath();
-      CTX.stroke();
-      CTX.restore();
-    });
+        CTX.save();
+        CTX.fillStyle = "white";
+        CTX.font = "400 14px -apple-system, BlinkMacSystemFont, sans-serif";
+        CTX.fillText(
+          text,
+          startPixel + widthInPixels / 2 - CTX.measureText(text).width / 2,
+          surface.height - 10
+        );
+        CTX.lineWidth = 2;
+        CTX.strokeStyle = "white";
+        CTX.beginPath();
+        CTX.moveTo(startPixel, surface.height);
+        CTX.lineTo(startPixel + widthInPixels, surface.height);
+        CTX.closePath();
+        CTX.stroke();
+        CTX.restore();
+      });
+    }
   };
 
   const getLandingData = () => {
@@ -183,7 +185,13 @@ export const makeTerrain = (state) => {
     return getLineAngle(segmentStart, segmentEnd);
   };
 
-  return { draw, reGenerate, getLandingData, getSegmentAngleAtX };
+  return {
+    draw,
+    reGenerate,
+    getLandingData,
+    getSegmentAngleAtX,
+    setShowLandingSurfaces: () => (showLandingSurfaces = true),
+  };
 };
 
 // Generate terrain with midpoint displacement
