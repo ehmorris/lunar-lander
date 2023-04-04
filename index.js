@@ -20,6 +20,10 @@ import { makeAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
 import { makeSeededRandom } from "./helpers/seededrandom.js";
 import { makeBonusPointsManager } from "./bonuspoints.js";
+import {
+  landingScoreDescription,
+  crashScoreDescription,
+} from "./helpers/scoring.js";
 
 // SETUP
 
@@ -124,11 +128,17 @@ function onGameEnd(data) {
   landerControls.detachEventListeners();
   bonusPointsManager.hide();
 
+  const finalScore = data.landerScore + bonusPointsManager.getTotalPoints();
+  const scoreDescription = data.landed
+    ? landingScoreDescription(finalScore)
+    : crashScoreDescription(finalScore);
+  const scoreForDisplay = Intl.NumberFormat().format(finalScore.toFixed(1));
+
   showStatsAndResetControl(
     appState,
     lander,
     animationObject,
-    data,
+    { ...data, scoreDescription, scoreForDisplay },
     landerControls.getHasKeyboard(),
     onResetGame
   );

@@ -13,13 +13,12 @@ export const showStatsAndResetControl = (
     document.querySelector("#tryAgain").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
-  const bonusPoints = state.get("bonusPointsManager").getTotalPoints();
 
   const shareText = `Daily Challenge #${state
     .get("challengeManager")
     .getChallengeNumber()}
-${data.score} point ${data.landed ? "landing" : "crash"} +${bonusPoints} bonus
-${data.description}
+${data.scoreForDisplay} point ${data.landed ? "landing" : "crash"}
+${data.scoreDescription}
 
 ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     data.rotationsInt === 1 ? "" : "s"
@@ -55,20 +54,13 @@ https://ehmorris.com/lander/`;
   };
 
   const populateStats = (data) => {
-    document.querySelector("#description").textContent = data.description;
-    document.querySelector("#score").textContent = data.score;
+    document.querySelector("#description").textContent = data.scoreDescription;
+    document.querySelector("#score").textContent = data.scoreForDisplay;
     document.querySelector("#type").textContent = data.landed
       ? "landing"
       : "crash";
     populateMeter("speed", data.speedPercent, data.speed);
     populateMeter("angle", data.anglePercent, data.angle);
-
-    if (bonusPoints > 0) {
-      document.querySelector("#bonusPointsContainer").classList.add("show");
-      document.querySelector("#bonusPoints").textContent = bonusPoints;
-    } else {
-      document.querySelector("#bonusPointsContainer").classList.remove("show");
-    }
 
     document.querySelector("#duration").textContent = data.durationInSeconds;
     document.querySelector("#rotations").textContent = data.rotationsFormatted;

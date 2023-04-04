@@ -9,12 +9,7 @@ import {
   heightInFeet,
   percentProgress,
 } from "../helpers/helpers.js";
-import {
-  scoreLanding,
-  scoreCrash,
-  landingScoreDescription,
-  crashScoreDescription,
-} from "../helpers/scoring.js";
+import { scoreLanding, scoreCrash } from "../helpers/scoring.js";
 import {
   GRAVITY,
   LANDER_WIDTH,
@@ -48,7 +43,9 @@ export const makeLander = (state, onGameEnd) => {
   let _rotatingRight;
 
   let _timeSinceStart;
-  let _gameEndData;
+  let gameEndData;
+  let _gameEndConfetti;
+  let _gameEndExplosion;
   let _flipConfetti;
   let _lastRotation;
   let _lastRotationAngle;
@@ -85,7 +82,9 @@ export const makeLander = (state, onGameEnd) => {
     _rotatingRight = false;
 
     _timeSinceStart = 0;
-    _gameEndData = false;
+    gameEndData = false;
+    _gameEndConfetti = false;
+    _gameEndExplosion = false;
     _flipConfetti = [];
     _lastRotation = 1;
     _lastRotationAngle = Math.PI * 2;
@@ -99,7 +98,7 @@ export const makeLander = (state, onGameEnd) => {
   resetProps();
 
   const _setGameEndData = (landed) => {
-    _gameEndData = {
+    gameEndData = {
       landed,
       speed: velocityInMPH(_velocity),
       angle: Intl.NumberFormat().format(
@@ -130,9 +129,9 @@ export const makeLander = (state, onGameEnd) => {
         getVectorVelocity(_velocity)
       );
 
-      _gameEndData.score = Intl.NumberFormat().format(score.toFixed(1));
-      _gameEndData.description = landingScoreDescription(score);
-      _gameEndData.confetti = makeConfetti(state, Math.round(score));
+      gameEndData.landerScore = score;
+
+      _gameEndConfetti = makeConfetti(state, Math.round(score));
 
       _angle = Math.PI * 2;
       _velocity = { x: 0, y: 0 };
@@ -143,9 +142,9 @@ export const makeLander = (state, onGameEnd) => {
         getVectorVelocity(_velocity)
       );
 
-      _gameEndData.score = Intl.NumberFormat().format(score.toFixed(1));
-      _gameEndData.description = crashScoreDescription(score);
-      _gameEndData.explosion = makeLanderExplosion(
+      gameEndData.landerScore = score;
+
+      _gameEndExplosion = makeLanderExplosion(
         state,
         _position,
         _velocity,
@@ -153,11 +152,11 @@ export const makeLander = (state, onGameEnd) => {
       );
     }
 
-    onGameEnd(_gameEndData);
+    onGameEnd(gameEndData);
   };
 
   const destroy = (asteroidVelocity) => {
-    if (!_gameEndData) {
+    if (!gameEndData) {
       const averageXVelocity = (_velocity.x + asteroidVelocity.x) / 2;
       const averageYVelocity = (_velocity.y + asteroidVelocity.y) / 2;
       _velocity = { x: averageXVelocity, y: averageYVelocity };
@@ -242,7 +241,7 @@ export const makeLander = (state, onGameEnd) => {
       } else if (getVectorVelocity(_velocity) < 20 && _babySoundPlayed) {
         _babySoundPlayed = false;
       }
-    } else if (!_gameEndData) {
+    } else if (!gameEndData) {
       _engineOn = false;
       _rotatingLeft = false;
       _rotatingRight = false;
@@ -439,23 +438,18 @@ export const makeLander = (state, onGameEnd) => {
   const draw = (timeSinceStart) => {
     _timeSinceStart = timeSinceStart;
 
-    if (!_gameEndData) {
+    if (!gameEndData) {
       _updateProps();
       drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
     }
 
     if (_flipConfetti.length > 0) _flipConfetti.forEach((c) => c.draw());
 
-    if (_gameEndData) {
-      if (_gameEndData.landed) {
-        _gameEndData.confetti.draw();
-        _drawLander();
-      } else {
-        _gameEndData.explosion.draw();
-      }
-    } else {
-      _drawLander();
-    }
+    if (_gameEndConfetti) _gameEndConfetti.draw();
+
+    if (_gameEndExplosion) _gameEndExplosion.draw();
+
+    if (!gameEndData || (gameEndData && gameEndData.landed)) _drawLander();
 
     // Draw speed and angle text beside lander, even after crashing
     _drawHUD();

@@ -156,14 +156,6 @@ li.strikethrough {
   margin-top: 0.3em;
 }
 
-.bonusPoints {
-  display: none;
-}
-
-.bonusPoints.show {
-  display: inline;
-}
-
 .statsTable {
   margin: 16px 0 20px;
   font-size: var(--stats-font-size);
@@ -193,6 +185,7 @@ li.strikethrough {
   background: var(--background-color);
   z-index: 1;
   padding-right: 8px;
+  border-radius: 32px;
 }
 
 .tableValue {
