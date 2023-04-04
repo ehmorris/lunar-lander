@@ -40,7 +40,7 @@ export const makeTerrain = (state) => {
     seededShuffleArray(landingZoneSpans, seededRandom);
   };
 
-  const generateLandingSurface = (widthUnit, bonusMultiplier) => {
+  const generateLandingSurface = (widthUnit, name) => {
     // Determine how many points are needed to at least be as wide as the
     // lander, and then use that as a basis for the passed width unit
     const minWidthInPoints = Math.ceil(
@@ -76,15 +76,15 @@ export const makeTerrain = (state) => {
         landingMaxHeight,
         seededRandom
       ),
-      bonusMultiplier,
+      name,
     };
   };
 
   const reGenerate = () => {
     generateLandingZoneSpans();
     landingSurfaces = [
-      generateLandingSurface(3, 1),
-      generateLandingSurface(1, 2),
+      generateLandingSurface(3, "largeLandingSurface"),
+      generateLandingSurface(1, "smallLandingSurface"),
     ];
 
     terrainPathArray = generateTerrainY(
@@ -130,7 +130,9 @@ export const makeTerrain = (state) => {
     landingSurfaces.forEach((surface) => {
       const startPixel = surface.startPoint * (canvasWidth / numPoints);
       const widthInPixels = surface.widthInPoints * (canvasWidth / numPoints);
-      const text = `${surface.bonusMultiplier}\u00D7`;
+      const text = `+${state
+        .get("bonusPointsManager")
+        .getPointValue(surface.name)}`;
 
       CTX.save();
       CTX.fillStyle = "white";
@@ -154,15 +156,13 @@ export const makeTerrain = (state) => {
   const getLandingData = () => {
     let landingSurfacesInPixels = [];
 
-    landingSurfaces.forEach(
-      ({ startPoint, widthInPoints, bonusMultiplier }) => {
-        landingSurfacesInPixels.push({
-          x: startPoint * (canvasWidth / numPoints),
-          width: widthInPoints * (canvasWidth / numPoints),
-          bonusMultiplier,
-        });
-      }
-    );
+    landingSurfaces.forEach(({ startPoint, widthInPoints, name }) => {
+      landingSurfacesInPixels.push({
+        x: startPoint * (canvasWidth / numPoints),
+        width: widthInPoints * (canvasWidth / numPoints),
+        name,
+      });
+    });
 
     return {
       terrainPath2D,

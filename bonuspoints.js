@@ -1,3 +1,5 @@
+import { progress, transition } from "./helpers/helpers.js";
+
 export const makeBonusPointsManager = (state) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
@@ -9,34 +11,37 @@ export const makeBonusPointsManager = (state) => {
   let lastPointLabel = "";
   let hidden = false;
 
-  const addMultiplier = (points) => {
-    totalPoints *= points;
-  };
+  const namePointMapping = new Map([
+    ["smallLandingSurface", 4],
+    ["largeLandingSurface", 0],
+    ["newRotation", 2],
+    ["newHeight", 6],
+    ["newSpeed", 6],
+  ]);
+
+  const nameLabelMapping = new Map([
+    ["smallLandingSurface", "Landed"],
+    ["largeLandingSurface", "Landed"],
+    ["newRotation", "Flip!"],
+    ["newHeight", "Height record!"],
+    ["newSpeed", "Speed record!"],
+  ]);
+
+  const getPointValue = (name) => namePointMapping.get(name);
 
   const addNamedPoint = (name) => {
-    switch (name) {
-      case "newRotation":
-        totalPoints += 40;
-        lastPointValue = 40;
-        lastPointLabel = "Flip";
-        break;
-      case "newHeight":
-        totalPoints += 80;
-        lastPointValue = 80;
-        lastPointLabel = "Height record";
-        break;
-      case "newSpeed":
-        totalPoints += 80;
-        lastPointValue = 80;
-        lastPointLabel = "Speed record";
-        break;
-    }
+    totalPoints += namePointMapping.get(name);
+    lastPointValue = namePointMapping.get(name);
+    lastPointLabel = nameLabelMapping.get(name);
     timeOfLastPoint = Date.now();
   };
 
   const reset = () => {
-    hidden = false;
+    timeOfLastPoint = 0;
     totalPoints = 0;
+    lastPointValue = 0;
+    lastPointLabel = "";
+    hidden = false;
   };
 
   const draw = () => {
@@ -45,23 +50,36 @@ export const makeBonusPointsManager = (state) => {
       totalPoints > 0 &&
       Date.now() - timeOfLastPoint < timeToShowPointsInMS
     ) {
-      CTX.save();
-      CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillStyle = "white";
-      CTX.fillText(
-        `${lastPointLabel} +${lastPointValue}`,
-        canvasWidth / 2 -
-          CTX.measureText(`${lastPointLabel} +${lastPointValue}`).width / 2,
-        canvasHeight / 2 - 16
+      const animateInProgress = Math.min(
+        1,
+        progress(0, 400, Date.now() - timeOfLastPoint)
       );
 
-      CTX.font = "400 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText(
-        `${totalPoints} total bonus`,
-        canvasWidth / 2 -
-          CTX.measureText(`${totalPoints} total bonus`).width / 2,
-        canvasHeight / 2 + 16
+      function easeOutBack(x) {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+      }
+
+      CTX.save();
+      CTX.fillStyle = "white";
+      CTX.translate(
+        canvasWidth / 2,
+        canvasHeight / 2 - transition(-16, 0, animateInProgress, easeOutBack)
       );
+      CTX.globalAlpha = transition(0, 1, animateInProgress, easeOutBack);
+      CTX.scale(
+        transition(0.98, 1, animateInProgress, easeOutBack),
+        transition(0.98, 1, animateInProgress, easeOutBack)
+      );
+
+      CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      const textLine1 = `${lastPointLabel} +${lastPointValue}`;
+      CTX.fillText(textLine1, -CTX.measureText(textLine1).width / 2, -16);
+
+      CTX.font = "400 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      const textLine2 = `${totalPoints} total bonus`;
+      CTX.fillText(textLine2, -CTX.measureText(textLine2).width / 2, 16);
       CTX.restore();
     }
   };
@@ -69,7 +87,7 @@ export const makeBonusPointsManager = (state) => {
   return {
     draw,
     reset,
-    addMultiplier,
+    getPointValue,
     addNamedPoint,
     getTotalPoints: () => totalPoints,
     hide: () => (hidden = true),

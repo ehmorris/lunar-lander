@@ -261,8 +261,7 @@ export const makeLander = (state, onGameEnd) => {
         getAngleDeltaUpright(_angle) < CRASH_ANGLE &&
         landingArea;
 
-      if (didLand)
-        bonusPointsManager.addMultiplier(landingArea.bonusMultiplier);
+      if (didLand) bonusPointsManager.addNamedPoint(landingArea.name);
 
       _setGameEndData(didLand);
     }
