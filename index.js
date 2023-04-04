@@ -96,6 +96,8 @@ const animationObject = animate((timeSinceStart) => {
   if (instructions.hasClosedInstructions()) {
     landerControls.drawTouchOverlay();
 
+    bonusPointsManager.draw();
+
     if (sendAsteroid && timeSinceStart > asteroidCountdown) {
       asteroids.forEach((a) => a.draw());
     }
@@ -105,7 +107,6 @@ const animationObject = animate((timeSinceStart) => {
     }
 
     lander.draw(timeSinceStart);
-    bonusPointsManager.draw();
   } else {
     toyLander.draw();
   }
