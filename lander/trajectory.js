@@ -73,30 +73,35 @@ export const drawTrajectory = (
     });
 
     // Draw landing zone angle indicator
-    const arrowSize = Math.max(
-      Math.min(lastSegment.projectedYVelocity * 4, 20),
-      2
-    );
-    const arrowLength = Math.max(
-      Math.min(lastSegment.projectedYVelocity * 30, 60),
-      5
-    );
-    CTX.globalAlpha = 1;
-    CTX.strokeStyle = "#fff";
-    CTX.translate(
-      lastSegment.projectedXPosition,
-      lastSegment.projectedYPosition
-    );
-    CTX.rotate(lastSegment.projectedAngle + Math.PI);
-    CTX.beginPath();
-    CTX.moveTo(0, 0);
-    CTX.lineTo(0, arrowLength);
-    CTX.lineTo(-arrowSize, arrowLength);
-    CTX.lineTo(0, arrowLength + arrowSize);
-    CTX.lineTo(arrowSize, arrowLength);
-    CTX.lineTo(0, arrowLength);
-    CTX.closePath();
-    CTX.stroke();
+    if (
+      lastSegment.projectedXPosition > 0 &&
+      lastSegment.projectedXPosition < canvasWidth
+    ) {
+      const arrowSize = Math.max(
+        Math.min(lastSegment.projectedYVelocity * 4, 20),
+        2
+      );
+      const arrowLength = Math.max(
+        Math.min(lastSegment.projectedYVelocity * 30, 60),
+        5
+      );
+      CTX.globalAlpha = 1;
+      CTX.strokeStyle = "#fff";
+      CTX.translate(
+        lastSegment.projectedXPosition,
+        lastSegment.projectedYPosition
+      );
+      CTX.rotate(lastSegment.projectedAngle + Math.PI);
+      CTX.beginPath();
+      CTX.moveTo(0, 0);
+      CTX.lineTo(0, arrowLength);
+      CTX.lineTo(-arrowSize, arrowLength);
+      CTX.lineTo(0, arrowLength + arrowSize);
+      CTX.lineTo(arrowSize, arrowLength);
+      CTX.lineTo(0, arrowLength);
+      CTX.closePath();
+      CTX.stroke();
+    }
     CTX.restore();
   }
 };
