@@ -70,6 +70,9 @@ export const heightInFeet = (yPos, groundedHeight) =>
 export const progress = (start, end, current) =>
   (current - start) / (end - start);
 
+export const clampedProgress = (start, end, current) =>
+  Math.max(0, Math.min(1, (current - start) / (end - start)));
+
 export const mirroredLoopingProgress = (start, end, current) => {
   const loopedProgress = progress(start, end, current) % 1;
   return Math.floor(current / end) % 2
@@ -106,3 +109,11 @@ export const jitterCoordinate = ({ x, y }, jitterAmount = 1) => ({
   x: x + randomBetween(-jitterAmount, jitterAmount),
   y: y + randomBetween(-jitterAmount, jitterAmount),
 });
+
+export const easeOutBack = (x) => {
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+};
+
+export const easeInOutSine = (x) => -(Math.cos(Math.PI * x) - 1) / 2;

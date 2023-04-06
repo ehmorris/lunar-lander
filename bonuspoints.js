@@ -1,4 +1,9 @@
-import { progress, transition } from "./helpers/helpers.js";
+import {
+  clampedProgress,
+  transition,
+  easeOutBack,
+  easeInOutSine,
+} from "./helpers/helpers.js";
 
 export const makeBonusPointsManager = (state) => {
   const CTX = state.get("CTX");
@@ -44,33 +49,85 @@ export const makeBonusPointsManager = (state) => {
     hidden = false;
   };
 
+  const transitionInOut = (
+    inStart,
+    inEnd,
+    outEnd,
+    animationDuration,
+    totalLiveTime,
+    timeElapsed,
+    easingIn,
+    easingOut
+  ) => {
+    const animateInProgress = clampedProgress(
+      0,
+      animationDuration,
+      timeElapsed
+    );
+    const animateOutProgress = clampedProgress(
+      totalLiveTime - animationDuration,
+      totalLiveTime,
+      timeElapsed
+    );
+
+    if (timeElapsed <= animationDuration) {
+      return transition(inStart, inEnd, animateInProgress, easingIn);
+    } else {
+      return transition(inEnd, outEnd, animateOutProgress, easingOut);
+    }
+  };
+
   const draw = () => {
-    if (
-      !hidden &&
-      totalPoints > 0 &&
-      Date.now() - timeOfLastPoint < timeToShowPointsInMS
-    ) {
-      const animateInProgress = Math.min(
-        1,
-        progress(0, 400, Date.now() - timeOfLastPoint)
-      );
+    const timeElapsed = Date.now() - timeOfLastPoint;
 
-      function easeOutBack(x) {
-        const c1 = 1.70158;
-        const c3 = c1 + 1;
-        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
-      }
-
+    if (!hidden && totalPoints > 0 && timeElapsed < timeToShowPointsInMS) {
       CTX.save();
       CTX.fillStyle = "white";
       CTX.translate(
         canvasWidth / 2,
-        canvasHeight / 2 - transition(-16, 0, animateInProgress, easeOutBack)
+        canvasHeight / 2 -
+          transitionInOut(
+            -16,
+            0,
+            24,
+            500,
+            timeToShowPointsInMS,
+            timeElapsed,
+            easeOutBack,
+            easeInOutSine
+          )
       );
-      CTX.globalAlpha = transition(0, 1, animateInProgress, easeOutBack);
+      CTX.globalAlpha = transitionInOut(
+        0.5,
+        1,
+        0,
+        400,
+        timeToShowPointsInMS,
+        timeElapsed,
+        easeInOutSine,
+        easeInOutSine
+      );
       CTX.scale(
-        transition(0.98, 1, animateInProgress, easeOutBack),
-        transition(0.98, 1, animateInProgress, easeOutBack)
+        transitionInOut(
+          0.98,
+          1,
+          1,
+          600,
+          timeToShowPointsInMS,
+          timeElapsed,
+          easeOutBack,
+          easeInOutSine
+        ),
+        transitionInOut(
+          0.98,
+          1,
+          1,
+          600,
+          timeToShowPointsInMS,
+          timeElapsed,
+          easeOutBack,
+          easeInOutSine
+        )
       );
 
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
