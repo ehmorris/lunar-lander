@@ -7,7 +7,9 @@ import { progress } from "./helpers.js";
 
 export const landingScoreDescription = (score) => {
   const description =
-    score >= 99
+    score >= 120
+      ? "So. Much. Bonus. And you landed?? Incredible"
+      : score >= 99
       ? "Perfect landing, incredible, you can’t get better than this"
       : score >= 95
       ? "Near-perfect landing, super smooth"
@@ -40,7 +42,9 @@ export const landingScoreDescription = (score) => {
 
 export const crashScoreDescription = (score) => {
   const description =
-    score >= 100
+    score >= 120
+      ? "So much bonus. So much crash."
+      : score >= 100
       ? "Unbelievable, the crater is visible from Earth"
       : score >= 95
       ? "Ludicrous crash! The debris has entered orbit"
