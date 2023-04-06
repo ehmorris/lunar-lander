@@ -14,10 +14,11 @@ export const showStatsAndResetControl = (
   };
   const canCopyText = navigator && navigator.clipboard;
 
-  const shareText = `Daily Challenge #${state
+  const shareText = `Challenge #${state
     .get("challengeManager")
     .getChallengeNumber()}
 ${data.scoreForDisplay} point ${data.landed ? "landing" : "crash"}
+
 ${data.scoreDescription}
 https://ehmorris.com/lander/
 
