@@ -123,7 +123,7 @@ export const makeTerrain = (state) => {
 
   const draw = () => {
     CTX.save();
-    CTX.fillStyle = "#757579";
+    CTX.fillStyle = "#CAA78D";
     CTX.fill(terrainPath2D);
     CTX.restore();
 

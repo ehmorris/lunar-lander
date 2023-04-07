@@ -1,6 +1,6 @@
 import { randomBetween } from "./helpers/helpers.js";
 
-export const makeStarfield = (state) => {
+export const makeStarfield = (state, bottomBoundary) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
@@ -14,7 +14,7 @@ export const makeStarfield = (state) => {
         opacity: randomBetween(0.1, 1),
         position: {
           x: Math.random() * canvasWidth,
-          y: Math.random() * canvasHeight,
+          y: randomBetween(0, bottomBoundary),
         },
       });
     }

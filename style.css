@@ -1,6 +1,5 @@
 body {
   --stats-font-size: clamp(12px, 2vmin, 16px);
-  --background-color: #02071e;
   margin: 0;
   background: #000;
   user-select: none;
@@ -108,17 +107,20 @@ li.strikethrough {
   }
 }
 
+/* #FDF7C3 @ 0%
+#FFAB5A @ 23.96%
+#C08D6C @ 66.15%
+#6B5A6C @ 100% */
+
 .meter {
   position: relative;
   height: var(--meter-height);
   background: linear-gradient(
     90deg,
-    hsl(142deg 100% 48%) 0%,
-    hsl(84deg 100% 42%) 6%,
-    hsl(61deg 100% 35%) 15%,
-    hsl(41deg 100% 40%) 29%,
-    hsl(25deg 100% 44%) 50%,
-    hsl(0deg 100% 46%) 100%
+    #fdf7c3 0%,
+    #ffab5a 24%,
+    #c08d6c 68%,
+    #6b5a6c 100%
   );
 }
 
@@ -182,16 +184,19 @@ li.strikethrough {
 }
 
 .tableLabel {
-  background: var(--background-color);
   z-index: 1;
-  padding-right: 8px;
+  padding: 0 8px;
+  margin-left: -8px;
   border-radius: 32px;
+  backdrop-filter: blur(8px);
 }
 
 .tableValue {
-  background: var(--background-color);
   z-index: 1;
-  padding-left: 8px;
+  padding: 0 8px;
+  margin-right: -8px;
+  border-radius: 32px;
+  backdrop-filter: blur(8px);
 }
 
 .buttonContainer {
