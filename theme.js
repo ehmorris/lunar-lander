@@ -1,4 +1,4 @@
-import { LANDER_WIDTH } from "../helpers/constants.js";
+import { LANDER_WIDTH } from "./helpers/constants.js";
 
 const horizon = 0.72;
 
