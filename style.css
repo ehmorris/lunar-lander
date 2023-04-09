@@ -178,6 +178,7 @@ li.strikethrough {
   margin-left: -8px;
   border-radius: 32px;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .tableValue {
@@ -186,6 +187,7 @@ li.strikethrough {
   margin-right: -8px;
   border-radius: 32px;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .buttonContainer {
