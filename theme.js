@@ -67,9 +67,15 @@ export const makeTheme = (state) => {
       "#4A4E6F",
       "#3D4264"
     ),
-    toyLanderGradient: (width) => (
-      CTX, "#DFE5E5", "#BDBCC3", "#4A4E6F", "#3D4264", width
-    ),
+    toyLanderGradient: (width) =>
+      makeLanderGradient(
+        CTX,
+        "#DFE5E5",
+        "#BDBCC3",
+        "#4A4E6F",
+        "#3D4264",
+        width
+      ),
     asteroid: "#898482",
     star: "#ffffff",
     terrain: "#757579",
@@ -112,9 +118,15 @@ export const makeTheme = (state) => {
       "#5E5B7A",
       "#44354A"
     ),
-    toyLanderGradient: (width) => (
-      CTX, "#FFE9DC", "#FDD1B6", "#5E5B7A", "#44354A", width
-    ),
+    toyLanderGradient: (width) =>
+      makeLanderGradient(
+        CTX,
+        "#FFE9DC",
+        "#FDD1B6",
+        "#5E5B7A",
+        "#44354A",
+        width
+      ),
     asteroid: "#CAA78D",
     star: "#ffffff",
     terrain: "#CAA78D",
