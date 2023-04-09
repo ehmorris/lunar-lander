@@ -115,7 +115,7 @@ export const makeTheme = (state) => {
     toyLanderGradient: (width) => (
       CTX, "#FFE9DC", "#FDD1B6", "#5E5B7A", "#44354A", width
     ),
-    asteroid: "#898482",
+    asteroid: "#CAA78D",
     star: "#ffffff",
     terrain: "#CAA78D",
     meterGradient:
