@@ -1,12 +1,12 @@
 body {
   --stats-font-size: clamp(12px, 2vmin, 16px);
   margin: 0;
-  background: #000;
+  background: var(--background);
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
   font: 400 18px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--body-font-color);
 }
 
 canvas {
@@ -58,7 +58,7 @@ li.strikethrough {
   font-size: clamp(26px, 7vmin, 62px);
   font-weight: 900;
   line-height: 1.1;
-  color: white;
+  color: var(--headline-font-color);
   margin: 0;
 }
 
@@ -70,7 +70,7 @@ li.strikethrough {
   font-size: clamp(24px, 6vmin, 42px);
   font-weight: 700;
   line-height: 1.2;
-  color: white;
+  color: var(--headline-font-color);
   margin: 0 0 0.2em;
 }
 
@@ -107,21 +107,10 @@ li.strikethrough {
   }
 }
 
-/* #FDF7C3 @ 0%
-#FFAB5A @ 23.96%
-#C08D6C @ 66.15%
-#6B5A6C @ 100% */
-
 .meter {
   position: relative;
   height: var(--meter-height);
-  background: linear-gradient(
-    90deg,
-    #fdf7c3 0%,
-    #ffab5a 24%,
-    #c08d6c 68%,
-    #6b5a6c 100%
-  );
+  background: var(--meter-gradient);
 }
 
 .cursor {
@@ -154,7 +143,7 @@ li.strikethrough {
   border: 2px solid white;
   border-radius: 100px;
   padding: 2px clamp(8px, 2vmin, 22px);
-  color: white;
+  color: var(--headline-font-color);
   margin-top: 0.3em;
 }
 

@@ -82,7 +82,7 @@ export const makeBonusPointsManager = (state) => {
 
     if (!hidden && totalPoints > 0 && timeElapsed < timeToShowPointsInMS) {
       CTX.save();
-      CTX.fillStyle = "white";
+      CTX.fillStyle = state.get("theme").headlineFontColor;
       CTX.translate(
         canvasWidth / 2,
         canvasHeight / 2 -

@@ -1,6 +1,5 @@
 import { randomBetween, jitterCoordinate } from "../helpers/helpers.js";
 import { LANDER_WIDTH, LANDER_HEIGHT } from "../helpers/constants.js";
-import { drawLanderGradient } from "./gradient.js";
 import { makeParticle } from "../particle.js";
 
 export const makeExplosion = (
@@ -30,7 +29,7 @@ export const makeExplosion = (
 };
 
 export const makeLanderExplosion = (state, position, velocity, angle) => {
-  const gradient = drawLanderGradient(state.get("CTX"));
+  const gradient = state.get("theme").landerGradient;
 
   const noseCone = makeParticle(
     state,

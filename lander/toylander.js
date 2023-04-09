@@ -1,5 +1,4 @@
 import { randomBetween, randomBool } from "../helpers/helpers.js";
-import { drawLanderGradient } from "./gradient.js";
 
 export const makeToyLander = (
   state,
@@ -55,7 +54,7 @@ export const makeToyLander = (
 
     // Move to top left of the lander and then rotate at that origin
     CTX.save();
-    CTX.fillStyle = drawLanderGradient(CTX, _toyLanderWidth);
+    CTX.fillStyle = state.get("theme").toyLanderGradient(_toyLanderWidth);
     CTX.translate(_position.x, _position.y);
     CTX.rotate(_angle);
 

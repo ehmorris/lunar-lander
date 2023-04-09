@@ -123,7 +123,7 @@ export const makeTerrain = (state) => {
 
   const draw = () => {
     CTX.save();
-    CTX.fillStyle = "#CAA78D";
+    CTX.fillStyle = state.get("theme").terrain;
     CTX.fill(terrainPath2D);
     CTX.restore();
 
@@ -136,7 +136,7 @@ export const makeTerrain = (state) => {
           .getPointValue(surface.name)}`;
 
         CTX.save();
-        CTX.fillStyle = "white";
+        CTX.fillStyle = state.get("theme").infoFontColor;
         CTX.font = "400 14px -apple-system, BlinkMacSystemFont, sans-serif";
         CTX.fillText(
           text,

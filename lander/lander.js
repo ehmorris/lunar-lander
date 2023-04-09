@@ -20,7 +20,6 @@ import {
 import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
 import { drawTrajectory } from "./trajectory.js";
-import { drawLanderGradient } from "./gradient.js";
 
 export const makeLander = (state, onGameEnd) => {
   const CTX = state.get("CTX");
@@ -299,7 +298,7 @@ export const makeLander = (state, onGameEnd) => {
       xPosBasis,
       yPosBasis
     );
-    CTX.fillStyle = "#ffffff";
+    CTX.fillStyle = state.get("theme").infoFontColor;
     CTX.fillText(
       `${heightInFeet(_position.y, _groundedHeight)} FT`,
       xPosBasis,
@@ -353,7 +352,7 @@ export const makeLander = (state, onGameEnd) => {
   const _drawLander = () => {
     // Move to top left of the lander and then rotate at that origin
     CTX.save();
-    CTX.fillStyle = drawLanderGradient(CTX);
+    CTX.fillStyle = state.get("theme").landerGradient;
     CTX.translate(_position.x, _position.y);
     CTX.rotate(_angle);
 

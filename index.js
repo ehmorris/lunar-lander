@@ -20,6 +20,7 @@ import { makeAsteroid } from "./asteroids.js";
 import { makeChallengeManager } from "./challenge.js";
 import { makeSeededRandom } from "./helpers/seededrandom.js";
 import { makeBonusPointsManager } from "./bonuspoints.js";
+import { makeTheme } from "./theme.js";
 import {
   landingScoreDescription,
   crashScoreDescription,
@@ -47,12 +48,16 @@ const appState = makeStateManager()
   .set("challengeManager", challengeManager)
   .set("seededRandom", seededRandom);
 
+const theme = makeTheme(appState);
+appState.set("theme", theme);
+
 const terrain = makeTerrain(appState);
 appState.set("terrain", terrain);
 
 const bonusPointsManager = makeBonusPointsManager(appState);
 appState.set("bonusPointsManager", bonusPointsManager);
 
+const stars = makeStarfield(appState);
 const instructions = manageInstructions(onCloseInstructions);
 const toyLander = makeToyLander(
   appState,
@@ -71,28 +76,6 @@ let asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
 let asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
 let randomConfetti = [];
 
-const horizonPoint = 0.72;
-const backgroundGradient = CTX.createLinearGradient(0, 0, 0, canvasHeight);
-backgroundGradient.addColorStop(0, "#547CA6");
-backgroundGradient.addColorStop(horizonPoint - 0.01, "#DB966D");
-backgroundGradient.addColorStop(horizonPoint, "#CC9B7A");
-backgroundGradient.addColorStop(horizonPoint + 0.01, "#CFBCB1");
-backgroundGradient.addColorStop(0.9, "#567DA6");
-
-const backgroundTerrainY = canvasHeight * horizonPoint + 12;
-const backgroundTerrainHeight = canvasHeight * 0.1;
-const backgroundTerrainGradient = CTX.createLinearGradient(
-  0,
-  backgroundTerrainY - backgroundTerrainHeight,
-  0,
-  backgroundTerrainY
-);
-backgroundTerrainGradient.addColorStop(0, "#815962");
-backgroundTerrainGradient.addColorStop(0.8, "#815962");
-backgroundTerrainGradient.addColorStop(1, "rgba(129, 89, 98, 0)");
-
-const stars = makeStarfield(appState, horizonPoint * canvasHeight);
-
 // INSTRUCTIONS SHOW/HIDE
 
 if (!instructions.hasClosedInstructions()) {
@@ -107,31 +90,13 @@ if (!instructions.hasClosedInstructions()) {
 // MAIN ANIMATION LOOP
 
 const animationObject = animate((timeSinceStart) => {
-  CTX.fillStyle = backgroundGradient;
+  CTX.fillStyle = theme.backgroundGradient;
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
   stars.draw();
 
-  CTX.save();
-  CTX.fillStyle = backgroundTerrainGradient;
-  CTX.moveTo(0, backgroundTerrainY);
-  CTX.lineTo(0, backgroundTerrainY - backgroundTerrainHeight);
-  CTX.lineTo(
-    canvasWidth * 0.1,
-    backgroundTerrainY - backgroundTerrainHeight * 1.1
-  );
-  CTX.lineTo(
-    canvasWidth * 0.2,
-    backgroundTerrainY - backgroundTerrainHeight * 0.9
-  );
-  CTX.lineTo(
-    canvasWidth * 0.3,
-    backgroundTerrainY - backgroundTerrainHeight * 0.8
-  );
-  CTX.lineTo(canvasWidth * 0.4, backgroundTerrainY);
-  CTX.lineTo(0, backgroundTerrainY);
-  CTX.closePath();
-  CTX.fill();
-  CTX.restore();
+  if (theme.drawBackgroundTerrain) {
+    theme.drawBackgroundTerrain();
+  }
 
   terrain.draw();
 

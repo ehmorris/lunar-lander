@@ -1,9 +1,10 @@
 import { randomBetween } from "./helpers/helpers.js";
 
-export const makeStarfield = (state, bottomBoundary) => {
+export const makeStarfield = (state) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
+  const theme = state.get("theme");
   let stars = [];
 
   const randomNoise = (amount) => {
@@ -14,7 +15,10 @@ export const makeStarfield = (state, bottomBoundary) => {
         opacity: randomBetween(0.1, 1),
         position: {
           x: Math.random() * canvasWidth,
-          y: randomBetween(0, bottomBoundary),
+          y: randomBetween(
+            0,
+            theme.horizon ? theme.horizon * canvasHeight : canvasHeight
+          ),
         },
       });
     }
@@ -27,15 +31,16 @@ export const makeStarfield = (state, bottomBoundary) => {
   reGenerate();
 
   const draw = () => {
-    CTX.save();
     stars.forEach(({ size, opacity, position }) => {
-      CTX.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+      CTX.save();
+      CTX.globalAlpha = opacity;
+      CTX.fillStyle = state.get("theme").star;
       CTX.beginPath();
       CTX.arc(position.x, position.y, size, 0, Math.PI * 2);
       CTX.closePath();
       CTX.fill();
+      CTX.restore();
     });
-    CTX.restore();
   };
 
   return { draw, reGenerate };

@@ -12,7 +12,7 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const seededRandom = state.get("seededRandom");
-  const fill = "#898482";
+  const fill = state.get("theme").asteroid;
   const size = seededRandomBetween(12, 30, seededRandom);
   const leftOfScreen = seededRandomBool(seededRandom);
   let startPosition = {
