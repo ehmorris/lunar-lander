@@ -34,14 +34,13 @@ li.strikethrough {
   left: 50%;
   transform: translateX(-50%);
   max-width: calc(800px + 16vw);
-  padding: 8vmin;
   flex-direction: column;
   justify-content: center;
   height: 100svh;
   grid-gap: clamp(8px, 2vmin, 18px);
   box-sizing: border-box;
-  width: 100%;
-  touch-action: manipulation;
+  width: calc(100% - 16vmin);
+  touch-action: none;
 }
 
 .fullSizeContainer.instructions {
