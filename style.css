@@ -37,9 +37,10 @@ li.strikethrough {
   flex-direction: column;
   justify-content: center;
   height: 100svh;
+  padding: 8vmin;
   grid-gap: clamp(8px, 2vmin, 18px);
   box-sizing: border-box;
-  width: calc(100% - 16vmin);
+  width: 100%;
   touch-action: none;
 }
 
