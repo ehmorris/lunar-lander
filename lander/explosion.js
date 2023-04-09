@@ -34,7 +34,7 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
   const noseCone = makeParticle(
     state,
     position,
-    velocity,
+    jitterCoordinate(velocity),
     LANDER_WIDTH,
     LANDER_HEIGHT / 2,
     gradient,
@@ -69,7 +69,7 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
   const chunk1 = makeParticle(
     state,
     position,
-    velocity,
+    jitterCoordinate(velocity),
     LANDER_WIDTH,
     LANDER_HEIGHT / 2,
     gradient,
@@ -92,7 +92,7 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
   const chunk2 = makeParticle(
     state,
     position,
-    velocity,
+    jitterCoordinate(velocity),
     LANDER_WIDTH,
     LANDER_HEIGHT / 2,
     gradient,
