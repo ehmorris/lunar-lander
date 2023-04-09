@@ -189,6 +189,7 @@ document.addEventListener("keydown", ({ key }) => {
 
 document.addEventListener("keydown", ({ key }) => {
   if (key === "m") {
+    sendAsteroid = true;
     asteroidCountdown = 0;
     asteroids.push(
       makeAsteroid(appState, lander.getPosition, onAsteroidImpact)
