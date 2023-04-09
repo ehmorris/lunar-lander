@@ -129,7 +129,7 @@ export const makeTheme = (state) => {
       ),
     asteroid: "#CAA78D",
     star: "#ffffff",
-    terrain: "#CAA78D",
+    terrain: "#B28171",
     meterGradient:
       "linear-gradient(90deg, #fdf7c3 0%, #ffab5a 24%, #c08d6c 68%, #6b5a6c 100%)",
   };
