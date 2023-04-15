@@ -134,7 +134,7 @@ export const makeTheme = (state) => {
       "linear-gradient(90deg, #fdf7c3 0%, #ffab5a 24%, #c08d6c 68%, #6b5a6c 100%)",
   };
 
-  const activeTheme = hawaiiTheme;
+  const activeTheme = spaceTheme;
 
   document.documentElement.style.setProperty(
     "--background",
