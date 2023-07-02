@@ -89,7 +89,7 @@ if (!instructions.hasClosedInstructions()) {
 
 // MAIN ANIMATION LOOP
 
-const animationObject = animate((timeSinceStart) => {
+const animationObject = animate((timeSinceStart, deltaTime) => {
   CTX.fillStyle = theme.backgroundGradient;
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
   stars.draw();
@@ -113,7 +113,7 @@ const animationObject = animate((timeSinceStart) => {
       randomConfetti.forEach((c) => c.draw());
     }
 
-    lander.draw(timeSinceStart);
+    lander.draw(timeSinceStart, deltaTime);
   } else {
     toyLander.draw();
   }

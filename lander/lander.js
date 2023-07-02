@@ -16,6 +16,7 @@ import {
   LANDER_HEIGHT,
   CRASH_VELOCITY,
   CRASH_ANGLE,
+  INTERVAL,
 } from "../helpers/constants.js";
 import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
@@ -169,8 +170,10 @@ export const makeLander = (state, onGameEnd) => {
     }
   };
 
-  const _updateProps = () => {
-    _position.y = _position.y + _velocity.y;
+  const _updateProps = (deltaTime) => {
+    const deltaTimeMultiplier = deltaTime / INTERVAL;
+
+    _position.y = _position.y + deltaTimeMultiplier * _velocity.y;
 
     if (
       _position.y + LANDER_HEIGHT / 2 < _landingData.terrainHeight ||
@@ -182,20 +185,20 @@ export const makeLander = (state, onGameEnd) => {
         ))
     ) {
       // Update ballistic properties
-      if (_rotatingRight) _rotationVelocity += 0.01;
-      if (_rotatingLeft) _rotationVelocity -= 0.01;
+      if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
+      if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
 
       if (_position.x < 0) _position.x = canvasWidth;
 
       if (_position.x > canvasWidth) _position.x = 0;
 
-      _position.x += _velocity.x;
-      _angle += (Math.PI / 180) * _rotationVelocity;
-      _velocity.y += GRAVITY;
+      _position.x += deltaTimeMultiplier * _velocity.x;
+      _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
+      _velocity.y += deltaTimeMultiplier * GRAVITY;
 
       if (_engineOn) {
-        _velocity.x += _thrust * Math.sin(_angle);
-        _velocity.y -= _thrust * Math.cos(_angle);
+        _velocity.x += deltaTimeMultiplier * (_thrust * Math.sin(_angle));
+        _velocity.y -= deltaTimeMultiplier * (_thrust * Math.cos(_angle));
       }
 
       // Log new rotations
@@ -434,11 +437,11 @@ export const makeLander = (state, onGameEnd) => {
     }
   };
 
-  const draw = (timeSinceStart) => {
+  const draw = (timeSinceStart, deltaTime) => {
     _timeSinceStart = timeSinceStart;
 
     if (!gameEndData) {
-      _updateProps();
+      _updateProps(deltaTime);
       drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
     }
 
