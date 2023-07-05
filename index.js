@@ -116,6 +116,8 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
     lander.draw(timeSinceStart, deltaTime);
   } else {
     toyLander.draw();
+
+    toyLanderControls.drawTouchOverlay();
   }
 });
 
