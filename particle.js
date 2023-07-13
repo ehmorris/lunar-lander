@@ -1,5 +1,5 @@
-import { GRAVITY } from "./helpers/constants.js";
-import { randomBetween, randomBool } from "./helpers/helpers.js";
+import { GRAVITY, INTERVAL } from "./helpers/constants.js";
+import { randomBool } from "./helpers/helpers.js";
 
 export const makeParticle = (
   state,
@@ -27,15 +27,19 @@ export const makeParticle = (
   let headingDeg = Math.atan2(velocity.y, velocity.x) * (180 / Math.PI);
   let stopped = false;
 
-  const update = () => {
+  const update = (deltaTime) => {
+    const deltaTimeMultiplier = deltaTime / INTERVAL;
+
     velocity.x = startVelocity.x + Math.cos((headingDeg * Math.PI) / 180);
-    velocity.y += GRAVITY;
-    rotationVelocity += rotationDirection ? 0.1 : -0.1;
+    velocity.y += deltaTimeMultiplier * GRAVITY;
+    rotationVelocity += rotationDirection
+      ? deltaTimeMultiplier * 0.1
+      : deltaTimeMultiplier * -0.1;
     rotationAngle = (rotationAngle + rotationVelocity) * friction;
 
     let prospectiveNextPosition = {
-      x: position.x + velocity.x,
-      y: position.y + velocity.y,
+      x: position.x + deltaTimeMultiplier * velocity.x,
+      y: position.y + deltaTimeMultiplier * velocity.y,
     };
 
     if (prospectiveNextPosition.y >= landingData.terrainHeight) {
@@ -61,8 +65,8 @@ export const makeParticle = (
         if (countSimilarCoordinates(positionLog) > 3) stopped = true;
 
         prospectiveNextPosition = {
-          x: position.x + velocity.x,
-          y: position.y + velocity.y,
+          x: position.x + deltaTimeMultiplier * velocity.x,
+          y: position.y + deltaTimeMultiplier * velocity.y,
         };
 
         // Provide the point just prior to collision so particles reflect off
@@ -86,8 +90,8 @@ export const makeParticle = (
     position.y = prospectiveNextPosition.y;
   };
 
-  const draw = () => {
-    if (!stopped) update();
+  const draw = (deltaTime) => {
+    if (!stopped) update(deltaTime);
 
     CTX.save();
 

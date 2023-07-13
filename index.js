@@ -106,16 +106,16 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
     bonusPointsManager.draw();
 
     if (sendAsteroid && timeSinceStart > asteroidCountdown) {
-      asteroids.forEach((a) => a.draw());
+      asteroids.forEach((a) => a.draw(deltaTime));
     }
 
     if (randomConfetti.length > 0) {
-      randomConfetti.forEach((c) => c.draw());
+      randomConfetti.forEach((c) => c.draw(deltaTime));
     }
 
     lander.draw(timeSinceStart, deltaTime);
   } else {
-    toyLander.draw();
+    toyLander.draw(deltaTime);
 
     toyLanderControls.drawTouchOverlay();
   }

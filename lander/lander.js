@@ -445,11 +445,12 @@ export const makeLander = (state, onGameEnd) => {
       drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
     }
 
-    if (_flipConfetti.length > 0) _flipConfetti.forEach((c) => c.draw());
+    if (_flipConfetti.length > 0)
+      _flipConfetti.forEach((c) => c.draw(deltaTime));
 
-    if (_gameEndConfetti) _gameEndConfetti.draw();
+    if (_gameEndConfetti) _gameEndConfetti.draw(deltaTime);
 
-    if (_gameEndExplosion) _gameEndExplosion.draw();
+    if (_gameEndExplosion) _gameEndExplosion.draw(deltaTime);
 
     if (!gameEndData || (gameEndData && gameEndData.landed)) _drawLander();
 

@@ -68,7 +68,7 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
     onImpact
   );
 
-  const draw = () => {
+  const draw = (deltaTime) => {
     if (!impact) {
       const landerPosition = getLanderPosition();
       const impactXPadding = LANDER_WIDTH;
@@ -84,9 +84,9 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
         onImpact(asteroidPosition, asteroid.getVelocity());
       }
 
-      asteroid.draw();
+      asteroid.draw(deltaTime);
     } else {
-      impact.draw();
+      impact.draw(deltaTime);
     }
   };
 

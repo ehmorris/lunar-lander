@@ -1,4 +1,5 @@
 import { randomBetween, randomBool } from "../helpers/helpers.js";
+import { INTERVAL } from "../helpers/constants.js";
 
 export const makeToyLander = (
   state,
@@ -43,13 +44,15 @@ export const makeToyLander = (
     onRightRotation();
   };
 
-  const draw = () => {
+  const draw = (deltaTime) => {
+    const deltaTimeMultiplier = deltaTime / INTERVAL;
+
     if ((_engineOn && _rotatingLeft) || (_engineOn && _rotatingRight)) {
       onEngineAndRotation();
     }
 
-    if (_rotatingRight) _rotationVelocity += 0.01;
-    if (_rotatingLeft) _rotationVelocity -= 0.01;
+    if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
+    if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
     _angle += (Math.PI / 180) * _rotationVelocity;
 
     // Move to top left of the lander and then rotate at that origin

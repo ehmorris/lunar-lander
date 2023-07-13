@@ -24,7 +24,7 @@ export const makeExplosion = (
     );
 
   return {
-    draw: () => smallExplosionChunks.forEach((e) => e.draw()),
+    draw: (deltaTime) => smallExplosionChunks.forEach((e) => e.draw(deltaTime)),
   };
 };
 
@@ -121,11 +121,11 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
     32
   );
 
-  const draw = () => {
-    noseCone.draw();
-    chunk1.draw();
-    chunk2.draw();
-    randomPieces.draw();
+  const draw = (deltaTime) => {
+    noseCone.draw(deltaTime);
+    chunk1.draw(deltaTime);
+    chunk2.draw(deltaTime);
+    randomPieces.draw(deltaTime);
   };
 
   return { draw };

@@ -73,13 +73,13 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
     );
   });
 
-  const draw = () => {
+  const draw = (deltaTime) => {
     if (!hasPlayedAudio) {
       audio.playConfetti();
       hasPlayedAudio = true;
     }
-    confettiPieces.forEach((e) => e.draw());
-    twirlPieces.forEach((e) => e.draw());
+    confettiPieces.forEach((e) => e.draw(deltaTime));
+    twirlPieces.forEach((e) => e.draw(deltaTime));
   };
 
   return { draw };
