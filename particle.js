@@ -55,14 +55,16 @@ export const makeParticle = (
 
       if (collisionPoint) {
         const collisionAngle = terrain.getSegmentAngleAtX(collisionPoint.x);
-        headingDeg = angleReflect(headingDeg, collisionAngle);
-        velocity.x =
-          velocity.x < velocityThreshold ? 0 : velocity.x * -friction;
-        velocity.y =
-          velocity.y < velocityThreshold ? 0 : velocity.y * -friction;
+
+        if (Math.abs(collisionAngle) > 20) {
+          headingDeg = angleReflect(headingDeg, collisionAngle);
+        }
+
+        velocity.x = velocity.x * -friction;
+        velocity.y = velocity.y * -friction;
         rotationAngle = collisionAngle;
 
-        if (countSimilarCoordinates(positionLog) > 3) stopped = true;
+        if (countSimilarCoordinates(positionLog) > 5) stopped = true;
 
         prospectiveNextPosition = {
           x: position.x + deltaTimeMultiplier * velocity.x,
