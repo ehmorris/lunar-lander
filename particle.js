@@ -62,7 +62,6 @@ export const makeParticle = (
 
         velocity.x = velocity.x * -friction;
         velocity.y = velocity.y * -friction;
-        rotationAngle = collisionAngle;
 
         if (countSimilarCoordinates(positionLog) > 5) stopped = true;
 
