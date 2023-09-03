@@ -14,6 +14,7 @@ import {
   GRAVITY,
   LANDER_WIDTH,
   LANDER_HEIGHT,
+  LANDER_MAX_RENDERED_HEIGHT,
   CRASH_VELOCITY,
   CRASH_ANGLE,
   INTERVAL,
@@ -355,8 +356,39 @@ export const makeLander = (state, onGameEnd) => {
   const _drawLander = () => {
     // Move to top left of the lander and then rotate at that origin
     CTX.save();
+
     CTX.fillStyle = state.get("theme").landerGradient;
-    CTX.translate(_position.x, _position.y);
+    CTX.translate(
+      _position.x,
+      Math.max(_position.y, LANDER_MAX_RENDERED_HEIGHT)
+    );
+
+    if (_position.y < LANDER_MAX_RENDERED_HEIGHT) {
+      const fillGradient = CTX.createRadialGradient(10, -25, 20, 0, 0, 52);
+      fillGradient.addColorStop(0, "white");
+      fillGradient.addColorStop(1, "black");
+
+      const strokeGradient = CTX.createRadialGradient(-10, 10, 20, 0, 0, 60);
+      strokeGradient.addColorStop(0, "white");
+      strokeGradient.addColorStop(1, "black");
+
+      CTX.scale(0.8, 0.8);
+      CTX.beginPath();
+      CTX.arc(0, -LANDER_HEIGHT / 6, LANDER_HEIGHT * 1.2, 0, Math.PI * 2);
+      CTX.closePath();
+
+      CTX.save();
+      CTX.strokeStyle = strokeGradient;
+      CTX.lineWidth = 2;
+      CTX.fillStyle = "black";
+      CTX.stroke();
+      CTX.fill();
+      CTX.fillStyle = fillGradient;
+      CTX.globalAlpha = 0.2;
+      CTX.fill();
+      CTX.restore();
+    }
+
     CTX.rotate(_angle);
 
     // Draw the lander
@@ -422,19 +454,6 @@ export const makeLander = (state, onGameEnd) => {
     }
 
     CTX.restore();
-
-    // Draw cursor when offscreen
-    if (_position.y < 0) {
-      CTX.save();
-      CTX.fillStyle = "white";
-      CTX.beginPath();
-      CTX.moveTo(_position.x, 1);
-      CTX.lineTo(_position.x + 6, 9);
-      CTX.lineTo(_position.x - 6, 9);
-      CTX.closePath();
-      CTX.fill();
-      CTX.restore();
-    }
   };
 
   const draw = (timeSinceStart, deltaTime) => {
@@ -442,7 +461,10 @@ export const makeLander = (state, onGameEnd) => {
 
     if (!gameEndData) {
       _updateProps(deltaTime);
-      drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
+
+      if (_position.y > LANDER_MAX_RENDERED_HEIGHT) {
+        drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
+      }
     }
 
     if (_flipConfetti.length > 0)
