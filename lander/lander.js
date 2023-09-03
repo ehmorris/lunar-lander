@@ -8,16 +8,12 @@ import {
   getAngleDeltaUprightWithSign,
   heightInFeet,
   percentProgress,
-  transition,
-  clampedProgress,
-  easeInOutSine,
 } from "../helpers/helpers.js";
 import { scoreLanding, scoreCrash } from "../helpers/scoring.js";
 import {
   GRAVITY,
   LANDER_WIDTH,
   LANDER_HEIGHT,
-  LANDER_MAX_RENDERED_HEIGHT,
   CRASH_VELOCITY,
   CRASH_ANGLE,
   INTERVAL,
@@ -361,12 +357,13 @@ export const makeLander = (state, onGameEnd) => {
     CTX.save();
 
     CTX.fillStyle = state.get("theme").landerGradient;
+
     CTX.translate(
       _position.x,
-      Math.max(_position.y, LANDER_MAX_RENDERED_HEIGHT)
+      _position.y < 0 ? LANDER_HEIGHT + 14 : _position.y
     );
 
-    if (_position.y < LANDER_MAX_RENDERED_HEIGHT) {
+    if (_position.y < 0) {
       const fillGradient = CTX.createRadialGradient(10, -25, 20, 0, 0, 52);
       fillGradient.addColorStop(0, "white");
       fillGradient.addColorStop(1, "black");
@@ -375,13 +372,7 @@ export const makeLander = (state, onGameEnd) => {
       strokeGradient.addColorStop(0, "white");
       strokeGradient.addColorStop(1, "black");
 
-      const scaleTransition = transition(
-        1,
-        0.8,
-        clampedProgress(LANDER_MAX_RENDERED_HEIGHT, LANDER_HEIGHT, _position.y),
-        easeInOutSine
-      );
-      CTX.scale(scaleTransition, scaleTransition);
+      CTX.scale(0.8, 0.8);
 
       // Render glass effect over scaled lander
       CTX.save();
@@ -399,13 +390,13 @@ export const makeLander = (state, onGameEnd) => {
       CTX.restore();
 
       // Render arrow to top of screen
-      const yPos = -LANDER_MAX_RENDERED_HEIGHT - 13;
       CTX.save();
+      CTX.translate(0, (-LANDER_HEIGHT - 14) / 0.8);
       CTX.fillStyle = "white";
       CTX.beginPath();
-      CTX.moveTo(0, yPos);
-      CTX.lineTo(0 + 6, yPos + 9);
-      CTX.lineTo(0 - 6, yPos + 9);
+      CTX.moveTo(0, 1);
+      CTX.lineTo(0 + 6, 9);
+      CTX.lineTo(0 - 6, 9);
       CTX.closePath();
       CTX.fill();
       CTX.restore();
@@ -484,7 +475,7 @@ export const makeLander = (state, onGameEnd) => {
     if (!gameEndData) {
       _updateProps(deltaTime);
 
-      if (_position.y > LANDER_MAX_RENDERED_HEIGHT) {
+      if (_position.y > 0) {
         drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
       }
     }
