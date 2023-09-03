@@ -373,11 +373,12 @@ export const makeLander = (state, onGameEnd) => {
       strokeGradient.addColorStop(1, "black");
 
       CTX.scale(0.8, 0.8);
+
+      // Render glass effect over scaled lander
+      CTX.save();
       CTX.beginPath();
       CTX.arc(0, -LANDER_HEIGHT / 6, LANDER_HEIGHT * 1.2, 0, Math.PI * 2);
       CTX.closePath();
-
-      CTX.save();
       CTX.strokeStyle = strokeGradient;
       CTX.lineWidth = 2;
       CTX.fillStyle = "black";
@@ -385,6 +386,18 @@ export const makeLander = (state, onGameEnd) => {
       CTX.fill();
       CTX.fillStyle = fillGradient;
       CTX.globalAlpha = 0.2;
+      CTX.fill();
+      CTX.restore();
+
+      // Render arrow to top of screen
+      const yPos = -LANDER_MAX_RENDERED_HEIGHT - 13;
+      CTX.save();
+      CTX.fillStyle = "white";
+      CTX.beginPath();
+      CTX.moveTo(0, yPos);
+      CTX.lineTo(0 + 6, yPos + 9);
+      CTX.lineTo(0 - 6, yPos + 9);
+      CTX.closePath();
       CTX.fill();
       CTX.restore();
     }
