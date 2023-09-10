@@ -238,7 +238,10 @@ export const makeLander = (state, onGameEnd) => {
 
       // Record bonus points for increments of height and speed
       // Ints here are pixels / raw values, not MPH or FT
-      if (_position.y < _heightMilestone - 3500) {
+      if (
+        _position.y <
+        _heightMilestone + Math.min(-3500, _heightMilestone * 3)
+      ) {
         _heightMilestone = _position.y;
         bonusPointsManager.addNamedPoint("newHeight");
       }
