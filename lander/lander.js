@@ -365,6 +365,19 @@ export const makeLander = (state, onGameEnd) => {
     const yPadding = LANDER_HEIGHT;
     const xPadding = LANDER_HEIGHT;
 
+    const secondsUntilTerrain =
+      _velocity.y > 0
+        ? Math.abs(
+            Math.round(
+              (_position.y -
+                canvasHeight +
+                (canvasHeight - _landingData.terrainAvgHeight)) /
+                _velocity.y /
+                100
+            )
+          )
+        : 99;
+
     CTX.save();
 
     CTX.fillStyle = state.get("theme").infoFontColor;
@@ -389,6 +402,24 @@ export const makeLander = (state, onGameEnd) => {
     CTX.letterSpacing = "1px";
     CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
     CTX.fillText("FT", canvasWidth - xPadding, canvasHeight - yPadding);
+
+    if (secondsUntilTerrain < 15) {
+      CTX.fillStyle = "rgb(255, 0, 0)";
+      CTX.textAlign = "center";
+      CTX.font = "600 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.fillText(
+        Intl.NumberFormat().format(secondsUntilTerrain),
+        canvasWidth / 2,
+        canvasHeight - yPadding - 24
+      );
+      CTX.letterSpacing = "1px";
+      CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.fillText(
+        "SECONDS UNTIL TERRAIN",
+        canvasWidth / 2,
+        canvasHeight - yPadding
+      );
+    }
 
     CTX.restore();
   };
