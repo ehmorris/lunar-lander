@@ -42,6 +42,7 @@ export const makeLander = (state, onGameEnd) => {
   const _thrust = 0.01;
 
   let _position;
+  let _displayPosition;
   let _velocity;
   let _rotationVelocity;
   let _angle;
@@ -74,6 +75,7 @@ export const makeLander = (state, onGameEnd) => {
       ),
       y: LANDER_HEIGHT * 2,
     };
+    _displayPosition = { ..._position };
     _velocity = {
       x: seededRandomBetween(
         -_thrust * (canvasWidth / 10),
@@ -205,6 +207,8 @@ export const makeLander = (state, onGameEnd) => {
       _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
       _velocity.y += deltaTimeMultiplier * GRAVITY;
 
+      _displayPosition.x = _position.x;
+
       if (_engineOn) {
         _velocity.x += deltaTimeMultiplier * (_thrust * Math.sin(_angle));
         _velocity.y -= deltaTimeMultiplier * (_thrust * Math.cos(_angle));
@@ -220,7 +224,9 @@ export const makeLander = (state, onGameEnd) => {
         _rotationCount++;
         _lastRotation = rotations;
         _lastRotationAngle = _angle;
-        _flipConfetti.push(makeConfetti(state, 10, _position, _velocity));
+        _flipConfetti.push(
+          makeConfetti(state, 10, _displayPosition, _velocity)
+        );
       }
 
       // Log new max speed and height
@@ -444,6 +450,9 @@ export const makeLander = (state, onGameEnd) => {
       _position.y < TRANSITION_TO_SPACE ? TRANSITION_TO_SPACE : _position.y
     );
 
+    _displayPosition.y =
+      _position.y < TRANSITION_TO_SPACE ? TRANSITION_TO_SPACE : _position.y;
+
     // Zone 2 positioning
     if (_position.y < 0 && _position.y > -canvasHeight * 2 && _velocity.y < 0) {
       CTX.translate(
@@ -454,6 +463,13 @@ export const makeLander = (state, onGameEnd) => {
           clampedProgress(0, -canvasHeight * 2, _position.y),
           easeInOutSine
         )
+      );
+
+      _displayPosition.y += transition(
+        0,
+        canvasHeight / 2 - TRANSITION_TO_SPACE,
+        clampedProgress(0, -canvasHeight * 2, _position.y),
+        easeInOutSine
       );
     }
 
@@ -468,6 +484,15 @@ export const makeLander = (state, onGameEnd) => {
           clampedProgress(-3, 3, _velocity.y),
           easeInOutSine
         )
+      );
+
+      _displayPosition.y += canvasHeight / 2 - TRANSITION_TO_SPACE;
+
+      _displayPosition.y += transition(
+        0,
+        -canvasHeight / 2 + TRANSITION_TO_SPACE,
+        clampedProgress(-3, 3, _velocity.y),
+        easeInOutSine
       );
     }
 

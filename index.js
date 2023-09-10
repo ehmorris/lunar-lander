@@ -123,7 +123,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
 
     bonusPointsManager.draw();
 
-    // Move asteroids and confetti as lander flies high
+    // Move asteroids as lander flies high
     CTX.save();
     CTX.translate(
       0,
@@ -136,11 +136,11 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
     if (sendAsteroid && timeSinceStart > asteroidCountdown) {
       asteroids.forEach((a) => a.draw(deltaTime));
     }
+    CTX.restore();
 
     if (randomConfetti.length > 0) {
       randomConfetti.forEach((c) => c.draw(deltaTime));
     }
-    CTX.restore();
 
     lander.draw(timeSinceStart, deltaTime);
   } else {
