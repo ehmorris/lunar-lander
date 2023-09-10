@@ -97,22 +97,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
 
   // Move stars in parallax as lander flies high
-  CTX.save();
-  CTX.translate(
-    0,
-    transition(
-      0,
-      canvasHeight,
-      clampedProgress(
-        TRANSITION_TO_SPACE,
-        -canvasHeight * 2,
-        lander.getPosition().y
-      )
-    )
-  );
-  stars.draw();
-  stars.drawStarCurtain(canvasHeight, lander.getVelocity().y);
-  CTX.restore();
+  stars.draw(lander.getVelocity());
 
   // Move terrain as lander flies high
   CTX.save();

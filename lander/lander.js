@@ -22,7 +22,11 @@ import {
 import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
 import { drawTrajectory } from "./trajectory.js";
-import { transition, clampedProgress } from "../helpers/helpers.js";
+import {
+  transition,
+  clampedProgress,
+  easeInOutSine,
+} from "../helpers/helpers.js";
 
 export const makeLander = (state, onGameEnd) => {
   const CTX = state.get("CTX");
@@ -153,6 +157,8 @@ export const makeLander = (state, onGameEnd) => {
         _velocity,
         _angle
       );
+
+      _velocity = { x: 0, y: 0 };
     }
 
     onGameEnd(gameEndData);
@@ -355,25 +361,81 @@ export const makeLander = (state, onGameEnd) => {
     }
   };
 
-  const _drawLander = () => {
-    // Move to top left of the lander and then rotate at that origin
+  const _drawBottomHUD = () => {
+    const yPadding = LANDER_HEIGHT;
+    const xPadding = LANDER_HEIGHT;
+
     CTX.save();
 
-    CTX.fillStyle = state.get("theme").landerGradient;
+    CTX.fillStyle = state.get("theme").infoFontColor;
+    CTX.font = "600 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+    CTX.textAlign = "left";
+    CTX.fillText(
+      `${velocityInMPH(_velocity)}`,
+      xPadding,
+      canvasHeight - yPadding - 24
+    );
+    CTX.letterSpacing = "1px";
+    CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+    CTX.fillText("MPH", xPadding, canvasHeight - yPadding);
 
+    CTX.textAlign = "right";
+    CTX.font = "600 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+    CTX.fillText(
+      `${heightInFeet(_position.y, _groundedHeight)}`,
+      canvasWidth - xPadding,
+      canvasHeight - yPadding - 24
+    );
+    CTX.letterSpacing = "1px";
+    CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+    CTX.fillText("FT", canvasWidth - xPadding, canvasHeight - yPadding);
+
+    CTX.restore();
+  };
+
+  const _drawLander = () => {
+    CTX.save();
+
+    // The lander positions is handled differently in three "altitude zones"
+    // Zone 1:
+    //   The lander is close to the ground - the viewport is static, and the
+    //   terrain is visible. The _position is the same as the display position
+    // Zone 2:
+    //   The lander has transitioned to space, and over the course of two
+    //   viewport heights, it's moved linearly to the center of the screen
+    // Zone 3:
+    //   The lander is high above the ground, and it moves between the center
+    //   and the top of the screen; top if it's heading downwards
+
+    // Zone 1 positioning
     CTX.translate(
       _position.x,
       _position.y < TRANSITION_TO_SPACE ? TRANSITION_TO_SPACE : _position.y
     );
 
-    if (_position.y < -canvasHeight) {
-      console.log("true");
+    // Zone 2 positioning
+    if (_position.y < 0 && _position.y > -canvasHeight * 2 && _velocity.y < 0) {
       CTX.translate(
         0,
         transition(
           0,
-          canvasHeight - TRANSITION_TO_SPACE * 2,
-          clampedProgress(-7, 7, _velocity.y)
+          canvasHeight / 2 - TRANSITION_TO_SPACE,
+          clampedProgress(0, -canvasHeight * 2, _position.y),
+          easeInOutSine
+        )
+      );
+    }
+
+    // Zone 3 positioning
+    if (_position.y < -canvasHeight * 2) {
+      CTX.translate(0, canvasHeight / 2 - TRANSITION_TO_SPACE);
+      CTX.translate(
+        0,
+        transition(
+          0,
+          -canvasHeight / 2 + TRANSITION_TO_SPACE,
+          clampedProgress(-3, 3, _velocity.y),
+          easeInOutSine
         )
       );
     }
@@ -399,6 +461,7 @@ export const makeLander = (state, onGameEnd) => {
     CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
     CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 2);
     CTX.closePath();
+    CTX.fillStyle = state.get("theme").landerGradient;
     CTX.fill();
 
     // Translate to the top-left corner of the lander so engine and booster
@@ -466,7 +529,20 @@ export const makeLander = (state, onGameEnd) => {
     if (!gameEndData || (gameEndData && gameEndData.landed)) _drawLander();
 
     // Draw speed and angle text beside lander, even after crashing
-    _drawHUD();
+    if (_position.y > TRANSITION_TO_SPACE) {
+      _drawHUD();
+    } else {
+      CTX.save();
+      const animateHUDProgress = clampedProgress(
+        0,
+        -canvasHeight / 2,
+        _position.y
+      );
+      CTX.globalAlpha = transition(0, 1, animateHUDProgress, easeInOutSine);
+      CTX.translate(0, transition(16, 0, animateHUDProgress, easeInOutSine));
+      _drawBottomHUD();
+      CTX.restore();
+    }
   };
 
   return {
