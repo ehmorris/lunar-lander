@@ -1,4 +1,8 @@
-import { randomBetween } from "./helpers/helpers.js";
+import {
+  transition,
+  clampedProgress,
+  randomBetween,
+} from "./helpers/helpers.js";
 
 export const makeStarfield = (state) => {
   const CTX = state.get("CTX");
@@ -11,7 +15,6 @@ export const makeStarfield = (state) => {
     let noiseArray = [];
     for (let index = 0; index < amount; index++) {
       noiseArray.push({
-        size: randomBetween(0.5, 1.5),
         opacity: randomBetween(0.1, 1),
         position: {
           x: Math.random() * canvasWidth,
@@ -20,6 +23,7 @@ export const makeStarfield = (state) => {
             theme.horizon ? theme.horizon * canvasHeight : canvasHeight
           ),
         },
+        distance: Math.random(), // higher number is closer/bigger
       });
     }
     return noiseArray;
@@ -30,32 +34,31 @@ export const makeStarfield = (state) => {
   };
   reGenerate();
 
-  const draw = () => {
-    stars.forEach(({ size, opacity, position }) => {
+  const draw = (velocity) => {
+    stars.forEach(({ distance, opacity, position }) => {
+      position.y =
+        position.y > canvasHeight
+          ? 0
+          : position.y < 0
+          ? canvasHeight
+          : position.y - (velocity.y * distance) / 10;
+
       CTX.save();
       CTX.globalAlpha = opacity;
       CTX.fillStyle = state.get("theme").star;
       CTX.beginPath();
-      CTX.arc(position.x, position.y, size, 0, Math.PI * 2);
+      CTX.arc(
+        position.x,
+        position.y,
+        transition(0.2, 1.5, distance),
+        0,
+        Math.PI * 2
+      );
       CTX.closePath();
       CTX.fill();
       CTX.restore();
     });
   };
 
-  const drawStarCurtain = (verticalOffset, yVelocity) => {
-    stars.forEach(({ size, opacity, position }) => {
-      CTX.save();
-      CTX.translate(0, -verticalOffset);
-      CTX.globalAlpha = opacity;
-      CTX.fillStyle = "red";
-      CTX.beginPath();
-      CTX.arc(position.x, position.y, size, 0, Math.PI * 2);
-      CTX.closePath();
-      CTX.fill();
-      CTX.restore();
-    });
-  };
-
-  return { draw, drawStarCurtain, reGenerate };
+  return { draw, reGenerate };
 };
