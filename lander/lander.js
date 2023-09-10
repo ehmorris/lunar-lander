@@ -17,14 +17,17 @@ import {
   CRASH_VELOCITY,
   CRASH_ANGLE,
   INTERVAL,
+  TRANSITION_TO_SPACE,
 } from "../helpers/constants.js";
 import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
 import { drawTrajectory } from "./trajectory.js";
+import { transition, clampedProgress } from "../helpers/helpers.js";
 
 export const makeLander = (state, onGameEnd) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
+  const canvasHeight = state.get("canvasHeight");
   const audioManager = state.get("audioManager");
   const bonusPointsManager = state.get("bonusPointsManager");
 
@@ -270,11 +273,11 @@ export const makeLander = (state, onGameEnd) => {
 
   const _drawHUD = () => {
     const textWidth = CTX.measureText("100.0 MPH").width + 2;
-    const staticPosition = getVectorVelocity(_velocity) > 7;
-    const xPosBasis = staticPosition
-      ? canvasWidth / 2 - textWidth / 2
-      : Math.min(_position.x + LANDER_WIDTH * 2, canvasWidth - textWidth);
-    const yPosBasis = Math.max(_position.y, 30);
+    const xPosBasis =
+      Math.abs(_velocity.x) > 6
+        ? canvasWidth / 2 - textWidth / 2
+        : Math.min(_position.x + LANDER_WIDTH * 2, canvasWidth - textWidth);
+    const yPosBasis = Math.max(_position.y, TRANSITION_TO_SPACE);
     const lineHeight = 14;
     const rotatingLeft = _rotationVelocity < 0;
     const speedColor =
@@ -360,46 +363,19 @@ export const makeLander = (state, onGameEnd) => {
 
     CTX.translate(
       _position.x,
-      _position.y < 0 ? LANDER_HEIGHT + 14 : _position.y
+      _position.y < TRANSITION_TO_SPACE ? TRANSITION_TO_SPACE : _position.y
     );
 
-    if (_position.y < 0) {
-      const fillGradient = CTX.createRadialGradient(10, -25, 20, 0, 0, 52);
-      fillGradient.addColorStop(0, "white");
-      fillGradient.addColorStop(1, "black");
-
-      const strokeGradient = CTX.createRadialGradient(-10, 10, 20, 0, 0, 60);
-      strokeGradient.addColorStop(0, "white");
-      strokeGradient.addColorStop(1, "black");
-
-      CTX.scale(0.8, 0.8);
-
-      // Render glass effect over scaled lander
-      CTX.save();
-      CTX.beginPath();
-      CTX.arc(0, -LANDER_HEIGHT / 6, LANDER_HEIGHT * 1.2, 0, Math.PI * 2);
-      CTX.closePath();
-      CTX.strokeStyle = strokeGradient;
-      CTX.lineWidth = 2;
-      CTX.fillStyle = "black";
-      CTX.stroke();
-      CTX.fill();
-      CTX.fillStyle = fillGradient;
-      CTX.globalAlpha = 0.2;
-      CTX.fill();
-      CTX.restore();
-
-      // Render arrow to top of screen
-      CTX.save();
-      CTX.translate(0, (-LANDER_HEIGHT - 14) / 0.8);
-      CTX.fillStyle = "white";
-      CTX.beginPath();
-      CTX.moveTo(0, 1);
-      CTX.lineTo(0 + 6, 9);
-      CTX.lineTo(0 - 6, 9);
-      CTX.closePath();
-      CTX.fill();
-      CTX.restore();
+    if (_position.y < -canvasHeight) {
+      console.log("true");
+      CTX.translate(
+        0,
+        transition(
+          0,
+          canvasHeight - TRANSITION_TO_SPACE * 2,
+          clampedProgress(-7, 7, _velocity.y)
+        )
+      );
     }
 
     CTX.rotate(_angle);
@@ -475,7 +451,7 @@ export const makeLander = (state, onGameEnd) => {
     if (!gameEndData) {
       _updateProps(deltaTime);
 
-      if (_position.y > 0) {
+      if (_position.y > TRANSITION_TO_SPACE) {
         drawTrajectory(state, _position, _angle, _velocity, _rotationVelocity);
       }
     }
@@ -498,6 +474,7 @@ export const makeLander = (state, onGameEnd) => {
     destroy,
     resetProps,
     getPosition: () => _position,
+    getVelocity: () => _velocity,
     engineOn: () => (_engineOn = true),
     engineOff: () => (_engineOn = false),
     rotateLeft: () => (_rotatingLeft = true),

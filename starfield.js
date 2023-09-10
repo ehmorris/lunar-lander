@@ -43,5 +43,19 @@ export const makeStarfield = (state) => {
     });
   };
 
-  return { draw, reGenerate };
+  const drawStarCurtain = (verticalOffset, yVelocity) => {
+    stars.forEach(({ size, opacity, position }) => {
+      CTX.save();
+      CTX.translate(0, -verticalOffset);
+      CTX.globalAlpha = opacity;
+      CTX.fillStyle = "red";
+      CTX.beginPath();
+      CTX.arc(position.x, position.y, size, 0, Math.PI * 2);
+      CTX.closePath();
+      CTX.fill();
+      CTX.restore();
+    });
+  };
+
+  return { draw, drawStarCurtain, reGenerate };
 };
