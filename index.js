@@ -1,9 +1,11 @@
 import {
   animate,
+  clampedProgress,
   generateCanvas,
   randomBetween,
   seededRandomBetween,
   seededRandomBool,
+  transition,
 } from "./helpers/helpers.js";
 import { makeLander } from "./lander/lander.js";
 import { makeToyLander } from "./lander/toylander.js";
@@ -21,6 +23,7 @@ import { makeChallengeManager } from "./challenge.js";
 import { makeSeededRandom } from "./helpers/seededrandom.js";
 import { makeBonusPointsManager } from "./bonuspoints.js";
 import { makeTheme } from "./theme.js";
+import { TRANSITION_TO_SPACE } from "./helpers/constants.js";
 import {
   landingScoreDescription,
   crashScoreDescription,
@@ -92,19 +95,57 @@ if (!instructions.hasClosedInstructions()) {
 const animationObject = animate((timeSinceStart, deltaTime) => {
   CTX.fillStyle = theme.backgroundGradient;
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
-  stars.draw();
 
+  // Move stars in parallax as lander flies high
+  CTX.save();
+  CTX.translate(
+    0,
+    transition(
+      0,
+      canvasHeight,
+      clampedProgress(
+        TRANSITION_TO_SPACE,
+        -canvasHeight * 2,
+        lander.getPosition().y
+      )
+    )
+  );
+  stars.draw();
+  stars.drawStarCurtain(canvasHeight, lander.getVelocity().y);
+  CTX.restore();
+
+  // Move terrain as lander flies high
+  CTX.save();
+  const maxTerrainOffset = terrain.getLandingData().terrainHeight;
+  CTX.translate(
+    0,
+    transition(
+      0,
+      maxTerrainOffset,
+      clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
+    )
+  );
   if (theme.drawBackgroundTerrain) {
     theme.drawBackgroundTerrain();
   }
-
   terrain.draw();
+  CTX.restore();
 
   if (instructions.hasClosedInstructions()) {
     landerControls.drawTouchOverlay();
 
     bonusPointsManager.draw();
 
+    // Move asteroids and confetti as lander flies high
+    CTX.save();
+    CTX.translate(
+      0,
+      transition(
+        0,
+        maxTerrainOffset,
+        clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
+      )
+    );
     if (sendAsteroid && timeSinceStart > asteroidCountdown) {
       asteroids.forEach((a) => a.draw(deltaTime));
     }
@@ -112,6 +153,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
     if (randomConfetti.length > 0) {
       randomConfetti.forEach((c) => c.draw(deltaTime));
     }
+    CTX.restore();
 
     lander.draw(timeSinceStart, deltaTime);
   } else {
