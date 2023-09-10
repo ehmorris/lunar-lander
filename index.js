@@ -1,6 +1,7 @@
 import {
   animate,
   clampedProgress,
+  easeInOutSine,
   generateCanvas,
   randomBetween,
   seededRandomBetween,
@@ -107,7 +108,8 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
     transition(
       0,
       maxTerrainOffset,
-      clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
+      clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y),
+      easeInOutSine
     )
   );
   if (theme.drawBackgroundTerrain) {

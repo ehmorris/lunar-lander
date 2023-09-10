@@ -565,8 +565,8 @@ export const makeLander = (state, onGameEnd) => {
     } else {
       CTX.save();
       const animateHUDProgress = clampedProgress(
-        0,
-        -canvasHeight / 2,
+        LANDER_HEIGHT,
+        -LANDER_HEIGHT,
         _position.y
       );
       CTX.globalAlpha = transition(0, 1, animateHUDProgress, easeInOutSine);
