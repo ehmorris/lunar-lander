@@ -436,16 +436,13 @@ export const makeLander = (state, onGameEnd) => {
   const _drawLander = () => {
     CTX.save();
 
-    // The lander positions is handled differently in three "altitude zones"
+    // The lander positions is handled differently in two "altitude zones"
     // Zone 1:
     //   The lander is close to the ground - the viewport is static, and the
     //   terrain is visible. The _position is the same as the display position
     // Zone 2:
     //   The lander has transitioned to space, and over the course of two
     //   viewport heights, it's moved linearly to the center of the screen
-    // Zone 3:
-    //   The lander is high above the ground, and it moves between the center
-    //   and the top of the screen; top if it's heading downwards
 
     // Zone 1 positioning
     CTX.translate(
@@ -457,7 +454,7 @@ export const makeLander = (state, onGameEnd) => {
       _position.y < TRANSITION_TO_SPACE ? TRANSITION_TO_SPACE : _position.y;
 
     // Zone 2 positioning
-    if (_position.y < 0 && _position.y > -canvasHeight * 2 && _velocity.y < 0) {
+    if (_position.y < 0) {
       CTX.translate(
         0,
         transition(
@@ -472,29 +469,6 @@ export const makeLander = (state, onGameEnd) => {
         0,
         canvasHeight / 2 - TRANSITION_TO_SPACE,
         clampedProgress(0, -canvasHeight * 2, _position.y),
-        easeInOutSine
-      );
-    }
-
-    // Zone 3 positioning
-    if (_position.y < -canvasHeight * 2) {
-      CTX.translate(0, canvasHeight / 2 - TRANSITION_TO_SPACE);
-      CTX.translate(
-        0,
-        transition(
-          0,
-          -canvasHeight / 2 + TRANSITION_TO_SPACE,
-          clampedProgress(-3, 3, _velocity.y),
-          easeInOutSine
-        )
-      );
-
-      _displayPosition.y += canvasHeight / 2 - TRANSITION_TO_SPACE;
-
-      _displayPosition.y += transition(
-        0,
-        -canvasHeight / 2 + TRANSITION_TO_SPACE,
-        clampedProgress(-3, 3, _velocity.y),
         easeInOutSine
       );
     }
