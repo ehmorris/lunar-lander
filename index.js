@@ -108,8 +108,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
     transition(
       0,
       maxTerrainOffset,
-      clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y),
-      easeInOutSine
+      clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
     )
   );
   if (theme.drawBackgroundTerrain) {
