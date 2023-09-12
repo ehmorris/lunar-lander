@@ -120,7 +120,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
   if (instructions.hasClosedInstructions()) {
     landerControls.drawTouchOverlay();
 
-    bonusPointsManager.draw();
+    bonusPointsManager.draw(lander.getPosition().y < TRANSITION_TO_SPACE);
 
     // Move asteroids as lander flies high
     CTX.save();

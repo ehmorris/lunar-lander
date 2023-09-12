@@ -1,3 +1,4 @@
+import { LANDER_HEIGHT } from "./helpers/constants.js";
 import {
   clampedProgress,
   transition,
@@ -77,15 +78,17 @@ export const makeBonusPointsManager = (state) => {
     }
   };
 
-  const draw = () => {
+  const draw = (displayOffset) => {
     const timeElapsed = Date.now() - timeOfLastPoint;
 
     if (!hidden && totalPoints > 0 && timeElapsed < timeToShowPointsInMS) {
+      const yPosBasis = displayOffset ? LANDER_HEIGHT * 2 : canvasHeight / 2;
+
       CTX.save();
       CTX.fillStyle = state.get("theme").headlineFontColor;
       CTX.translate(
         canvasWidth / 2,
-        canvasHeight / 2 -
+        yPosBasis -
           transitionInOut(
             -16,
             0,
@@ -131,12 +134,12 @@ export const makeBonusPointsManager = (state) => {
       );
 
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      const textLine1 = `${lastPointLabel} +${lastPointValue}`;
-      CTX.fillText(textLine1, -CTX.measureText(textLine1).width / 2, -16);
+      CTX.textAlign = "center";
+      CTX.fillText(`${lastPointLabel} +${lastPointValue}`, 0, -12);
 
-      CTX.font = "400 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      const textLine2 = `${totalPoints} total bonus`;
-      CTX.fillText(textLine2, -CTX.measureText(textLine2).width / 2, 16);
+      CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.letterSpacing = "1px";
+      CTX.fillText(`${totalPoints} TOTAL BONUS`, 0, 12);
       CTX.restore();
     }
   };
