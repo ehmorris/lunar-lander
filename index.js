@@ -20,6 +20,7 @@ import { makeStateManager } from "./helpers/state.js";
 import { makeConfetti } from "./lander/confetti.js";
 import { makeTallyManger } from "./tally.js";
 import { makeAsteroid } from "./asteroids.js";
+import { makeSpaceAsteroid } from "./spaceAsteroids.js";
 import { makeChallengeManager } from "./challenge.js";
 import { makeSeededRandom } from "./helpers/seededrandom.js";
 import { makeBonusPointsManager } from "./bonuspoints.js";
@@ -78,6 +79,7 @@ const tally = makeTallyManger();
 let sendAsteroid = seededRandomBool(seededRandom);
 let asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
 let asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
+let spaceAsteroids = [];
 let randomConfetti = [];
 
 // INSTRUCTIONS SHOW/HIDE
@@ -121,6 +123,21 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
     landerControls.drawTouchOverlay();
 
     bonusPointsManager.draw(lander.getPosition().y < TRANSITION_TO_SPACE);
+
+    // Generate and draw space asteroids
+    if (lander.getPosition().y < -canvasHeight * 2) {
+      if (Math.round(randomBetween(0, 100)) === 0) {
+        spaceAsteroids.push(
+          makeSpaceAsteroid(
+            appState,
+            lander.getDisplayPosition,
+            onAsteroidImpact
+          )
+        );
+      }
+
+      spaceAsteroids.forEach((a) => a.draw(deltaTime));
+    }
 
     // Move asteroids as lander flies high
     CTX.save();
@@ -197,6 +214,7 @@ function onResetGame() {
   sendAsteroid = seededRandomBool(seededRandom);
   asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
   asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
+  spaceAsteroids = [];
   bonusPointsManager.reset();
 }
 

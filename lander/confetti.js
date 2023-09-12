@@ -50,7 +50,9 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
         jitterCoordinate(_startingVelocity(index)),
         size,
         size,
-        `hsl(${randomBetween(0, 360)}, 100%, 50%)`
+        `hsl(${randomBetween(0, 360)}, 100%, 50%)`,
+        false,
+        false
       );
     });
 
@@ -75,7 +77,8 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
         CTX.lineTo(0, size / 2);
         CTX.closePath();
         CTX.fill();
-      }
+      },
+      false
     );
   });
 

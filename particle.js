@@ -9,6 +9,7 @@ export const makeParticle = (
   height,
   fill,
   customDraw = false,
+  useTerrain = true,
   onCollide = () => {}
 ) => {
   const CTX = state.get("CTX");
@@ -41,7 +42,7 @@ export const makeParticle = (
       y: position.y + deltaTimeMultiplier * velocity.y,
     };
 
-    if (prospectiveNextPosition.y >= landingData.terrainHeight) {
+    if (useTerrain && prospectiveNextPosition.y >= landingData.terrainHeight) {
       const collisionPoint = isShapeInPath(
         CTX,
         scaleFactor,
