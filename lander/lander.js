@@ -395,7 +395,7 @@ export const makeLander = (state, onGameEnd) => {
     CTX.save();
 
     CTX.fillStyle = state.get("theme").infoFontColor;
-    CTX.font = "600 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+    CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
     CTX.textAlign = "left";
     CTX.fillText(
       `${velocityInMPH(_velocity)}`,
@@ -407,7 +407,7 @@ export const makeLander = (state, onGameEnd) => {
     CTX.fillText("MPH", xPadding, canvasHeight - yPadding);
 
     CTX.textAlign = "right";
-    CTX.font = "600 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+    CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
     CTX.fillText(
       `${heightInFeet(_position.y, _groundedHeight)}`,
       canvasWidth - xPadding,
@@ -420,7 +420,7 @@ export const makeLander = (state, onGameEnd) => {
     if (secondsUntilTerrain < 15) {
       CTX.fillStyle = "rgb(255, 0, 0)";
       CTX.textAlign = "center";
-      CTX.font = "600 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
       CTX.fillText(
         Intl.NumberFormat().format(secondsUntilTerrain),
         canvasWidth / 2,
