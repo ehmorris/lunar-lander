@@ -122,3 +122,5 @@ export const easeOutBack = (x) => {
 };
 
 export const easeInOutSine = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
+
+export const easeInExpo = (x) => (x === 0 ? 0 : Math.pow(2, 10 * x - 10));

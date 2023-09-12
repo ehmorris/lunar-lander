@@ -16,7 +16,6 @@ export const makeParticle = (
   const terrain = state.get("terrain");
   const landingData = state.get("terrain").getLandingData();
   const friction = 0.3;
-  const velocityThreshold = 2;
   const rotationDirection = randomBool();
 
   let position = { ...startPosition };
