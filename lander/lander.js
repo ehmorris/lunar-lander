@@ -225,7 +225,12 @@ export const makeLander = (state, onGameEnd) => {
         _lastRotation = rotations;
         _lastRotationAngle = _angle;
         _flipConfetti.push(
-          makeConfetti(state, 10, _displayPosition, _velocity)
+          makeConfetti(
+            state,
+            10,
+            _displayPosition,
+            _position.y > 0 ? _velocity : { x: _velocity.x, y: 0 }
+          )
         );
       }
 

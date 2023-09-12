@@ -2,14 +2,20 @@ import {
   randomBetween,
   mirroredLoopingProgress,
   jitterCoordinate,
+  transition,
+  clampedProgress,
+  easeInExpo,
 } from "../helpers/helpers.js";
 import { makeParticle } from "../particle.js";
 
 export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
+  const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const audio = state.get("audioManager");
   const confettiTypeAmount = Math.round(amount / 2);
+  const timeOfInit = Date.now();
+  const visibilityDuration = 1_500;
   let hasPlayedAudio = false;
 
   const _startingPosition = (index) =>
@@ -57,7 +63,7 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
       size,
       size,
       `hsl(${randomBetween(0, 360)}, 100%, 50%)`,
-      (CTX, position, velocity, _, fill, rotationVelocity) => {
+      (CTX, position, __, _, fill, rotationVelocity) => {
         const twirlWidth =
           mirroredLoopingProgress(0, 3, Math.abs(rotationVelocity)) * size;
         CTX.fillStyle = fill;
@@ -74,12 +80,27 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
   });
 
   const draw = (deltaTime) => {
-    if (!hasPlayedAudio) {
-      audio.playConfetti();
-      hasPlayedAudio = true;
+    if (confettiPieces.length && twirlPieces.length) {
+      if (Date.now() - timeOfInit > visibilityDuration) {
+        twirlPieces.length = 0;
+        confettiPieces.length = 0;
+      } else {
+        if (!hasPlayedAudio) {
+          audio.playConfetti();
+          hasPlayedAudio = true;
+        }
+        CTX.save();
+        const animationProgress = clampedProgress(
+          0,
+          visibilityDuration,
+          Date.now() - timeOfInit
+        );
+        CTX.globalAlpha = transition(1, 0, animationProgress, easeInExpo);
+        confettiPieces.forEach((e) => e.draw(deltaTime));
+        twirlPieces.forEach((e) => e.draw(deltaTime));
+        CTX.restore();
+      }
     }
-    confettiPieces.forEach((e) => e.draw(deltaTime));
-    twirlPieces.forEach((e) => e.draw(deltaTime));
   };
 
   return { draw };
