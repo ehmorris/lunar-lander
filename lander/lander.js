@@ -588,6 +588,7 @@ export const makeLander = (state, onGameEnd) => {
     destroy,
     resetProps,
     getPosition: () => _position,
+    getDisplayPosition: () => _displayPosition,
     getVelocity: () => _velocity,
     engineOn: () => (_engineOn = true),
     engineOff: () => (_engineOn = false),

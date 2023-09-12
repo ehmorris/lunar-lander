@@ -8,7 +8,8 @@ export const makeExplosion = (
   velocity,
   fill,
   size,
-  amount
+  amount,
+  useTerrain = true
 ) => {
   const smallExplosionChunks = new Array(amount)
     .fill()
@@ -19,7 +20,9 @@ export const makeExplosion = (
         jitterCoordinate(velocity),
         randomBetween(size / 4, size),
         randomBetween(size / 4, size),
-        fill
+        fill,
+        false,
+        useTerrain
       )
     );
 
