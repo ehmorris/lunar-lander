@@ -131,6 +131,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
         spaceAsteroids.push(
           makeSpaceAsteroid(
             appState,
+            lander.getVelocity,
             lander.getDisplayPosition,
             onAsteroidImpact
           )

@@ -9,6 +9,7 @@ import { makeParticle } from "./particle.js";
 
 export const makeSpaceAsteroid = (
   state,
+  getLanderVelocity,
   getLanderPosition,
   onLanderCollision
 ) => {
@@ -23,7 +24,7 @@ export const makeSpaceAsteroid = (
   };
   let startVelocity = {
     x: randomBetween(-1, 1),
-    y: randomBetween(4, 8),
+    y: -getLanderVelocity().y,
   };
 
   let impact = false;
