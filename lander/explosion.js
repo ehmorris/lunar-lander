@@ -31,7 +31,13 @@ export const makeExplosion = (
   };
 };
 
-export const makeLanderExplosion = (state, position, velocity, angle) => {
+export const makeLanderExplosion = (
+  state,
+  position,
+  velocity,
+  angle,
+  useTerrain = true
+) => {
   const gradient = state.get("theme").landerGradient;
 
   const noseCone = makeParticle(
@@ -66,7 +72,8 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
       CTX.lineTo(LANDER_WIDTH / 2, LANDER_HEIGHT / 4 - 4);
       CTX.closePath();
       CTX.fill();
-    }
+    },
+    useTerrain
   );
 
   const chunk1 = makeParticle(
@@ -89,7 +96,8 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
       CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
       CTX.closePath();
       CTX.fill();
-    }
+    },
+    useTerrain
   );
 
   const chunk2 = makeParticle(
@@ -112,7 +120,8 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
       CTX.lineTo(-LANDER_WIDTH / 2, LANDER_HEIGHT / 4);
       CTX.closePath();
       CTX.fill();
-    }
+    },
+    useTerrain
   );
 
   const randomPieces = makeExplosion(
@@ -121,7 +130,8 @@ export const makeLanderExplosion = (state, position, velocity, angle) => {
     velocity,
     gradient,
     randomBetween(2, 20),
-    32
+    32,
+    useTerrain
   );
 
   const draw = (deltaTime) => {

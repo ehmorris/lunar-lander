@@ -106,9 +106,12 @@ export const makeLander = (state, onGameEnd) => {
   };
   resetProps();
 
-  const _setGameEndData = (landed) => {
+  const _isFixedPositionInSpace = () => _position.y < 0;
+
+  const _setGameEndData = (landed, struckByAsteroid = false) => {
     gameEndData = {
       landed,
+      struckByAsteroid,
       speed: velocityInMPH(_velocity),
       angle: Intl.NumberFormat().format(
         getAngleDeltaUpright(_angle).toFixed(1)
@@ -155,9 +158,10 @@ export const makeLander = (state, onGameEnd) => {
 
       _gameEndExplosion = makeLanderExplosion(
         state,
-        _position,
+        _isFixedPositionInSpace() ? _displayPosition : _position,
         _velocity,
-        _angle
+        _angle,
+        !_isFixedPositionInSpace()
       );
 
       _velocity = { x: 0, y: 0 };
@@ -170,14 +174,16 @@ export const makeLander = (state, onGameEnd) => {
     if (!gameEndData) {
       const averageXVelocity = (_velocity.x + asteroidVelocity.x) / 2;
       const averageYVelocity = (_velocity.y + asteroidVelocity.y) / 2;
-      _velocity = { x: averageXVelocity, y: averageYVelocity };
+      _velocity = _isFixedPositionInSpace()
+        ? { x: averageXVelocity, y: asteroidVelocity.y }
+        : { x: averageXVelocity, y: averageYVelocity };
       _engineOn = false;
       _rotatingLeft = false;
       _rotatingRight = false;
       audioManager.stopEngineSound();
       audioManager.stopBoosterSound1();
       audioManager.stopBoosterSound2();
-      _setGameEndData(false);
+      _setGameEndData(false, true);
     }
   };
 
@@ -459,7 +465,7 @@ export const makeLander = (state, onGameEnd) => {
       _position.y < TRANSITION_TO_SPACE ? TRANSITION_TO_SPACE : _position.y;
 
     // Zone 2 positioning
-    if (_position.y < 0) {
+    if (_isFixedPositionInSpace()) {
       CTX.translate(
         0,
         transition(

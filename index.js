@@ -29,6 +29,7 @@ import { TRANSITION_TO_SPACE } from "./helpers/constants.js";
 import {
   landingScoreDescription,
   crashScoreDescription,
+  destroyedDescription,
 } from "./helpers/scoring.js";
 
 // SETUP
@@ -182,6 +183,8 @@ function onGameEnd(data) {
   const finalScore = data.landerScore + bonusPointsManager.getTotalPoints();
   const scoreDescription = data.landed
     ? landingScoreDescription(finalScore)
+    : data.struckByAsteroid
+    ? destroyedDescription()
     : crashScoreDescription(finalScore);
   const scoreForDisplay = Intl.NumberFormat().format(finalScore.toFixed(1));
 
