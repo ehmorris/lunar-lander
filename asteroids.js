@@ -65,6 +65,7 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
       CTX.closePath();
       CTX.fill();
     },
+    true,
     onImpact
   );
 
