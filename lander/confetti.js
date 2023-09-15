@@ -15,7 +15,7 @@ export const makeConfetti = (state, amount, passedPosition, passedVelocity) => {
   const audio = state.get("audioManager");
   const confettiTypeAmount = Math.round(amount / 2);
   const timeOfInit = Date.now();
-  const visibilityDuration = 1_500;
+  const visibilityDuration = 5_000;
   let hasPlayedAudio = false;
 
   const _startingPosition = (index) =>
