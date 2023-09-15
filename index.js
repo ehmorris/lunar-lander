@@ -83,6 +83,8 @@ let asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
 let spaceAsteroids = [];
 let randomConfetti = [];
 
+let gameEnded = false;
+
 // INSTRUCTIONS SHOW/HIDE
 
 if (!instructions.hasClosedInstructions()) {
@@ -105,12 +107,11 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
 
   // Move terrain as lander flies high
   CTX.save();
-  const maxTerrainOffset = terrain.getLandingData().terrainHeight;
   CTX.translate(
     0,
     transition(
       0,
-      maxTerrainOffset,
+      terrain.getLandingData().terrainHeight,
       clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
     )
   );
@@ -127,7 +128,15 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
 
     // Generate and draw space asteroids
     if (lander.getPosition().y < -canvasHeight * 2) {
-      if (Math.round(randomBetween(0, 100)) === 0) {
+      // The chance that an asteroid will be sent is determined by the screen
+      // width. This means that the density of asteroids will be similar across
+      // phones and wider desktop screens. On a 14" MacBook the chance of an
+      // asteroid being sent in any given frame is ~1 in 50; on an iPhone 14
+      // it's ~1 in 200, or 1/4 the chance for a screen ~1/4 the width.
+      if (
+        !gameEnded &&
+        Math.round(randomBetween(0, 100 / (canvasWidth / 800))) === 0
+      ) {
         spaceAsteroids.push(
           makeSpaceAsteroid(
             appState,
@@ -147,7 +156,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
       0,
       transition(
         0,
-        maxTerrainOffset,
+        terrain.getLandingData().terrainHeight,
         clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
       )
     );
@@ -178,6 +187,7 @@ function onCloseInstructions() {
 }
 
 function onGameEnd(data) {
+  gameEnded = true;
   landerControls.detachEventListeners();
   bonusPointsManager.hide();
 
@@ -210,6 +220,7 @@ function onGameEnd(data) {
 }
 
 function onResetGame() {
+  gameEnded = false;
   landerControls.attachEventListeners();
   seededRandom.setDailyChallengeSeed();
   randomConfetti = [];
