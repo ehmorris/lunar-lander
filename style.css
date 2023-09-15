@@ -74,18 +74,22 @@ li.strikethrough {
   margin: 0 0 0.2em;
 }
 
+.instructionsControls {
+  padding-bottom: 6vh;
+  box-sizing: border-box;
+}
+
 @media screen and (max-width: 640px) {
   .fullSizeContainer h1 {
     font-weight: 800;
   }
 
   .fullSizeContainer h1 + p {
-    margin-top: 0;
+    margin-top: 0.2em;
   }
 
   .fullSizeContainer h2 {
     font-weight: 600;
-    margin-bottom: 0;
   }
 }
 

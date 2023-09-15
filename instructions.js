@@ -57,6 +57,7 @@ export const manageInstructions = (onCloseInstructions) => {
   const setEngineDone = () => {
     _engineDone = true;
     document.querySelector("#engineCheck").classList.add("strikethrough");
+    document.querySelector("#engineCheck input").checked = true;
     checkDone();
   };
 
@@ -65,12 +66,16 @@ export const manageInstructions = (onCloseInstructions) => {
     document
       .querySelector("#rightRotationCheck")
       .classList.add("strikethrough");
+    document.querySelector("#rightRotationCheck input").checked = true;
+
     checkDone();
   };
 
   const setRightRotationDone = () => {
     _rightRotationDone = true;
     document.querySelector("#leftRotationCheck").classList.add("strikethrough");
+    document.querySelector("#leftRotationCheck input").checked = true;
+
     checkDone();
   };
 
@@ -79,6 +84,7 @@ export const manageInstructions = (onCloseInstructions) => {
     document
       .querySelector("#engineAndRotationCheck")
       .classList.add("strikethrough");
+    document.querySelector("#engineAndRotationCheck input").checked = true;
     checkDone();
   };
 

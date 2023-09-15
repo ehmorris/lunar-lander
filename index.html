@@ -1,186 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Lander</title>
-    <meta property="og:title" content="Lander" />
-    <meta property="og:url" content="https://ehmorris.com/lander/" />
-    <meta
-      name="description"
-      content="Can you successfully pilot the lander to the surface? Play instantly from your phone or computer."
-    />
-    <meta
-      property="og:description"
-      content="Can you successfully pilot the lander to the surface?"
-    />
-    <meta
-      property="og:image"
-      content="https://ehmorris.com/lander/images/oembed.png"
-    />
-    <meta property="og:image:width" content="700" />
-    <meta property="og:image:height" content="700" />
-    <link
-      rel="icon"
-      type="image/png"
-      href="./images/favicon-16x16.png"
-      sizes="16x16"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="./images/favicon-32x32.png"
-      sizes="32x32"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="./images/favicon-180x180.png"
-      sizes="180x180"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="./images/favicon-270x270.png"
-      sizes="270x270"
-    />
-    <link rel="apple-touch-icon" href="./images/favicon-270x270.png" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <link rel="stylesheet" type="text/css" href="./style.css" />
-  </head>
-  <body>
-    <div class="game"></div>
-    <div id="endGameStats" class="fullSizeContainer">
-      <h1 id="description"></h1>
-      <div class="scoreContainer">
-        <span id="score"></span> point <span id="type"></span>
-      </div>
-      <div class="meterAndLabel">
-        <div class="label">Speed</div>
-        <div class="meter" data-stat-name="speed">
-          <div class="cursor" data-percent-position="">
-            <span data-value=""></span><span class="unit">&nbsp;MPH</span>
-          </div>
-        </div>
-      </div>
-      <div class="meterAndLabel">
-        <div class="label">Angle</div>
-        <div class="meter" data-stat-name="angle">
-          <div class="cursor" data-percent-position="">
-            <span data-value=""></span> <span class="unit">&#176;</span>
-          </div>
-        </div>
-      </div>
-      <div class="statsTable">
-        <div class="tableRow">
-          <span class="tableLabel">Time</span>
-          <span class="tableValue"><span id="duration"></span> seconds</span>
-        </div>
-        <div class="tableRow">
-          <span class="tableLabel">Flips</span>
-          <span class="tableValue" id="rotations"></span>
-        </div>
-        <div class="tableRow">
-          <span class="tableLabel">Max Speed</span>
-          <span class="tableValue"><span id="maxSpeed"></span> MPH</span>
-        </div>
-        <div class="tableRow">
-          <span class="tableLabel">Max Height</span>
-          <span class="tableValue"><span id="maxHeight"></span> FT</span>
-        </div>
-      </div>
-      <div class="buttonContainer">
-        <div class="button loading" id="tryAgain">
-          <span id="tryAgainText">Play Again</span>
-          <svg class="buttonAnimatedBorder">
-            <rect width="100%" height="100%"></rect>
-          </svg>
-        </div>
-        <div class="button" id="share">
-          <span>Share</span>
-          <svg class="buttonBorder">
-            <rect width="100%" height="100%"></rect>
-          </svg>
-        </div>
-        <div class="button" id="copyText">
-          <span>Copy Stats</span>
-          <svg class="buttonBorder">
-            <rect width="100%" height="100%"></rect>
-          </svg>
+
+<head>
+  <title>Lander</title>
+  <meta property="og:title" content="Lander" />
+  <meta property="og:url" content="https://ehmorris.com/lander/" />
+  <meta name="description"
+    content="Can you successfully pilot the lander to the surface? Play instantly from your phone or computer." />
+  <meta property="og:description" content="Can you successfully pilot the lander to the surface?" />
+  <meta property="og:image" content="https://ehmorris.com/lander/images/oembed.png" />
+  <meta property="og:image:width" content="700" />
+  <meta property="og:image:height" content="700" />
+  <link rel="icon" type="image/png" href="./images/favicon-16x16.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="./images/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="./images/favicon-180x180.png" sizes="180x180" />
+  <link rel="icon" type="image/png" href="./images/favicon-270x270.png" sizes="270x270" />
+  <link rel="apple-touch-icon" href="./images/favicon-270x270.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="stylesheet" type="text/css" href="./style.css" />
+</head>
+
+<body>
+  <div class="game"></div>
+  <div id="endGameStats" class="fullSizeContainer">
+    <h1 id="description"></h1>
+    <div class="scoreContainer">
+      <span id="score"></span> point <span id="type"></span>
+    </div>
+    <div class="meterAndLabel">
+      <div class="label">Speed</div>
+      <div class="meter" data-stat-name="speed">
+        <div class="cursor" data-percent-position="">
+          <span data-value=""></span><span class="unit">&nbsp;MPH</span>
         </div>
       </div>
     </div>
-    <div id="instructions" class="fullSizeContainer instructions">
-      <div>
-        <h1>How to play</h1>
-        <p>
-          Land on a white landing pad. Go slow and straight. If you touch down
-          too fast or angled, you crash. Try flipping for bonus points.
-        </p>
-      </div>
-      <div>
-        <h2>Try the controls</h2>
-        <div id="forKeyboard">
-          <ul>
-            <li id="engineCheck">Up arrow</li>
-            <li id="rightRotationCheck">Left arrow</li>
-            <li id="leftRotationCheck">Right arrow</li>
-            <li id="engineAndRotationCheck">
-              Hold the up arrow while pressing the left or right arrows
-            </li>
-          </ul>
-        </div>
-        <div id="forTouch">
-          <ul>
-            <li id="engineCheck">Tap the center of the screen</li>
-            <li id="rightRotationCheck">Tap the left side</li>
-            <li id="leftRotationCheck">Tap the right side</li>
-            <li id="engineAndRotationCheck">
-              Hold down on the center while you tap the sides
-            </li>
-          </ul>
+    <div class="meterAndLabel">
+      <div class="label">Angle</div>
+      <div class="meter" data-stat-name="angle">
+        <div class="cursor" data-percent-position="">
+          <span data-value=""></span> <span class="unit">&#176;</span>
         </div>
       </div>
     </div>
-    <div id="cornerChallenge" class="topLeftCorner show">
-      Daily Challenge <span id="cornerChallengeNumber"></span>
+    <div class="statsTable">
+      <div class="tableRow">
+        <span class="tableLabel">Time</span>
+        <span class="tableValue"><span id="duration"></span> seconds</span>
+      </div>
+      <div class="tableRow">
+        <span class="tableLabel">Flips</span>
+        <span class="tableValue" id="rotations"></span>
+      </div>
+      <div class="tableRow">
+        <span class="tableLabel">Max Speed</span>
+        <span class="tableValue"><span id="maxSpeed"></span> MPH</span>
+      </div>
+      <div class="tableRow">
+        <span class="tableLabel">Max Height</span>
+        <span class="tableValue"><span id="maxHeight"></span> FT</span>
+      </div>
     </div>
-    <div id="tally" class="topRightCorner">
-      L<span id="landingTotal"></span> C<span id="crashTotal"></span>
+    <div class="buttonContainer">
+      <div class="button loading" id="tryAgain">
+        <span id="tryAgainText">Play Again</span>
+        <svg class="buttonAnimatedBorder">
+          <rect width="100%" height="100%"></rect>
+        </svg>
+      </div>
+      <div class="button" id="share">
+        <span>Share</span>
+        <svg class="buttonBorder">
+          <rect width="100%" height="100%"></rect>
+        </svg>
+      </div>
+      <div class="button" id="copyText">
+        <span>Copy Stats</span>
+        <svg class="buttonBorder">
+          <rect width="100%" height="100%"></rect>
+        </svg>
+      </div>
     </div>
-    <script src="index.js" type="module"></script>
-    <script>
-      (function (h, o, u, n, d) {
-        h = h[d] = h[d] || {
-          q: [],
-          onReady: function (c) {
-            h.q.push(c);
-          },
-        };
-        d = o.createElement(u);
-        d.async = 1;
-        d.src = n;
-        n = o.getElementsByTagName(u)[0];
-        n.parentNode.insertBefore(d, n);
-      })(
-        window,
-        document,
-        "script",
-        "https://www.datadoghq-browser-agent.com/datadog-rum-v4.js",
-        "DD_RUM"
-      );
-      DD_RUM.onReady(function () {
-        DD_RUM.init({
-          clientToken: "pub29b4ec61338ff64383116ae4bf1b2e48",
-          applicationId: "4c09e9e3-7012-4576-bbeb-9a81a5c7b9e7",
-          site: "datadoghq.com",
-          sessionSampleRate: 100,
-          trackUserInteractions: true,
-        });
+  </div>
+  <div id="instructions" class="fullSizeContainer instructions">
+    <div>
+      <h1>How to play</h1>
+      <p> Land on a white landing pad. Pointy end goes up. Try doing a flip. </p>
+    </div>
+    <div class="instructionsControls">
+      <h2>Test the controls</h2>
+      <div id="forKeyboard">
+        <ul>
+          <li id="engineCheck"><input type="checkbox" /> Up arrow (the main engine)</li>
+          <li id="rightRotationCheck"><input type="checkbox" />Left arrow</li>
+          <li id="leftRotationCheck"><input type="checkbox" />Right arrow</li>
+          <li id="engineAndRotationCheck"><input type="checkbox" /> Hold the up arrow while pressing the left or right
+            arrows</li>
+        </ul>
+      </div>
+      <div id="forTouch">
+        <ul>
+          <li id="engineCheck"><input type="checkbox" /> Tap the center of the screen</li>
+          <li id="rightRotationCheck"><input type="checkbox" /> Tap the left side</li>
+          <li id="leftRotationCheck"><input type="checkbox" /> Tap the right side</li>
+          <li id="engineAndRotationCheck"><input type="checkbox" /> Hold down on the center while you tap the sides</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div id="cornerChallenge" class="topLeftCorner show"> Daily Challenge <span id="cornerChallengeNumber"></span>
+  </div>
+  <div id="tally" class="topRightCorner"> L<span id="landingTotal"></span> C<span id="crashTotal"></span>
+  </div>
+  <script src="index.js" type="module"></script>
+  <script>
+    (function (h, o, u, n, d) {
+      h = h[d] = h[d] || {
+        q: [],
+        onReady: function (c) {
+          h.q.push(c);
+        },
+      };
+      d = o.createElement(u);
+      d.async = 1;
+      d.src = n;
+      n = o.getElementsByTagName(u)[0];
+      n.parentNode.insertBefore(d, n);
+    })(
+      window,
+      document,
+      "script",
+      "https://www.datadoghq-browser-agent.com/datadog-rum-v4.js",
+      "DD_RUM"
+    );
+    DD_RUM.onReady(function () {
+      DD_RUM.init({
+        clientToken: "pub29b4ec61338ff64383116ae4bf1b2e48",
+        applicationId: "4c09e9e3-7012-4576-bbeb-9a81a5c7b9e7",
+        site: "datadoghq.com",
+        sessionSampleRate: 100,
+        trackUserInteractions: true,
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
+
 </html>
