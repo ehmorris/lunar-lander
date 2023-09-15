@@ -78,7 +78,7 @@ export const destroyedDescription = () => {
     "Try to avoid the space rocks next time",
     "Slamming into rocks is not great for the lander",
     "Sometimes asteroids just happen",
-    "Better for have flown and been destroyed by an asteroid than never to have flown at all",
+    "Better to have flown and been destroyed by an asteroid than never to have flown at all",
   ];
   return remarks[Math.floor(Math.random() * remarks.length)];
 };
