@@ -1,8 +1,4 @@
-import {
-  transition,
-  clampedProgress,
-  randomBetween,
-} from "./helpers/helpers.js";
+import { transition, randomBetween } from "./helpers/helpers.js";
 
 export const makeStarfield = (state) => {
   const CTX = state.get("CTX");
@@ -18,10 +14,7 @@ export const makeStarfield = (state) => {
         opacity: randomBetween(0.1, 1),
         position: {
           x: Math.random() * canvasWidth,
-          y: randomBetween(
-            0,
-            theme.horizon ? theme.horizon * canvasHeight : canvasHeight
-          ),
+          y: randomBetween(0, canvasHeight),
         },
         distance: Math.random(), // higher number is closer/bigger
       });

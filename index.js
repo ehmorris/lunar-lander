@@ -114,9 +114,6 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
       clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
     )
   );
-  if (theme.drawBackgroundTerrain) {
-    theme.drawBackgroundTerrain();
-  }
   terrain.draw();
   CTX.restore();
 
