@@ -466,22 +466,15 @@ export const makeLander = (state, onGameEnd) => {
 
     // Zone 2 positioning
     if (_isFixedPositionInSpace()) {
-      CTX.translate(
-        0,
-        transition(
-          0,
-          canvasHeight / 2 - TRANSITION_TO_SPACE,
-          clampedProgress(0, -canvasHeight * 2, _position.y),
-          easeInOutSine
-        )
-      );
-
-      _displayPosition.y += transition(
+      const yPosTransition = transition(
         0,
         canvasHeight / 2 - TRANSITION_TO_SPACE,
         clampedProgress(0, -canvasHeight * 2, _position.y),
         easeInOutSine
       );
+
+      CTX.translate(0, yPosTransition);
+      _displayPosition.y += yPosTransition;
     }
 
     CTX.rotate(_angle);

@@ -1,7 +1,6 @@
 import {
   animate,
   clampedProgress,
-  easeInOutSine,
   generateCanvas,
   randomBetween,
   seededRandomBetween,
