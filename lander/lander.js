@@ -175,7 +175,7 @@ export const makeLander = (state, onGameEnd) => {
       const averageXVelocity = (_velocity.x + asteroidVelocity.x) / 2;
       const averageYVelocity = (_velocity.y + asteroidVelocity.y) / 2;
       _velocity = _isFixedPositionInSpace()
-        ? { x: averageXVelocity, y: asteroidVelocity.y }
+        ? { x: averageXVelocity, y: asteroidVelocity.y / 2 }
         : { x: averageXVelocity, y: averageYVelocity };
       _engineOn = false;
       _rotatingLeft = false;
