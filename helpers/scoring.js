@@ -67,6 +67,8 @@ export const crashScoreDescription = (score) =>
     ? "A smooth… wait… you crashed"
     : score >= 10
     ? "The lander has been… damaged"
+    : score < 0
+    ? "You have to land on the white landing zones"
     : "So, so close to a landing, but still a crash";
 
 export const destroyedDescription = () => {
