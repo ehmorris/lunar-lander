@@ -117,7 +117,7 @@ export const makeLander = (state, onGameEnd) => {
         getAngleDeltaUpright(_angle).toFixed(1)
       ),
       durationInSeconds: Intl.NumberFormat().format(
-        Math.round(_timeSinceStart / 1000)
+        (_timeSinceStart / 1000).toFixed(1)
       ),
       rotationsInt: _rotationCount,
       rotationsFormatted: Intl.NumberFormat().format(_rotationCount),
