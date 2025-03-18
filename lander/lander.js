@@ -167,6 +167,17 @@ export const makeLander = (state, onGameEnd) => {
       _velocity = { x: 0, y: 0 };
     }
 
+    DD_RUM.addAction("score", {
+      score: gameEndData.landerScore,
+      landed: landed,
+      speed: gameEndData.speed,
+      angle: gameEndData.angle,
+      duration: gameEndData.durationInSeconds,
+      flips: gameEndData.rotationsInt,
+      maxSpeed: gameEndData.maxSpeed,
+      maxHeight: gameEndData.maxHeight,
+    });
+
     onGameEnd(gameEndData);
   };
 
