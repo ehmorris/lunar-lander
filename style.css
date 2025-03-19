@@ -208,7 +208,7 @@ li.strikethrough {
   text-align: center;
   color: white;
   flex: 1;
-  padding: clamp(10px, 2vmin, 20px);
+  padding: clamp(10px, 2vmin, 20px) clamp(14px, 2vmin, 20px);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   transition: all 0.6s ease-out;
@@ -220,6 +220,10 @@ li.strikethrough {
   align-items: center;
   display: flex;
   justify-content: center;
+}
+
+.button--hug {
+  flex: unset;
 }
 
 .button.loading {
