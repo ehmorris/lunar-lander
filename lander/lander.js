@@ -39,7 +39,7 @@ export const makeLander = (state, onGameEnd) => {
   const _landingData = state.get("terrain").getLandingData();
   const _groundedHeight =
     _landingData.terrainAvgHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
-  const _thrust = 0.01;
+  const _thrust = 0.012;
 
   let _position;
   let _displayPosition;

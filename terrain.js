@@ -13,7 +13,7 @@ export const makeTerrain = (state) => {
 
   const targetHeight = canvasHeight * 0.8;
   const landingMaxHeight = targetHeight;
-  const landingMinHeight = canvasHeight - 20;
+  const landingMinHeight = canvasHeight - 40;
   const numPoints = Math.max(Math.round(canvasWidth / 60), 20);
   let landingZoneSpans = [];
   let landingSurfaces = [];
@@ -84,7 +84,7 @@ export const makeTerrain = (state) => {
   const reGenerate = () => {
     generateLandingZoneSpans();
     landingSurfaces = [
-      generateLandingSurface(3, "largeLandingSurface"),
+      generateLandingSurface(4, "largeLandingSurface"),
       generateLandingSurface(1, "smallLandingSurface"),
     ];
 

@@ -1,4 +1,4 @@
-export const GRAVITY = 0.004;
+export const GRAVITY = 0.0035;
 export const LANDER_WIDTH = 20;
 export const LANDER_HEIGHT = 40;
 export const TRANSITION_TO_SPACE = LANDER_HEIGHT * 4;
