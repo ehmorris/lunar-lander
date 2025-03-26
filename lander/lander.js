@@ -451,14 +451,13 @@ export const makeLander = (state, onGameEnd) => {
         canvasHeight - yPadding
       );
     } else {
+      const duration = new Intl.DurationFormat({ style: "digital" }).format({
+        seconds: Math.floor(_timeSinceStart / 1000),
+      });
       CTX.fillStyle = state.get("theme").infoFontColor;
       CTX.textAlign = "center";
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText(
-        `${Intl.NumberFormat().format((_timeSinceStart / 1000).toFixed(0))}s`,
-        canvasWidth / 2,
-        canvasHeight - yPadding - 24
-      );
+      CTX.fillText(duration, canvasWidth / 2, canvasHeight - yPadding - 24);
       CTX.letterSpacing = "1px";
       CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
       CTX.fillText("DURATION", canvasWidth / 2, canvasHeight - yPadding);
@@ -591,7 +590,7 @@ export const makeLander = (state, onGameEnd) => {
     // Draw speed and angle text beside lander, even after crashing
     if (_position.y > TRANSITION_TO_SPACE) {
       _drawHUD();
-    } else {
+    } else if (!gameEndData) {
       CTX.save();
       const animateHUDProgress = clampedProgress(
         LANDER_HEIGHT,
