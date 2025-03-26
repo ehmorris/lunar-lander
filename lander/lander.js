@@ -415,7 +415,7 @@ export const makeLander = (state, onGameEnd) => {
     CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
     CTX.textAlign = "left";
     CTX.fillText(
-      `${velocityInMPH(_velocity)}`,
+      `${velocityInMPH(_velocity, 0)}`,
       xPadding,
       canvasHeight - yPadding - 24
     );
@@ -450,6 +450,18 @@ export const makeLander = (state, onGameEnd) => {
         canvasWidth / 2,
         canvasHeight - yPadding
       );
+    } else {
+      CTX.fillStyle = state.get("theme").infoFontColor;
+      CTX.textAlign = "center";
+      CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.fillText(
+        `${Intl.NumberFormat().format((_timeSinceStart / 1000).toFixed(0))}s`,
+        canvasWidth / 2,
+        canvasHeight - yPadding - 24
+      );
+      CTX.letterSpacing = "1px";
+      CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.fillText("DURATION", canvasWidth / 2, canvasHeight - yPadding);
     }
 
     CTX.restore();
