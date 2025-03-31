@@ -451,13 +451,26 @@ export const makeLander = (state, onGameEnd) => {
         canvasHeight - yPadding
       );
     } else {
-      const duration = new Intl.DurationFormat({ style: "digital" }).format({
-        seconds: Math.floor(_timeSinceStart / 1000),
+      const duration = {
+        hours: Math.floor(_timeSinceStart / (1000 * 60 * 60)),
+        minutes: Math.floor(_timeSinceStart / (1000 * 60)) % 60,
+        seconds: Math.floor(_timeSinceStart / 1000) % 60,
+      };
+
+      const formatter = new Intl.DurationFormat("en", {
+        style: "digital",
+        hoursDisplay: "auto",
+        minutesDisplay: "auto",
       });
+
       CTX.fillStyle = state.get("theme").infoFontColor;
       CTX.textAlign = "center";
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText(duration, canvasWidth / 2, canvasHeight - yPadding - 24);
+      CTX.fillText(
+        formatter.format(duration),
+        canvasWidth / 2,
+        canvasHeight - yPadding - 24
+      );
       CTX.letterSpacing = "1px";
       CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
       CTX.fillText("DURATION", canvasWidth / 2, canvasHeight - yPadding);
