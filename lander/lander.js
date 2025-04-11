@@ -167,7 +167,7 @@ export const makeLander = (state, onGameEnd) => {
       _velocity = { x: 0, y: 0 };
     }
 
-    DD_RUM.addAction("score", {
+    window?.DD_RUM?.addAction("score", {
       score: gameEndData.landerScore,
       landed: !!landed,
       speed: gameEndData.speed,
