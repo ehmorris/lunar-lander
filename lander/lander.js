@@ -167,15 +167,17 @@ export const makeLander = (state, onGameEnd) => {
       _velocity = { x: 0, y: 0 };
     }
 
-    window?.DD_RUM?.addAction("score", {
-      score: gameEndData.landerScore,
-      landed: !!landed,
-      speed: gameEndData.speed,
-      angle: gameEndData.angle,
-      duration: gameEndData.durationInSeconds,
-      flips: gameEndData.rotationsInt,
-      maxSpeed: gameEndData.maxSpeed,
-      maxHeight: gameEndData.maxHeight,
+    DD_RUM.onReady(() => {
+      DD_RUM.addAction("score", {
+        score: gameEndData.landerScore,
+        landed: !!landed,
+        speed: gameEndData.speed,
+        angle: gameEndData.angle,
+        duration: gameEndData.durationInSeconds,
+        flips: gameEndData.rotationsInt,
+        maxSpeed: gameEndData.maxSpeed,
+        maxHeight: gameEndData.maxHeight,
+      });
     });
 
     onGameEnd(gameEndData);
