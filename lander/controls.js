@@ -1,4 +1,4 @@
-export const makeControls = (state, lander, audioManager) => {
+export const makeControls = (state, lander, audioManager, sendMessage) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
