@@ -15,14 +15,17 @@ export const makeControls = (state, lander, audioManager) => {
     if (key === "w" || key === "ArrowUp") {
       lander.engineOn();
       audioManager.playEngineSound();
+      sendMessage({ type: 'engineOn' });
     }
     if (key === "a" || key === "ArrowLeft") {
       lander.rotateLeft();
       audioManager.playBoosterSound1();
+      sendMessage({ type: 'rotateLeft' });
     }
     if (key === "d" || key === "ArrowRight") {
       lander.rotateRight();
       audioManager.playBoosterSound2();
+      sendMessage({ type: 'rotateRight' });
     }
     hasKeyboard = true;
   }
@@ -31,14 +34,17 @@ export const makeControls = (state, lander, audioManager) => {
     if (key === "w" || key === "ArrowUp") {
       lander.engineOff();
       audioManager.stopEngineSound();
+      sendMessage({ type: 'engineOff' });
     }
     if (key === "a" || key === "ArrowLeft") {
       lander.stopLeftRotation();
       audioManager.stopBoosterSound1();
+      sendMessage({ type: 'stopLeftRotation' });
     }
     if (key === "d" || key === "ArrowRight") {
       lander.stopRightRotation();
       audioManager.stopBoosterSound2();
+      sendMessage({ type: 'stopRightRotation' });
     }
   }
 

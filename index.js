@@ -84,6 +84,58 @@ let randomConfetti = [];
 
 let gameEnded = false;
 
+// Track multiple players
+let players = {};
+
+// Establish WebSocket connection
+const socket = new WebSocket('ws://localhost:8080');
+
+socket.addEventListener('open', () => {
+  console.log('Connected to WebSocket server');
+});
+
+socket.addEventListener('message', (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Received data:', data);
+
+  if (!players[data.playerId]) {
+    // Create a new lander for a new player
+    players[data.playerId] = makeLander(appState, onGameEnd);
+  }
+
+  const playerLander = players[data.playerId];
+
+  switch (data.type) {
+    case 'engineOn':
+      playerLander.engineOn();
+      break;
+    case 'engineOff':
+      playerLander.engineOff();
+      break;
+    case 'rotateLeft':
+      playerLander.rotateLeft();
+      break;
+    case 'stopLeftRotation':
+      playerLander.stopLeftRotation();
+      break;
+    case 'rotateRight':
+      playerLander.rotateRight();
+      break;
+    case 'stopRightRotation':
+      playerLander.stopRightRotation();
+      break;
+    default:
+      console.log('Unknown action type:', data.type);
+  }
+});
+
+// Example: Send a message to the server
+function sendMessage(message) {
+  socket.send(JSON.stringify(message));
+}
+
+// Example usage: sendMessage({ type: 'join', playerId: 'player1' });
+
 // INSTRUCTIONS SHOW/HIDE
 
 if (!instructions.hasClosedInstructions()) {
@@ -97,14 +149,23 @@ if (!instructions.hasClosedInstructions()) {
 
 // MAIN ANIMATION LOOP
 
+// Function to check for collisions between two landers
+function checkCollision(lander1, lander2) {
+  const pos1 = lander1.getPosition();
+  const pos2 = lander2.getPosition();
+  const distance = Math.sqrt(
+    Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2)
+  );
+  const collisionDistance = LANDER_WIDTH; // Assuming landers are circular for simplicity
+  return distance < collisionDistance;
+}
+
 const animationObject = animate((timeSinceStart, deltaTime) => {
   CTX.fillStyle = theme.backgroundGradient;
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
 
-  // Move stars in parallax as lander flies high
   stars.draw(lander.getVelocity());
 
-  // Move terrain as lander flies high
   CTX.save();
   CTX.translate(
     0,
@@ -119,20 +180,10 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
 
   if (instructions.hasClosedInstructions()) {
     landerControls.drawTouchOverlay();
-
     bonusPointsManager.draw(lander.getPosition().y < TRANSITION_TO_SPACE);
 
-    // Generate and draw space asteroids
     if (lander.getPosition().y < -canvasHeight * 2) {
-      // The chance that an asteroid will be sent is determined by the screen
-      // width. This means that the density of asteroids will be similar across
-      // phones and wider desktop screens. On a 14" MacBook the chance of an
-      // asteroid being sent in any given frame is ~1 in 50; on an iPhone 14
-      // it's ~1 in 200, or 1/4 the chance for a screen ~1/4 the width.
-      if (
-        !gameEnded &&
-        Math.round(randomBetween(0, 100 / (canvasWidth / 800))) === 0
-      ) {
+      if (!gameEnded && Math.round(randomBetween(0, 100 / (canvasWidth / 800))) === 0) {
         spaceAsteroids.push(
           makeSpaceAsteroid(
             appState,
@@ -146,7 +197,6 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
       spaceAsteroids.forEach((a) => a.draw(deltaTime));
     }
 
-    // Move asteroids as lander flies high
     CTX.save();
     CTX.translate(
       0,
@@ -165,10 +215,23 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
       randomConfetti.forEach((c) => c.draw(deltaTime));
     }
 
-    lander.draw(timeSinceStart, deltaTime);
+    // Draw each player's lander and check for collisions
+    const playerLanders = Object.values(players);
+    playerLanders.forEach((playerLander, index) => {
+      playerLander.draw(timeSinceStart, deltaTime);
+
+      // Check for collisions with other landers
+      for (let j = index + 1; j < playerLanders.length; j++) {
+        if (checkCollision(playerLander, playerLanders[j])) {
+          console.log('Collision detected between landers');
+          // Handle collision (e.g., destroy both landers)
+          playerLander.destroy();
+          playerLanders[j].destroy();
+        }
+      }
+    });
   } else {
     toyLander.draw(deltaTime);
-
     toyLanderControls.drawTouchOverlay();
   }
 });
