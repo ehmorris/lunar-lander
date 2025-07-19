@@ -218,13 +218,13 @@ export const makeLander = (state, onGameEnd) => {
       if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
       if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
 
-      if (_position.x < 0) _position.x = canvasWidth;
-
-      if (_position.x > canvasWidth) _position.x = 0;
 
       _position.x += deltaTimeMultiplier * _velocity.x;
       _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
       _velocity.y += deltaTimeMultiplier * GRAVITY;
+
+      // Wrap around horizontally if lander moved off screen
+      _position.x = (_position.x - canvasWidth * Math.floor(_position.x / canvasWidth)) % canvasWidth;
 
       _displayPosition.x = _position.x;
 
