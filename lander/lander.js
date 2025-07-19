@@ -237,12 +237,14 @@ export const makeLander = (state, onGameEnd) => {
       const rotations = Math.floor(_angle / (Math.PI * 2));
       if (
         Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
-        (rotations > _lastRotation || rotations < _lastRotation)
+        (rotations != _lastRotation)
       ) {
-        bonusPointsManager.addNamedPoint("newRotation");
-        _rotationCount++;
-        _lastRotation = rotations;
-        _lastRotationAngle = _angle;
+        while (rotations != _lastRotation) {
+          bonusPointsManager.addNamedPoint("newRotation");
+          _rotationCount++;
+          _lastRotation += Math.sign(rotations - _lastRotation);
+          _lastRotationAngle = _angle;
+        }
         _flipConfetti.push(
           makeConfetti(
             state,
@@ -251,6 +253,7 @@ export const makeLander = (state, onGameEnd) => {
             _position.y > 0 ? _velocity : { x: _velocity.x, y: 0 }
           )
         );
+
       }
 
       // Log new max speed and height
