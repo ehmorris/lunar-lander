@@ -206,13 +206,13 @@ export const makeLander = (state, onGameEnd) => {
     _position.y = _position.y + deltaTimeMultiplier * _velocity.y;
 
     if (
-      _position.y + LANDER_HEIGHT / 2 < _landingData.terrainHeight ||
-      (_position.y + LANDER_HEIGHT / 2 >= _landingData.terrainHeight &&
-        !CTX.isPointInPath(
-          _landingData.terrainPath2D,
-          _position.x * state.get("scaleFactor"),
-          (_position.y + LANDER_HEIGHT / 2) * state.get("scaleFactor")
-        ))
+      // Lander not currently colliding with terrain and is not underground
+      !CTX.isPointInPath(
+        _landingData.terrainPath2D,
+        _position.x * state.get("scaleFactor"),
+        (_position.y + LANDER_HEIGHT / 2) * state.get("scaleFactor")
+      )
+      && _position.y < canvasHeight
     ) {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
