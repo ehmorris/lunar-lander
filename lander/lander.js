@@ -205,26 +205,27 @@ export const makeLander = (state, onGameEnd) => {
 
     _position.y = _position.y + deltaTimeMultiplier * _velocity.y;
 
-    if (
-      // Lander not currently colliding with terrain and is not underground
-      !CTX.isPointInPath(
-        _landingData.terrainPath2D,
-        _position.x * state.get("scaleFactor"),
-        (_position.y + LANDER_HEIGHT / 2) * state.get("scaleFactor")
-      )
-      && _position.y < canvasHeight
-    ) {
+    const landerInTerrain = CTX.isPointInPath(
+      _landingData.terrainPath2D,
+      _position.x * state.get("scaleFactor"),
+      (_position.y + LANDER_HEIGHT / 2) * state.get("scaleFactor")
+    );
+
+    const landerUnderTerrain = _position.y >= canvasHeight;
+
+    if (!landerInTerrain && !landerUnderTerrain) {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
       if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
-
 
       _position.x += deltaTimeMultiplier * _velocity.x;
       _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
       _velocity.y += deltaTimeMultiplier * GRAVITY;
 
       // Wrap around horizontally if lander moved off screen
-      _position.x = (_position.x - canvasWidth * Math.floor(_position.x / canvasWidth)) % canvasWidth;
+      _position.x =
+        (_position.x - canvasWidth * Math.floor(_position.x / canvasWidth)) %
+        canvasWidth;
 
       _displayPosition.x = _position.x;
 
@@ -237,7 +238,7 @@ export const makeLander = (state, onGameEnd) => {
       const rotations = Math.floor(_angle / (Math.PI * 2));
       if (
         Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
-        (rotations != _lastRotation)
+        rotations != _lastRotation
       ) {
         while (rotations != _lastRotation) {
           bonusPointsManager.addNamedPoint("newRotation");
@@ -253,7 +254,6 @@ export const makeLander = (state, onGameEnd) => {
             _position.y > 0 ? _velocity : { x: _velocity.x, y: 0 }
           )
         );
-
       }
 
       // Log new max speed and height
@@ -400,9 +400,15 @@ export const makeLander = (state, onGameEnd) => {
   const _drawBottomHUD = () => {
     const yPadding = LANDER_HEIGHT;
     const xPadding = LANDER_HEIGHT;
-    const secondsUntilTerrain = _velocity.y > 0 ?
-      (Math.sqrt(_velocity.y ** 2 + 2 * GRAVITY * (_landingData.terrainAvgHeight - _position.y)) - _velocity.y) / (1000 / INTERVAL * GRAVITY)
-      : 99;
+    const secondsUntilTerrain =
+      _velocity.y > 0
+        ? (Math.sqrt(
+            _velocity.y ** 2 +
+              2 * GRAVITY * (_landingData.terrainAvgHeight - _position.y)
+          ) -
+            _velocity.y) /
+          ((1000 / INTERVAL) * GRAVITY)
+        : 99;
     CTX.save();
 
     CTX.fillStyle = state.get("theme").infoFontColor;
