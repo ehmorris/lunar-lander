@@ -221,12 +221,7 @@ export const makeLander = (state, onGameEnd) => {
       _position.x += deltaTimeMultiplier * _velocity.x;
       _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
       _velocity.y += deltaTimeMultiplier * GRAVITY;
-
-      // Wrap around horizontally if lander moved off screen
-      _position.x =
-        (_position.x - canvasWidth * Math.floor(_position.x / canvasWidth)) %
-        canvasWidth;
-
+      _position.x = ((_position.x % canvasWidth) + canvasWidth) % canvasWidth;
       _displayPosition.x = _position.x;
 
       if (_engineOn) {
@@ -235,17 +230,18 @@ export const makeLander = (state, onGameEnd) => {
       }
 
       // Log new rotations
-      const rotations = Math.floor(_angle / (Math.PI * 2));
+      const uprightRotations = Math.floor((_angle + Math.PI) / (Math.PI * 2));
       if (
         Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
-        rotations != _lastRotation
+        uprightRotations != _lastRotation
       ) {
-        while (rotations != _lastRotation) {
-          bonusPointsManager.addNamedPoint("newRotation");
-          _rotationCount++;
-          _lastRotation += Math.sign(rotations - _lastRotation);
-          _lastRotationAngle = _angle;
-        }
+        const rotationDifference = Math.abs(uprightRotations - _lastRotation);
+
+        bonusPointsManager.addNamedPoints("newRotation", rotationDifference);
+        _rotationCount += rotationDifference;
+        _lastRotation = uprightRotations;
+        _lastRotationAngle = _angle;
+
         _flipConfetti.push(
           makeConfetti(
             state,
@@ -400,15 +396,17 @@ export const makeLander = (state, onGameEnd) => {
   const _drawBottomHUD = () => {
     const yPadding = LANDER_HEIGHT;
     const xPadding = LANDER_HEIGHT;
+
+    const fallDistance = _landingData.terrainAvgHeight - _position.y;
+    const discriminant = _velocity.y ** 2 + 2 * GRAVITY * fallDistance;
     const secondsUntilTerrain =
       _velocity.y > 0
-        ? (Math.sqrt(
-            _velocity.y ** 2 +
-              2 * GRAVITY * (_landingData.terrainAvgHeight - _position.y)
-          ) -
-            _velocity.y) /
-          ((1000 / INTERVAL) * GRAVITY)
+        ? Math.round(
+            (Math.sqrt(discriminant) - _velocity.y) /
+              ((1000 / INTERVAL) * GRAVITY)
+          )
         : 99;
+
     CTX.save();
 
     CTX.fillStyle = state.get("theme").infoFontColor;
@@ -439,7 +437,7 @@ export const makeLander = (state, onGameEnd) => {
       CTX.textAlign = "center";
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
       CTX.fillText(
-        Math.floor(secondsUntilTerrain),
+        Intl.NumberFormat().format(secondsUntilTerrain),
         canvasWidth / 2,
         canvasHeight - yPadding - 24
       );
