@@ -219,9 +219,9 @@ export const makeLander = (state, onGameEnd) => {
       if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
 
       _position.x += deltaTimeMultiplier * _velocity.x;
+      _position.x = ((_position.x % canvasWidth) + canvasWidth) % canvasWidth; // wrap around
       _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
       _velocity.y += deltaTimeMultiplier * GRAVITY;
-      _position.x = ((_position.x % canvasWidth) + canvasWidth) % canvasWidth;
       _displayPosition.x = _position.x;
 
       if (_engineOn) {
