@@ -205,27 +205,23 @@ export const makeLander = (state, onGameEnd) => {
 
     _position.y = _position.y + deltaTimeMultiplier * _velocity.y;
 
-    if (
-      _position.y + LANDER_HEIGHT / 2 < _landingData.terrainHeight ||
-      (_position.y + LANDER_HEIGHT / 2 >= _landingData.terrainHeight &&
-        !CTX.isPointInPath(
-          _landingData.terrainPath2D,
-          _position.x * state.get("scaleFactor"),
-          (_position.y + LANDER_HEIGHT / 2) * state.get("scaleFactor")
-        ))
-    ) {
+    const landerInTerrain = CTX.isPointInPath(
+      _landingData.terrainPath2D,
+      _position.x * state.get("scaleFactor"),
+      (_position.y + LANDER_HEIGHT / 2) * state.get("scaleFactor")
+    );
+
+    const landerUnderTerrain = _position.y >= canvasHeight;
+
+    if (!landerInTerrain && !landerUnderTerrain) {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
       if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
 
-      if (_position.x < 0) _position.x = canvasWidth;
-
-      if (_position.x > canvasWidth) _position.x = 0;
-
       _position.x += deltaTimeMultiplier * _velocity.x;
+      _position.x = ((_position.x % canvasWidth) + canvasWidth) % canvasWidth; // wrap around
       _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
       _velocity.y += deltaTimeMultiplier * GRAVITY;
-
       _displayPosition.x = _position.x;
 
       if (_engineOn) {
@@ -234,15 +230,18 @@ export const makeLander = (state, onGameEnd) => {
       }
 
       // Log new rotations
-      const rotations = Math.floor(_angle / (Math.PI * 2));
+      const uprightRotations = Math.floor((_angle + Math.PI) / (Math.PI * 2));
       if (
         Math.abs(_angle - _lastRotationAngle) > Math.PI * 2 &&
-        (rotations > _lastRotation || rotations < _lastRotation)
+        uprightRotations != _lastRotation
       ) {
-        bonusPointsManager.addNamedPoint("newRotation");
-        _rotationCount++;
-        _lastRotation = rotations;
+        const rotationDifference = Math.abs(uprightRotations - _lastRotation);
+
+        bonusPointsManager.addNamedPoints("newRotation", rotationDifference);
+        _rotationCount += rotationDifference;
+        _lastRotation = uprightRotations;
         _lastRotationAngle = _angle;
+
         _flipConfetti.push(
           makeConfetti(
             state,
@@ -398,16 +397,13 @@ export const makeLander = (state, onGameEnd) => {
     const yPadding = LANDER_HEIGHT;
     const xPadding = LANDER_HEIGHT;
 
+    const fallDistance = _landingData.terrainAvgHeight - _position.y;
+    const discriminant = _velocity.y ** 2 + 2 * GRAVITY * fallDistance;
     const secondsUntilTerrain =
       _velocity.y > 0
-        ? Math.abs(
-            Math.round(
-              (_position.y -
-                canvasHeight +
-                (canvasHeight - _landingData.terrainAvgHeight)) /
-                _velocity.y /
-                100
-            )
+        ? Math.round(
+            (Math.sqrt(discriminant) - _velocity.y) /
+              ((1000 / INTERVAL) * GRAVITY)
           )
         : 99;
 
@@ -436,7 +432,7 @@ export const makeLander = (state, onGameEnd) => {
     CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
     CTX.fillText("FT", canvasWidth - xPadding, canvasHeight - yPadding);
 
-    if (secondsUntilTerrain < 15) {
+    if (secondsUntilTerrain < 30) {
       CTX.fillStyle = "rgb(255, 0, 0)";
       CTX.textAlign = "center";
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
