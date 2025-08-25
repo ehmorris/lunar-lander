@@ -42,6 +42,15 @@ export const makeBonusPointsManager = (state) => {
     timeOfLastPoint = Date.now();
   };
 
+  const addNamedPoints = (name, countOfNamedPoints) => {
+    const totalPointsToAdd = namePointMapping.get(name) * countOfNamedPoints;
+
+    totalPoints += totalPointsToAdd;
+    lastPointValue = totalPointsToAdd;
+    lastPointLabel = nameLabelMapping.get(name);
+    timeOfLastPoint = Date.now();
+  };
+
   const reset = () => {
     timeOfLastPoint = 0;
     totalPoints = 0;
@@ -149,6 +158,7 @@ export const makeBonusPointsManager = (state) => {
     reset,
     getPointValue,
     addNamedPoint,
+    addNamedPoints,
     getTotalPoints: () => totalPoints,
     hide: () => (hidden = true),
   };
