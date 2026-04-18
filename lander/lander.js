@@ -35,8 +35,8 @@ export const makeLander = (state, onGameEnd) => {
   const bonusPointsManager = state.get("bonusPointsManager");
 
   // Use grounded height to approximate distance from ground
-  const _landingData = state.get("terrain").getLandingData();
-  const _groundedHeight =
+  let _landingData = state.get("terrain").getLandingData();
+  let _groundedHeight =
     _landingData.terrainAvgHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
   const _thrust = 0.012;
   const getGravity = () => state.get("world").gravity;
@@ -627,10 +627,16 @@ export const makeLander = (state, onGameEnd) => {
     }
   };
 
+  const updateLandingData = () => {
+    _landingData = state.get("terrain").getLandingData();
+    _groundedHeight = _landingData.terrainAvgHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
+  }
+
   return {
     draw,
     destroy,
     resetProps,
+    updateLandingData,
     getPosition: () => _position,
     getDisplayPosition: () => _displayPosition,
     getVelocity: () => _velocity,

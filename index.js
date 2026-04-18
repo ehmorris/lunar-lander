@@ -242,6 +242,7 @@ function resetRoundState() {
   seededRandom.setDailyChallengeSeed();
   randomConfetti = [];
   terrain.reGenerate();
+  lander.updateLandingData();
   stars.reGenerate();
   sendAsteroid = seededRandomBool(seededRandom);
   asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
