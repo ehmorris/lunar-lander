@@ -255,6 +255,8 @@ function onWorldChange(e) {
   const selectedWorldName = e.target.value;
   if (selectedWorldName === appState.get("worldName")) return;
 
+  worldSelectElement.blur();
+  
   appState.set("worldName", selectedWorldName);
   appState.set("world", getWorldConfig(selectedWorldName));
   appState.set("theme", makeTheme(appState));
