@@ -40,13 +40,20 @@ export const manageInstructions = (onCloseInstructions) => {
     }
   }
 
+  // setEngineAndRotationDone fires from toyLander.draw on every frame while
+  // the controls are held, and each call built a fresh closure that
+  // addEventListener could not dedupe. Arm the close exactly once.
+  let _closeArmed = false;
+
   const checkDone = () => {
     if (
+      !_closeArmed &&
       _engineDone &&
       _leftRotationDone &&
       _rightRotationDone &&
       _engineAndRotationDone
     ) {
+      _closeArmed = true;
       const closeTimeout = () => setTimeout(close, 1000);
       const options = { once: true };
       document.addEventListener("touchend", closeTimeout, options);

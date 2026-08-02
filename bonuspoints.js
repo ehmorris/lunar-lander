@@ -35,21 +35,22 @@ export const makeBonusPointsManager = (state) => {
 
   const getPointValue = (name) => namePointMapping.get(name);
 
-  const addNamedPoint = (name) => {
-    totalPoints += namePointMapping.get(name);
-    lastPointValue = namePointMapping.get(name);
-    lastPointLabel = nameLabelMapping.get(name);
-    timeOfLastPoint = Date.now();
+  // Announcing a zero-point award rendered "Landed +0"; an unknown name used
+  // to add undefined and turn the running total into NaN.
+  const announce = (name, value) => {
+    totalPoints += value;
+
+    if (value > 0) {
+      lastPointValue = value;
+      lastPointLabel = nameLabelMapping.get(name);
+      timeOfLastPoint = Date.now();
+    }
   };
 
-  const addNamedPoints = (name, countOfNamedPoints) => {
-    const totalPointsToAdd = namePointMapping.get(name) * countOfNamedPoints;
+  const addNamedPoint = (name) => announce(name, namePointMapping.get(name) ?? 0);
 
-    totalPoints += totalPointsToAdd;
-    lastPointValue = totalPointsToAdd;
-    lastPointLabel = nameLabelMapping.get(name);
-    timeOfLastPoint = Date.now();
-  };
+  const addNamedPoints = (name, countOfNamedPoints) =>
+    announce(name, (namePointMapping.get(name) ?? 0) * countOfNamedPoints);
 
   const reset = () => {
     timeOfLastPoint = 0;

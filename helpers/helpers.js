@@ -4,13 +4,27 @@ export const generateCanvas = ({ width, height, attachNode }) => {
   const element = document.createElement("canvas");
   const context = element.getContext("2d");
 
-  element.style.width = width + "px";
-  element.style.height = height + "px";
-
   const scale = window.devicePixelRatio;
   element.width = Math.floor(width * scale);
   element.height = Math.floor(height * scale);
   context.scale(scale, scale);
+
+  // The game world is generated once at this size and never regenerated, so
+  // the canvas is laid out to fit whatever the viewport becomes rather than
+  // being left at its original pixel size. Without this, rotating a phone (or
+  // the mobile URL bar collapsing) left part of the screen as bare background
+  // with no touch listeners on it at all.
+  const fitToViewport = () => {
+    const viewportScale = Math.min(
+      window.innerWidth / width,
+      window.innerHeight / height
+    );
+    element.style.width = width * viewportScale + "px";
+    element.style.height = height * viewportScale + "px";
+  };
+  fitToViewport();
+  window.addEventListener("resize", fitToViewport);
+  window.addEventListener("orientationchange", fitToViewport);
 
   document.querySelector(attachNode).appendChild(element);
 
@@ -111,6 +125,26 @@ export const formatDuration = (milliseconds) => {
         : `${duration[unit]}${unit[0]}`
     )
     .join(" ");
+};
+
+// role="button" elements are focusable and announced as buttons, but unlike a
+// real <button> they do not fire click on Enter or Space. Returns a detach
+// function so callers can tear both listeners down together.
+export const onActivate = (element, handler) => {
+  const onKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handler(event);
+    }
+  };
+
+  element.addEventListener("click", handler);
+  element.addEventListener("keydown", onKeyDown);
+
+  return () => {
+    element.removeEventListener("click", handler);
+    element.removeEventListener("keydown", onKeyDown);
+  };
 };
 
 export const randomBool = (probability = 0.5) => Math.random() >= probability;

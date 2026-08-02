@@ -35,6 +35,7 @@ export const makeSpaceAsteroid = (
   let explosion = false;
 
   const onImpact = (collisionPoint, collisionVelocity) => {
+    timeOfExplosion = Date.now();
     explosion = makeExplosion(
       state,
       collisionPoint,
@@ -136,5 +137,10 @@ export const makeSpaceAsteroid = (
     }
   };
 
-  return { draw, destroy };
+  // Nothing ever removed these from the array, so they accumulated for as
+  // long as the player stayed in space.
+  const isFinished = () =>
+    offScreen || (explosion && Date.now() - timeOfExplosion >= visibilityDuration);
+
+  return { draw, destroy, isFinished };
 };

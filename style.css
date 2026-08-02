@@ -314,3 +314,13 @@ li.strikethrough {
 
 
 
+
+/* The canvas keeps the aspect ratio it was generated at and is centred in the
+   viewport, so a resize or rotation never leaves live game area off-screen. */
+.game {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}

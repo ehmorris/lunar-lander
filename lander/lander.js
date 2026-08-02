@@ -566,7 +566,6 @@ export const makeLander = (state, onGameEnd) => {
     }
 
     if (_shieldActive) {
-      console.log("drawing shield");
       CTX.strokeStyle = "#1e00e2";
       CTX.lineWidth = 2;
       CTX.translate(LANDER_WIDTH / 2, LANDER_HEIGHT / 3);

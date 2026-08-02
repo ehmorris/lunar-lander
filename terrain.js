@@ -118,6 +118,7 @@ export const makeTerrain = (state) => {
         y: landingSurface ? landingSurface.height : y,
       };
     });
+    terrainPathArray = terrainPathArray.slice(0, numPoints + 1);
     terrainPathArray[0] = { x: 0, y: terrainAvgHeight };
     terrainPathArray[numPoints] = { x: canvasWidth, y: terrainAvgHeight };
 
@@ -190,10 +191,19 @@ export const makeTerrain = (state) => {
   };
 
   const getSegmentAngleAtX = (x) => {
-    const segmentNumber = Math.floor(x / (canvasWidth / numPoints));
-    const segmentStart = terrainPathArray[segmentNumber];
-    const segmentEnd = terrainPathArray[segmentNumber + 1];
-    return getLineAngle(segmentStart, segmentEnd);
+    // Clamped so that a collision at exactly canvasWidth cannot read past the
+    // end of the array and hand getLineAngle an undefined coordinate.
+    const segmentNumber = Math.max(
+      0,
+      Math.min(
+        Math.floor(x / (canvasWidth / numPoints)),
+        terrainPathArray.length - 2
+      )
+    );
+    return getLineAngle(
+      terrainPathArray[segmentNumber],
+      terrainPathArray[segmentNumber + 1]
+    );
   };
 
   return {

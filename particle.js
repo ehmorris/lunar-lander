@@ -28,10 +28,17 @@ export const makeParticle = (
   let headingDeg = Math.atan2(velocity.y, velocity.x) * (180 / Math.PI);
   let stopped = false;
 
+  // Recomputing this on every tick discarded the damping applied on collision
+  // below, so debris kept its full horizontal speed and slid across the flat
+  // landing pads forever. Reapply it only when the heading actually changes.
+  const applyHeadingToVelocityX = () => {
+    velocity.x = startVelocity.x + Math.cos((headingDeg * Math.PI) / 180);
+  };
+  applyHeadingToVelocityX();
+
   const update = (deltaTime) => {
     const deltaTimeMultiplier = deltaTime / INTERVAL;
 
-    velocity.x = startVelocity.x + Math.cos((headingDeg * Math.PI) / 180);
     velocity.y += deltaTimeMultiplier * gravity;
     rotationVelocity += rotationDirection
       ? deltaTimeMultiplier * 0.1
@@ -59,6 +66,7 @@ export const makeParticle = (
 
         if (Math.abs(collisionAngle) > 20) {
           headingDeg = angleReflect(headingDeg, collisionAngle);
+          applyHeadingToVelocityX();
         }
 
         velocity.x = velocity.x * -friction;

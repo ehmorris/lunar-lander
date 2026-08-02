@@ -78,7 +78,9 @@ const tally = makeTallyManger();
 const asteroidRandom = seededRandom.getStream("asteroids");
 let sendAsteroid = seededRandomBool(asteroidRandom);
 let asteroidCountdown = seededRandomBetween(2000, 15000, asteroidRandom);
-let asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
+let asteroids = [
+  makeAsteroid(appState, lander.getDisplayPosition, onAsteroidImpact),
+];
 let spaceAsteroids = [];
 let randomConfetti = [];
 
@@ -104,16 +106,18 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
   // Move stars in parallax as lander flies high
   stars.draw(lander.getVelocity(), deltaTime);
 
+  // How far the terrain and everything anchored to it is pushed down the
+  // screen as the lander climbs. Asteroids need the same value to hit-test
+  // against where they are actually drawn.
+  const terrainOffset = transition(
+    0,
+    terrain.getLandingData().terrainHeight,
+    clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
+  );
+
   // Move terrain as lander flies high
   CTX.save();
-  CTX.translate(
-    0,
-    transition(
-      0,
-      terrain.getLandingData().terrainHeight,
-      clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
-    )
-  );
+  CTX.translate(0, terrainOffset);
   terrain.draw();
   CTX.restore();
 
@@ -142,22 +146,20 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
           )
         );
       }
-
-      spaceAsteroids.forEach((a) => a.draw(deltaTime));
     }
+
+    // Retired and drawn outside the altitude gate above. Gating the update as
+    // well as the spawn froze every space asteroid when the lander descended
+    // and popped them back in at their old positions on the way up, and
+    // nothing was ever removed from the array while the player stayed high.
+    spaceAsteroids = spaceAsteroids.filter((a) => !a.isFinished());
+    spaceAsteroids.forEach((a) => a.draw(deltaTime));
 
     // Move asteroids as lander flies high
     CTX.save();
-    CTX.translate(
-      0,
-      transition(
-        0,
-        terrain.getLandingData().terrainHeight,
-        clampedProgress(TRANSITION_TO_SPACE, 0, lander.getPosition().y)
-      )
-    );
+    CTX.translate(0, terrainOffset);
     if (sendAsteroid && timeSinceStart > asteroidCountdown) {
-      asteroids.forEach((a) => a.draw(deltaTime));
+      asteroids.forEach((a) => a.draw(deltaTime, terrainOffset));
     }
     CTX.restore();
 
@@ -237,7 +239,9 @@ function resetRoundState() {
   stars.reGenerate();
   sendAsteroid = seededRandomBool(asteroidRandom);
   asteroidCountdown = seededRandomBetween(2000, 15000, asteroidRandom);
-  asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
+  asteroids = [
+    makeAsteroid(appState, lander.getDisplayPosition, onAsteroidImpact),
+  ];
   spaceAsteroids = [];
   bonusPointsManager.reset();
 }
@@ -264,7 +268,7 @@ document.addEventListener("keydown", ({ key }) => {
     sendAsteroid = true;
     asteroidCountdown = 0;
     asteroids.push(
-      makeAsteroid(appState, lander.getPosition, onAsteroidImpact)
+      makeAsteroid(appState, lander.getDisplayPosition, onAsteroidImpact)
     );
   }
 });
