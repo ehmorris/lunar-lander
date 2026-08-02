@@ -75,8 +75,9 @@ const lander = makeLander(appState, onGameEnd);
 const landerControls = makeControls(appState, lander, audioManager);
 const tally = makeTallyManger();
 
-let sendAsteroid = seededRandomBool(seededRandom);
-let asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
+const asteroidRandom = seededRandom.getStream("asteroids");
+let sendAsteroid = seededRandomBool(asteroidRandom);
+let asteroidCountdown = seededRandomBetween(2000, 15000, asteroidRandom);
 let asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
 let spaceAsteroids = [];
 let randomConfetti = [];
@@ -101,7 +102,7 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
   CTX.fillRect(0, 0, canvasWidth, canvasHeight);
 
   // Move stars in parallax as lander flies high
-  stars.draw(lander.getVelocity());
+  stars.draw(lander.getVelocity(), deltaTime);
 
   // Move terrain as lander flies high
   CTX.save();
@@ -196,7 +197,6 @@ function onGameEnd(data) {
 
   showStatsAndResetControl(
     appState,
-    lander,
     animationObject,
     { ...data, scoreDescription, scoreForDisplay },
     landerControls.getHasKeyboard(),
@@ -230,9 +230,10 @@ function resetRoundState() {
   randomConfetti = [];
   terrain.reGenerate();
   lander.updateLandingData();
+  lander.resetProps();
   stars.reGenerate();
-  sendAsteroid = seededRandomBool(seededRandom);
-  asteroidCountdown = seededRandomBetween(2000, 15000, seededRandom);
+  sendAsteroid = seededRandomBool(asteroidRandom);
+  asteroidCountdown = seededRandomBetween(2000, 15000, asteroidRandom);
   asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
   spaceAsteroids = [];
   bonusPointsManager.reset();

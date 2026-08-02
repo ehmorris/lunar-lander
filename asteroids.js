@@ -14,7 +14,7 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
-  const seededRandom = state.get("seededRandom");
+  const seededRandom = state.get("seededRandom").getStream("asteroids");
   const visibilityDuration = 5_000;
   const fill = state.get("theme").asteroid;
   const size = seededRandomBetween(12, 30, seededRandom);

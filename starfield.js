@@ -1,4 +1,5 @@
 import { transition, randomBetween } from "./helpers/helpers.js";
+import { INTERVAL } from "./helpers/constants.js";
 
 export const makeStarfield = (state) => {
   const CTX = state.get("CTX");
@@ -27,14 +28,16 @@ export const makeStarfield = (state) => {
   };
   reGenerate();
 
-  const draw = (velocity) => {
+  const draw = (velocity, deltaTime) => {
+    const deltaTimeMultiplier = deltaTime / INTERVAL;
+
     stars.forEach(({ distance, opacity, position }) => {
       position.y =
         position.y > canvasHeight
           ? 0
           : position.y < 0
           ? canvasHeight
-          : position.y - (velocity.y * distance) / 10;
+          : position.y - (deltaTimeMultiplier * velocity.y * distance) / 10;
 
       CTX.save();
       CTX.globalAlpha = opacity;

@@ -16,7 +16,7 @@ export const makeTerrain = (state) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
-  const seededRandom = state.get("seededRandom");
+  const seededRandom = state.get("seededRandom").getStream("terrain");
 
   let terrainAvgHeight = canvasHeight * 0.8;
   let landingMaxHeight = terrainAvgHeight;

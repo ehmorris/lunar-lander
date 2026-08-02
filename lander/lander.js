@@ -66,7 +66,7 @@ export const makeLander = (state, onGameEnd) => {
   let _babySoundPlayed;
 
   const resetProps = () => {
-    const seededRandom = state.get("seededRandom");
+    const seededRandom = state.get("seededRandom").getStream("lander");
 
     _position = {
       x: seededRandomBetween(
