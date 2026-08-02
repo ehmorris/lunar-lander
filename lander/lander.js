@@ -8,6 +8,7 @@ import {
   getAngleDeltaUprightWithSign,
   heightInFeet,
   percentProgress,
+  formatDuration,
 } from "../helpers/helpers.js";
 import { scoreLanding, scoreCrash } from "../helpers/scoring.js";
 import {
@@ -118,9 +119,8 @@ export const makeLander = (state, onGameEnd) => {
       angle: Intl.NumberFormat().format(
         getAngleDeltaUpright(_angle).toFixed(1)
       ),
-      durationInSeconds: Intl.NumberFormat().format(
-        (_timeSinceStart / 1000).toFixed(1)
-      ),
+      duration: formatDuration(_timeSinceStart),
+      durationMs: Math.round(_timeSinceStart),
       rotationsInt: _rotationCount,
       rotationsFormatted: Intl.NumberFormat().format(_rotationCount),
       maxSpeed: velocityInMPH(_maxVelocity),
@@ -175,7 +175,7 @@ export const makeLander = (state, onGameEnd) => {
         landed: !!landed,
         speed: gameEndData.speed,
         angle: gameEndData.angle,
-        duration: gameEndData.durationInSeconds,
+        duration: gameEndData.durationMs,
         flips: gameEndData.rotationsInt,
         maxSpeed: gameEndData.maxSpeed,
         maxHeight: gameEndData.maxHeight,
@@ -403,7 +403,7 @@ export const makeLander = (state, onGameEnd) => {
     const fallDistance = _landingData.terrainAvgHeight - _position.y;
     const discriminant = _velocity.y ** 2 + 2 * gravity * fallDistance;
     const secondsUntilTerrain =
-      _velocity.y > 0
+      _velocity.y > 0 && discriminant >= 0
         ? Math.round(
             (Math.sqrt(discriminant) - _velocity.y) / ((1000 / INTERVAL) * gravity)
           )
@@ -451,23 +451,11 @@ export const makeLander = (state, onGameEnd) => {
         canvasHeight - yPadding
       );
     } else {
-      const duration = {
-        hours: Math.floor(_timeSinceStart / (1000 * 60 * 60)),
-        minutes: Math.floor(_timeSinceStart / (1000 * 60)) % 60,
-        seconds: Math.floor(_timeSinceStart / 1000) % 60,
-      };
-
-      const formatter = new Intl.DurationFormat("en", {
-        style: "digital",
-        hoursDisplay: "auto",
-        minutesDisplay: "auto",
-      });
-
       CTX.fillStyle = state.get("theme").infoFontColor;
       CTX.textAlign = "center";
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
       CTX.fillText(
-        formatter.format(duration),
+        formatDuration(_timeSinceStart),
         canvasWidth / 2,
         canvasHeight - yPadding - 24
       );
