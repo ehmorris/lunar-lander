@@ -26,12 +26,6 @@ import { makeBonusPointsManager } from "./bonuspoints.js";
 import { makeTheme } from "./theme.js";
 import { TRANSITION_TO_SPACE } from "./helpers/constants.js";
 import {
-  DEFAULT_WORLD_NAME,
-  getStoredWorldName,
-  getWorldConfig,
-  storeWorldName,
-} from "./helpers/worlds.js";
-import {
   landingScoreDescription,
   crashScoreDescription,
   destroyedDescription,
@@ -48,7 +42,6 @@ const [CTX, canvasWidth, canvasHeight, canvasElement, scaleFactor] =
   });
 const challengeManager = makeChallengeManager();
 const seededRandom = makeSeededRandom();
-const initialWorldName = getStoredWorldName();
 
 const appState = makeStateManager()
   .set("CTX", CTX)
@@ -58,9 +51,7 @@ const appState = makeStateManager()
   .set("scaleFactor", scaleFactor)
   .set("audioManager", audioManager)
   .set("challengeManager", challengeManager)
-  .set("seededRandom", seededRandom)
-  .set("worldName", initialWorldName)
-  .set("world", getWorldConfig(initialWorldName));
+  .set("seededRandom", seededRandom);
 
 appState.set("theme", makeTheme(appState));
 
@@ -91,10 +82,6 @@ let spaceAsteroids = [];
 let randomConfetti = [];
 
 let gameEnded = false;
-
-const worldSelectElement = document.querySelector("#worldSelect");
-worldSelectElement.value = appState.get("worldName") || DEFAULT_WORLD_NAME;
-worldSelectElement.addEventListener("change", onWorldChange);
 
 // INSTRUCTIONS SHOW/HIDE
 
@@ -249,23 +236,6 @@ function resetRoundState() {
   asteroids = [makeAsteroid(appState, lander.getPosition, onAsteroidImpact)];
   spaceAsteroids = [];
   bonusPointsManager.reset();
-}
-
-function onWorldChange(e) {
-  const selectedWorldName = e.target.value;
-  if (selectedWorldName === appState.get("worldName")) return;
-
-  worldSelectElement.blur();
-  
-  appState.set("worldName", selectedWorldName);
-  appState.set("world", getWorldConfig(selectedWorldName));
-  appState.set("theme", makeTheme(appState));
-  storeWorldName(selectedWorldName);
-
-  // Start a clean run so all world-dependent visuals and entities match.
-  lander.resetProps();
-  animationObject.resetStartTime();
-  resetRoundState();
 }
 
 function onAsteroidImpact(asteroidVelocity) {

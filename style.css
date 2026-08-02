@@ -312,33 +312,5 @@ li.strikethrough {
   text-transform: uppercase;
 }
 
-.topCenterCorner {
-  position: absolute;
-  top: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: var(--stats-font-size);
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--headline-font-color);
-  pointer-events: auto;
-}
 
-.topCenterCorner select {
-  font: inherit;
-  text-transform: uppercase;
-  color: var(--headline-font-color);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 12px;
-  padding: 2px 8px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
 
-.topCenterCorner select:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.65);
-  outline-offset: 2px;
-}

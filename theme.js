@@ -1,5 +1,19 @@
 import { LANDER_WIDTH } from "./helpers/constants.js";
 
+const COLORS = {
+  bodyFontColor: "rgba(255, 255, 255, 0.75)",
+  headlineFontColor: "#fff",
+  infoFontColor: "#fff",
+  background: "#02071e",
+  spaceGradientMid: "#02071e",
+  landerGradientStops: ["#DFE5E5", "#BDBCC3", "#4A4E6F", "#3D4264"],
+  asteroid: "#898482",
+  star: "#ffffff",
+  terrain: "#757579",
+  meterGradient:
+    "linear-gradient(90deg, hsl(142deg 100% 48%) 0%, hsl(84deg 100% 42%) 6%, hsl(61deg 100% 35%) 15%, hsl(41deg 100% 40%) 29%, hsl(25deg 100% 44%) 50%, hsl(0deg 100% 46%) 100%)",
+};
+
 const makeLanderGradient = (
   CTX,
   color1,
@@ -26,38 +40,37 @@ const makeSpaceBackgroundGradient = (CTX, canvasHeight, backgroundColor) => {
 export const makeTheme = (state) => {
   const CTX = state.get("CTX");
   const canvasHeight = state.get("canvasHeight");
-  const worldColors = state.get("world").colors;
 
   const activeTheme = {
-    bodyFontColor: worldColors.bodyFontColor,
-    headlineFontColor: worldColors.headlineFontColor,
-    infoFontColor: worldColors.infoFontColor,
-    background: worldColors.background,
+    bodyFontColor: COLORS.bodyFontColor,
+    headlineFontColor: COLORS.headlineFontColor,
+    infoFontColor: COLORS.infoFontColor,
+    background: COLORS.background,
     backgroundGradient: makeSpaceBackgroundGradient(
       CTX,
       canvasHeight,
-      worldColors.spaceGradientMid
+      COLORS.spaceGradientMid
     ),
     landerGradient: makeLanderGradient(
       CTX,
-      worldColors.landerGradientStops[0],
-      worldColors.landerGradientStops[1],
-      worldColors.landerGradientStops[2],
-      worldColors.landerGradientStops[3]
+      COLORS.landerGradientStops[0],
+      COLORS.landerGradientStops[1],
+      COLORS.landerGradientStops[2],
+      COLORS.landerGradientStops[3]
     ),
     toyLanderGradient: (width) =>
       makeLanderGradient(
         CTX,
-        worldColors.landerGradientStops[0],
-        worldColors.landerGradientStops[1],
-        worldColors.landerGradientStops[2],
-        worldColors.landerGradientStops[3],
+        COLORS.landerGradientStops[0],
+        COLORS.landerGradientStops[1],
+        COLORS.landerGradientStops[2],
+        COLORS.landerGradientStops[3],
         width
       ),
-    asteroid: worldColors.asteroid,
-    star: worldColors.star,
-    terrain: worldColors.terrain,
-    meterGradient: worldColors.meterGradient,
+    asteroid: COLORS.asteroid,
+    star: COLORS.star,
+    terrain: COLORS.terrain,
+    meterGradient: COLORS.meterGradient,
   };
 
   document.documentElement.style.setProperty(

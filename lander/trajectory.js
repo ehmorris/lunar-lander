@@ -1,4 +1,4 @@
-import { LANDER_HEIGHT, CRASH_ANGLE } from "../helpers/constants.js";
+import { GRAVITY } from "../helpers/constants.js";
 
 export const drawTrajectory = (
   state,
@@ -10,7 +10,7 @@ export const drawTrajectory = (
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
-  const gravity = state.get("world").gravity;
+  const gravity = GRAVITY;
   const terrainLandingData = state.get("terrain").getLandingData();
   const scaleFactor = state.get("scaleFactor");
 
