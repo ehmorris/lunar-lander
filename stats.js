@@ -116,6 +116,7 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     // Delay showing the reset button in case the user is actively tapping
     // in that area for thrust
     setTimeout(() => {
+      if (hasReset) return;
       document.querySelector("#tryAgain").classList.remove("loading");
       detachers.push(
         onActivate(document.querySelector("#tryAgain"), tryAgain)
@@ -136,6 +137,7 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
       // Delay showing the reset button in case the user is actively tapping
       // in that area for thrust
       setTimeout(() => {
+        if (hasReset) return;
         document.addEventListener("keydown", tryAgainOnSpace);
         detachers.push(() =>
           document.removeEventListener("keydown", tryAgainOnSpace)
