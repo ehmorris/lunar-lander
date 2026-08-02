@@ -1,3 +1,5 @@
+import { onActivate } from "./helpers/helpers.js";
+
 export const showStatsAndResetControl = (
   state,
   animationObject,
@@ -12,6 +14,7 @@ export const showStatsAndResetControl = (
     document.querySelector("#tryAgain").classList.add("loading");
   };
   const canCopyText = navigator && navigator.clipboard;
+  let hasReset = false;
 
   const shareText = `Challenge #${state
     .get("challengeManager")
@@ -26,9 +29,6 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
   } | ${data.duration}`;
 
   const hideStats = () => {
-    document
-      .querySelector("#endGameStats .buttonContainer")
-      .classList.remove("show");
     document.querySelector("#endGameStats").classList.remove("show");
   };
 
@@ -65,7 +65,6 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     document.querySelector("#rotations").textContent = data.rotationsFormatted;
     document.querySelector("#maxSpeed").textContent = data.maxSpeed;
     document.querySelector("#maxHeight").textContent = data.maxHeight;
-    document.querySelector("#maxHeight").textContent = data.maxHeight;
 
     if (hasKeyboard) {
       document.querySelector("#tryAgainText").textContent =
@@ -86,37 +85,51 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
   };
 
   function showShareSheet() {
-    try {
-      navigator.share({ text: shareText });
-    } catch {}
+    Promise.resolve()
+      .then(() => navigator.share({ text: shareText }))
+      .catch(() => {});
   }
 
   function copyShareStats() {
-    try {
-      navigator.clipboard.writeText(shareText);
-    } catch {}
+    Promise.resolve()
+      .then(() => navigator.clipboard.writeText(shareText))
+      .then(() => {
+        const button = document.querySelector("#copyText span");
+        if (button) {
+          button.textContent = "Copied";
+          setTimeout(() => (button.textContent = "Copy Stats"), 2000);
+        }
+      })
+      .catch(() => {});
   }
 
   function tryAgainOnSpace({ code }) {
     if (code === "Space") tryAgain();
   }
 
+  // Collected so that every listener attached for this game-over screen is
+  // guaranteed to come back off again, including the share/copy pair that
+  // used to be left behind and stack up a duplicate every round.
+  let detachers = [];
+
   const attachEventListeners = () => {
     // Delay showing the reset button in case the user is actively tapping
     // in that area for thrust
     setTimeout(() => {
       document.querySelector("#tryAgain").classList.remove("loading");
-      document.querySelector("#tryAgain").addEventListener("click", tryAgain);
+      detachers.push(
+        onActivate(document.querySelector("#tryAgain"), tryAgain)
+      );
     }, buttonDelayTime);
 
     if (canShowShareSheet) {
-      document
-        .querySelector("#share")
-        .addEventListener("click", showShareSheet);
+      detachers.push(
+        onActivate(document.querySelector("#share"), showShareSheet)
+      );
     } else if (canCopyText) {
-      document
-        .querySelector("#copyText")
-        .addEventListener("click", copyShareStats);
+      detachers.push(
+        onActivate(document.querySelector("#copyText"), copyShareStats)
+      );
     }
 
     if (hasKeyboard) {
@@ -124,25 +137,25 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
       // in that area for thrust
       setTimeout(() => {
         document.addEventListener("keydown", tryAgainOnSpace);
+        detachers.push(() =>
+          document.removeEventListener("keydown", tryAgainOnSpace)
+        );
       }, buttonDelayTime);
     }
   };
 
   const detachEventListeners = () => {
-    document.querySelector("#tryAgain").removeEventListener("click", tryAgain);
-
-    if (canShowShareSheet) {
-      document
-        .querySelector("#share")
-        .removeEventListener("click", showShareSheet);
-    }
-
-    if (hasKeyboard) {
-      document.removeEventListener("keydown", tryAgainOnSpace);
-    }
+    detachers.forEach((detach) => detach());
+    detachers = [];
   };
 
   function tryAgain() {
+    // The global Space shortcut and the focused button can both fire for one
+    // keypress, and resetting the round twice would advance past the daily
+    // challenge state.
+    if (hasReset) return;
+    hasReset = true;
+
     animationObject.resetStartTime();
     resetMeter("speed");
     resetMeter("angle");

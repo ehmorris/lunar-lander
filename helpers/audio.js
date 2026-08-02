@@ -45,33 +45,43 @@ export const makeAudioManager = () => {
       // ringer channel.
       themeAudio = new Audio("./audio/theme.mp3");
       themeAudio.loop = true;
-      themeAudio.play();
+      themeAudio.play().catch(() => {});
     }
   };
 
   document.addEventListener("touchend", _initialize, { once: true });
-  document.addEventListener(
-    "keydown",
-    ({ isTrusted, metaKey, shiftKey, ctrlKey, altKey, key }) => {
-      if (
-        isTrusted &&
-        !(metaKey || shiftKey || ctrlKey || altKey) &&
-        key !== "Escape" &&
-        key !== "Esc"
-      ) {
-        _initialize();
-      }
-    },
-    { once: true }
-  );
+  document.addEventListener("mousedown", _initialize, { once: true });
+
+  // Removed by hand rather than with `once`, which would consume the unlock
+  // on the very first keypress even when the guard below rejects it.
+  const initializeOnKeyDown = ({
+    isTrusted,
+    metaKey,
+    shiftKey,
+    ctrlKey,
+    altKey,
+    key,
+  }) => {
+    if (
+      isTrusted &&
+      !(metaKey || shiftKey || ctrlKey || altKey) &&
+      key !== "Escape" &&
+      key !== "Esc"
+    ) {
+      document.removeEventListener("keydown", initializeOnKeyDown);
+      _initialize();
+    }
+  };
+  document.addEventListener("keydown", initializeOnKeyDown);
 
   document.addEventListener("visibilitychange", () => {
     if (themeAudio) {
-      document.hidden ? themeAudio.pause() : themeAudio.play();
+      if (document.hidden) themeAudio.pause();
+      else themeAudio.play().catch(() => {});
     }
   });
 
-  async function _playTrack(audioBuffer, loop = true) {
+  async function _playTrack(getAudioBuffer, loop = true) {
     const playBuffer = (buffer) => {
       const trackSource = new AudioBufferSourceNode(audioCTX, {
         buffer: buffer,
@@ -82,32 +92,30 @@ export const makeAudioManager = () => {
       return trackSource;
     };
 
-    if (hasInitialized) {
-      return Promise.all([audioCTX.resume(), audioBuffer]).then((e) =>
-        playBuffer(e[1])
-      );
-    } else {
-      return Promise.all([_initialize(), audioBuffer]).then((e) =>
-        playBuffer(e[1])
-      );
-    }
+    if (!hasInitialized) _initialize();
+
+    // Resolved after initialization, so the buffer is read once it exists
+    // rather than captured as undefined by an early caller.
+    return Promise.all([audioCTX.resume(), getAudioBuffer()]).then((e) =>
+      playBuffer(e[1])
+    );
   }
 
   const playEngineSound = () => {
     if (!engineFileBufferSource) {
-      engineFileBufferSource = _playTrack(engineFileBuffer);
+      engineFileBufferSource = _playTrack(() => engineFileBuffer);
     }
   };
 
   const playBoosterSound1 = () => {
     if (!booster1FileBufferSource) {
-      booster1FileBufferSource = _playTrack(boosterFileBuffer);
+      booster1FileBufferSource = _playTrack(() => boosterFileBuffer);
     }
   };
 
   const playBoosterSound2 = () => {
     if (!booster2FileBufferSource) {
-      booster2FileBufferSource = _playTrack(boosterFileBuffer);
+      booster2FileBufferSource = _playTrack(() => boosterFileBuffer);
     }
   };
 
@@ -139,19 +147,19 @@ export const makeAudioManager = () => {
   };
 
   const playCrash = () => {
-    _playTrack(randomBool() ? crash1FileBuffer : crash2FileBuffer, false);
+    _playTrack(() => (randomBool() ? crash1FileBuffer : crash2FileBuffer), false);
   };
 
   const playLanding = () => {
-    _playTrack(randomBool() ? landing1FileBuffer : landing2FileBuffer, false);
+    _playTrack(() => (randomBool() ? landing1FileBuffer : landing2FileBuffer), false);
   };
 
   const playConfetti = () => {
-    _playTrack(randomBool() ? confetti1FileBuffer : confetti2FileBuffer, false);
+    _playTrack(() => (randomBool() ? confetti1FileBuffer : confetti2FileBuffer), false);
   };
 
   const playBaby = () => {
-    _playTrack(babyFileBuffer, false);
+    _playTrack(() => babyFileBuffer, false);
   };
 
   return {

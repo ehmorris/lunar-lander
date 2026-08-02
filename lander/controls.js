@@ -74,12 +74,21 @@ export const makeControls = (state, lander, audioManager) => {
     }
   };
 
-  const getTouchZone = (x) => {
+  const toCanvasX = (clientX) => {
+    const bounds = canvasElement.getBoundingClientRect();
+    return bounds.width
+      ? ((clientX - bounds.left) / bounds.width) * canvasWidth
+      : clientX;
+  };
+
+  const getTouchZone = (clientX) => {
+    const x = toCanvasX(clientX);
+
     const clampedColumnNumber = Math.max(
       0,
       Math.min(
         Math.floor(x / (canvasWidth / touchColumnMap.length)),
-        touchColumnMap.length
+        touchColumnMap.length - 1
       )
     );
 
@@ -116,6 +125,8 @@ export const makeControls = (state, lander, audioManager) => {
           touchPreviousData = touch;
         }
       });
+      if (!touchPreviousData) continue;
+
       const previousTouchZone = getTouchZone(touchPreviousData.clientX);
       const currentTouchZone = getTouchZone(e.changedTouches[index].clientX);
 
@@ -158,6 +169,15 @@ export const makeControls = (state, lander, audioManager) => {
     canvasElement.removeEventListener("touchstart", onTouchStart);
     canvasElement.removeEventListener("touchmove", onTouchMove);
     canvasElement.removeEventListener("touchend", onTouchEnd);
+
+    // Whatever the player was holding when the listeners went away can never
+    // receive its matching keyup or touchend, so release all three zones.
+    // Otherwise crashing mid-thrust leaves the engine sound looping into the
+    // next round and the touch column tinted for the rest of the session.
+    allActiveTouches.clear();
+    deactivateTouchZone("left");
+    deactivateTouchZone("center");
+    deactivateTouchZone("right");
   };
 
   const drawTouchOverlay = () => {

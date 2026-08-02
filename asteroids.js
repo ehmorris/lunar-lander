@@ -95,17 +95,22 @@ export const makeAsteroid = (state, getLanderPosition, onLanderCollision) => {
     }
   };
 
-  const draw = (deltaTime) => {
+  const draw = (deltaTime, displayOffset = 0) => {
     if (!explosion) {
       const landerPosition = getLanderPosition();
       const impactXPadding = LANDER_WIDTH;
       const impactYPadding = LANDER_HEIGHT;
       const asteroidPosition = asteroid.getPosition();
+      // Asteroids are drawn inside a translate that grows as the lander
+      // climbs, while the lander is drawn outside it. Comparing raw positions
+      // meant the hit test drifted hundreds of pixels away from what was on
+      // screen, so apply the same offset the renderer does.
+      const asteroidScreenY = asteroidPosition.y + displayOffset;
       if (
         asteroidPosition.x > landerPosition.x - impactXPadding &&
         asteroidPosition.x < landerPosition.x + impactXPadding &&
-        asteroidPosition.y > landerPosition.y - impactYPadding &&
-        asteroidPosition.y < landerPosition.y + impactYPadding
+        asteroidScreenY > landerPosition.y - impactYPadding &&
+        asteroidScreenY < landerPosition.y + impactYPadding
       ) {
         onLanderCollision(asteroid.getVelocity());
         onImpact(asteroidPosition, asteroid.getVelocity());

@@ -22,8 +22,14 @@ export const makeTallyManger = () => {
     }
   };
 
-  _landingTotal = parseInt(getLandingTotalStorage());
-  _crashTotal = parseInt(getCrashTotalStorage());
+  // Storage can hold anything, and parseInt on junk yields NaN
+  const toCount = (value) => {
+    const parsed = parseInt(value, 10);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  _landingTotal = toCount(getLandingTotalStorage());
+  _crashTotal = toCount(getCrashTotalStorage());
 
   const storeLanding = () => {
     _landingTotal++;
@@ -39,10 +45,11 @@ export const makeTallyManger = () => {
     } catch {}
   };
 
+  // Read from memory rather than back out of storage, so the tally still
+  // counts up when writes are failing (private mode, blocked cookies).
   const updateDisplay = () => {
-    document.querySelector("#landingTotal").textContent =
-      getLandingTotalStorage();
-    document.querySelector("#crashTotal").textContent = getCrashTotalStorage();
+    document.querySelector("#landingTotal").textContent = _landingTotal;
+    document.querySelector("#crashTotal").textContent = _crashTotal;
   };
   updateDisplay();
 

@@ -28,7 +28,7 @@ export const landingScoreDescription = (score) =>
     ? "Not the worst landing, but not very good either"
     : score >= 55
     ? "Pretty bad landing, but it could be worse"
-    : score >= 55
+    : score >= 45
     ? "Not great"
     : score >= 40
     ? "Basically a fender bender, but you landed"
