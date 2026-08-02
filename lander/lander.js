@@ -11,6 +11,7 @@ import {
 } from "../helpers/helpers.js";
 import { scoreLanding, scoreCrash } from "../helpers/scoring.js";
 import {
+  GRAVITY,
   LANDER_WIDTH,
   LANDER_HEIGHT,
   CRASH_VELOCITY,
@@ -39,7 +40,6 @@ export const makeLander = (state, onGameEnd) => {
   let _groundedHeight =
     _landingData.terrainAvgHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
   const _thrust = 0.012;
-  const getGravity = () => state.get("world").gravity;
 
   let _position;
   let _displayPosition;
@@ -223,7 +223,7 @@ export const makeLander = (state, onGameEnd) => {
       _position.x += deltaTimeMultiplier * _velocity.x;
       _position.x = ((_position.x % canvasWidth) + canvasWidth) % canvasWidth;
       _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
-      _velocity.y += deltaTimeMultiplier * getGravity();
+      _velocity.y += deltaTimeMultiplier * GRAVITY;
       _displayPosition.x = _position.x;
 
       if (_engineOn) {
@@ -398,7 +398,7 @@ export const makeLander = (state, onGameEnd) => {
   const _drawBottomHUD = () => {
     const yPadding = LANDER_HEIGHT;
     const xPadding = LANDER_HEIGHT;
-    const gravity = getGravity();
+    const gravity = GRAVITY;
 
     const fallDistance = _landingData.terrainAvgHeight - _position.y;
     const discriminant = _velocity.y ** 2 + 2 * gravity * fallDistance;

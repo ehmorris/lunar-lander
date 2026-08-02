@@ -1,4 +1,4 @@
-import { INTERVAL } from "./helpers/constants.js";
+import { GRAVITY, INTERVAL } from "./helpers/constants.js";
 import { randomBool } from "./helpers/helpers.js";
 
 export const makeParticle = (
@@ -16,7 +16,7 @@ export const makeParticle = (
   const scaleFactor = state.get("scaleFactor");
   const terrain = state.get("terrain");
   const landingData = state.get("terrain").getLandingData();
-  const gravity = state.get("world").gravity;
+  const gravity = GRAVITY;
   const friction = 0.3;
   const rotationDirection = randomBool();
 

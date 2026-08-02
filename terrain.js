@@ -5,6 +5,13 @@ import {
 } from "./helpers/helpers.js";
 import { LANDER_WIDTH } from "./helpers/constants.js";
 
+const terrainConfig = {
+  targetHeightRatio: 0.8,
+  displaceRatio: 0.1,
+  roughness: 0.75,
+  landingMinInset: 40,
+};
+
 export const makeTerrain = (state) => {
   const CTX = state.get("CTX");
   const canvasWidth = state.get("canvasWidth");
@@ -82,7 +89,6 @@ export const makeTerrain = (state) => {
   };
 
   const reGenerate = () => {
-    const terrainConfig = state.get("world").terrain;
     terrainAvgHeight = canvasHeight * terrainConfig.targetHeightRatio;
     landingMaxHeight = terrainAvgHeight;
     landingMinHeight = canvasHeight - terrainConfig.landingMinInset;
