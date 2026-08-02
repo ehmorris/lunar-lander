@@ -1,6 +1,5 @@
 export const showStatsAndResetControl = (
   state,
-  lander,
   animationObject,
   data,
   hasKeyboard,
@@ -144,7 +143,6 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
   };
 
   function tryAgain() {
-    lander.resetProps();
     animationObject.resetStartTime();
     resetMeter("speed");
     resetMeter("angle");
