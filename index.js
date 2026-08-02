@@ -178,6 +178,9 @@ const animationObject = animate((timeSinceStart, deltaTime) => {
 function onCloseInstructions() {
   toyLanderControls.detachEventListeners();
   landerControls.attachEventListeners();
+  // The clock starts when the page loads, so without this a first-time
+  // player's duration includes all the time they spent in the tutorial.
+  animationObject.resetStartTime();
   challengeManager.populateCornerInfo();
   terrain.setShowLandingSurfaces();
 }

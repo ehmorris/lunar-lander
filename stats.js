@@ -23,7 +23,7 @@ https://ehmorris.com/lander/
 
 ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     data.rotationsInt === 1 ? "" : "s"
-  } | ${data.durationInSeconds}s`;
+  } | ${data.duration}`;
 
   const hideStats = () => {
     document
@@ -61,7 +61,7 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     populateMeter("speed", data.speedPercent, data.speed);
     populateMeter("angle", data.anglePercent, data.angle);
 
-    document.querySelector("#duration").textContent = data.durationInSeconds;
+    document.querySelector("#duration").textContent = data.duration;
     document.querySelector("#rotations").textContent = data.rotationsFormatted;
     document.querySelector("#maxSpeed").textContent = data.maxSpeed;
     document.querySelector("#maxHeight").textContent = data.maxHeight;

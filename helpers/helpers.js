@@ -17,26 +17,100 @@ export const generateCanvas = ({ width, height, attachNode }) => {
   return [context, width, height, element, scale];
 };
 
+// A frame gap longer than this is treated as a pause rather than as elapsed
+// game time. requestAnimationFrame is throttled to zero while a tab is
+// hidden, so without a ceiling the first frame back carries the whole hidden
+// duration — at INTERVAL 8 a 30s tab switch yields a multiplier of ~3750,
+// which teleports the lander straight through the terrain.
+const MAX_DELTA_TIME = 100;
+
 export const animate = (drawFunc) => {
-  let startTime = Date.now();
-  let currentFrameTime = Date.now();
+  let elapsed = 0;
   let previousTimestamp = false;
 
-  const resetStartTime = () => (startTime = Date.now());
+  const resetStartTime = () => (elapsed = 0);
 
   const drawFuncContainer = (timestamp) => {
-    currentFrameTime = Date.now();
-    const deltaTime = previousTimestamp
-      ? timestamp - previousTimestamp
-      : performance.now() - timestamp;
-    drawFunc(currentFrameTime - startTime, deltaTime);
+    // Queue the next frame before drawing this one. Scheduling afterwards
+    // means a single exception anywhere in the render tree stops the loop
+    // forever, with no way back short of a reload.
     window.requestAnimationFrame(drawFuncContainer);
+
+    const deltaTime = Math.min(
+      previousTimestamp ? timestamp - previousTimestamp : 0,
+      MAX_DELTA_TIME
+    );
     previousTimestamp = timestamp;
+
+    // Accumulated from clamped deltas rather than read off the wall clock, so
+    // that time spent in a hidden tab doesn't inflate the reported duration.
+    elapsed += deltaTime;
+
+    drawFunc(elapsed, deltaTime);
   };
 
   window.requestAnimationFrame(drawFuncContainer);
 
   return { resetStartTime };
+};
+
+// Intl.DurationFormat only became widely available in late 2024, and building
+// a formatter is the expensive part of the Intl APIs. Construct one up front,
+// once, and only when it is actually supported: this runs inside the render
+// loop, so an unguarded `new Intl.DurationFormat` throws on every frame and
+// takes the whole game down with it on an older engine.
+const durationFormatter = (() => {
+  try {
+    return new Intl.DurationFormat(undefined, {
+      style: "narrow",
+      hoursDisplay: "auto",
+      minutesDisplay: "auto",
+      secondsDisplay: "always",
+    });
+  } catch {
+    return null;
+  }
+})();
+
+// Fallback for engines without DurationFormat. Still localised — the unit
+// style of NumberFormat has been available far longer.
+const fallbackUnitFormatters = (() => {
+  try {
+    const make = (unit) =>
+      new Intl.NumberFormat(undefined, {
+        style: "unit",
+        unit,
+        unitDisplay: "narrow",
+      });
+    return { hours: make("hour"), minutes: make("minute"), seconds: make("second") };
+  } catch {
+    return null;
+  }
+})();
+
+// Shows seconds, then minutes, then hours, in the player's own locale.
+export const formatDuration = (milliseconds) => {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const duration = {
+    hours: Math.floor(totalSeconds / 3600),
+    minutes: Math.floor(totalSeconds / 60) % 60,
+    seconds: totalSeconds % 60,
+  };
+
+  if (durationFormatter) return durationFormatter.format(duration);
+
+  // Skip leading units that are still zero, so short times stay short
+  const units = ["hours", "minutes", "seconds"];
+  const shown = units.slice(units.findIndex((unit) => duration[unit] > 0));
+  const visible = shown.length ? shown : ["seconds"];
+
+  return visible
+    .map((unit) =>
+      fallbackUnitFormatters
+        ? fallbackUnitFormatters[unit].format(duration[unit])
+        : `${duration[unit]}${unit[0]}`
+    )
+    .join(" ");
 };
 
 export const randomBool = (probability = 0.5) => Math.random() >= probability;
