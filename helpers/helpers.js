@@ -160,6 +160,45 @@ export const seededRandomBool = (seededRandom, probability = 0.5) =>
 export const getVectorVelocity = (velocity) =>
   Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
 
+// How many more frames the lander could have kept falling before a full-thrust
+// burn became the last thing that could still bring it in under safeSpeed.
+//
+// Distance needed to shed the excess speed is (v² - safeSpeed²) / 2a, so the
+// burn is mandatory the instant altitude equals that. Solving
+// altitude(t) === stoppingDistance(speed(t)) for t collapses to
+// gravity*t² + 2*descentSpeed*t - k = 0.
+//
+// Everything is in the game's native px-per-INTERVAL units, matching the
+// secondsUntilTerrain math in the lander's bottom HUD. Returns 0 when the burn
+// is mandatory right now, negative when the window has already closed (which is
+// reachable — ground level is approximated by the average terrain height, so a
+// low patch of terrain buys real margin), and Infinity when no burn is needed.
+export const framesOfBurnSlack = ({
+  altitude,
+  descentSpeed,
+  safeSpeed,
+  thrust,
+  gravity,
+}) => {
+  const netDeceleration = thrust - gravity;
+  if (netDeceleration <= 0) return -Infinity;
+
+  // Already slow enough to touch down safely, so this isn't a burn that saved
+  // anything. Also catches a lander that's rising rather than falling.
+  if (descentSpeed <= safeSpeed) return Infinity;
+
+  const stoppingDistance =
+    (Math.pow(descentSpeed, 2) - Math.pow(safeSpeed, 2)) /
+    (2 * netDeceleration);
+  const spareDistance = altitude - stoppingDistance;
+  const k = (2 * netDeceleration * spareDistance) / thrust;
+  const discriminant = Math.pow(descentSpeed, 2) + gravity * k;
+
+  if (discriminant < 0) return -Infinity;
+
+  return (Math.sqrt(discriminant) - descentSpeed) / gravity;
+};
+
 export const getAngleDeltaUpright = (angle) => {
   const angleInDeg = (angle * 180) / Math.PI;
   const repeatingAngle = Math.abs(angleInDeg) % 360;

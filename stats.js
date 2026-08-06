@@ -26,7 +26,9 @@ https://ehmorris.com/lander/
 
 ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     data.rotationsInt === 1 ? "" : "s"
-  } | ${data.duration}`;
+  } | ${data.duration} | ${data.engineActivations} burn${
+    data.engineActivations === 1 ? "" : "s"
+  }`;
 
   const hideStats = () => {
     document.querySelector("#endGameStats").classList.remove("show");
@@ -65,6 +67,8 @@ ${data.speed}mph | ${data.angle}° | ${data.rotationsFormatted} flip${
     document.querySelector("#rotations").textContent = data.rotationsFormatted;
     document.querySelector("#maxSpeed").textContent = data.maxSpeed;
     document.querySelector("#maxHeight").textContent = data.maxHeight;
+    document.querySelector("#engineActivations").textContent =
+      data.engineActivationsFormatted;
 
     if (hasKeyboard) {
       document.querySelector("#tryAgainText").textContent =

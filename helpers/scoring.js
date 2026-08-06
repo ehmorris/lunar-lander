@@ -2,6 +2,7 @@ import {
   CRASH_VELOCITY,
   CRASH_ANGLE,
   VELOCITY_MULTIPLIER,
+  HOVERSLAM_SLACK_MS,
 } from "./constants.js";
 import { progress } from "./helpers.js";
 
@@ -70,6 +71,38 @@ export const crashScoreDescription = (score) =>
     : score < 0
     ? "You have to land on the white landing zones"
     : "So, so close to a landing, but still a crash";
+
+// A hoverslam: coast to the last survivable moment, then a single burn held all
+// the way into the ground.
+//
+// Thrust is 3.4x gravity, so the single activation and the hold to touchdown do
+// most of the filtering on their own — igniting early means arresting the fall
+// above the ground and climbing away, which can only then be landed by letting
+// go. Nor can it be faked by descending tilted, since hovering needs ~73° off
+// upright and CRASH_ANGLE is 11. The slack bound is mostly there to close that
+// tilted-descent gap.
+//
+// burnSlackMs is null when the engine was never started, Infinity when no burn
+// was ever needed, and can be negative when a low patch of terrain bought margin
+// the average-height estimate didn't account for.
+export const isHoverslam = ({
+  landed,
+  struckByAsteroid,
+  engineActivations,
+  engineHeldToTouchdown,
+  burnSlackMs,
+}) =>
+  !!landed &&
+  !struckByAsteroid &&
+  engineActivations === 1 &&
+  !!engineHeldToTouchdown &&
+  burnSlackMs !== null &&
+  burnSlackMs <= HOVERSLAM_SLACK_MS;
+
+// Shown in place of the score copy when the landing was earned this way. The
+// engine has no throttle and no fuel limit, so every successful hoverslam is the
+// same maneuver — there are no degrees of it worth different copy.
+export const hoverslamDescription = "Hoverslam!";
 
 export const destroyedDescription = () => {
   const remarks = [

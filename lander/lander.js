@@ -9,8 +9,13 @@ import {
   heightInFeet,
   percentProgress,
   formatDuration,
+  framesOfBurnSlack,
 } from "../helpers/helpers.js";
-import { scoreLanding, scoreCrash } from "../helpers/scoring.js";
+import {
+  scoreLanding,
+  scoreCrash,
+  isHoverslam,
+} from "../helpers/scoring.js";
 import {
   GRAVITY,
   LANDER_WIDTH,
@@ -19,6 +24,7 @@ import {
   CRASH_ANGLE,
   INTERVAL,
   TRANSITION_TO_SPACE,
+  HOVERSLAM_RELEASE_GRACE_MS,
 } from "../helpers/constants.js";
 import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
@@ -65,6 +71,10 @@ export const makeLander = (state, onGameEnd) => {
   let _maxHeight;
   let _heightMilestone;
   let _babySoundPlayed;
+  let _engineActivations;
+  let _firstBurnSlackFrames;
+  let _engineOffAt;
+  let _engineHeldToTouchdown;
 
   const resetProps = () => {
     const seededRandom = state.get("seededRandom").getStream("lander");
@@ -106,12 +116,41 @@ export const makeLander = (state, onGameEnd) => {
     _maxHeight = _position.y;
     _heightMilestone = 0;
     _babySoundPlayed = false;
+    _engineActivations = 0;
+    _firstBurnSlackFrames = null;
+    _engineOffAt = null;
+    _engineHeldToTouchdown = false;
   };
   resetProps();
 
   const _isFixedPositionInSpace = () => _position.y < 0;
 
+  // How much longer the player could have coasted at this instant before the
+  // engine had to come on. Sampled when the engine is first started, to judge
+  // whether the burn was left as late as a hoverslam demands.
+  const _burnSlackFrames = () => {
+    // Thrust points along the lander's axis, so sideways drift can't be shed on
+    // the way down — it eats into the survivable touchdown speed budget
+    const safeSpeed = Math.sqrt(
+      Math.max(0, Math.pow(CRASH_VELOCITY, 2) - Math.pow(_velocity.x, 2))
+    );
+
+    return framesOfBurnSlack({
+      altitude: _groundedHeight - _position.y,
+      descentSpeed: _velocity.y,
+      safeSpeed,
+      thrust: _thrust,
+      gravity: GRAVITY,
+    });
+  };
+
   const _setGameEndData = (landed, struckByAsteroid = false) => {
+    // Infinity means no burn was ever needed, -Infinity that the window was
+    // hopelessly closed. Neither is meaningful to display, but both still
+    // compare correctly against the slack bound in isHoverslam.
+    const burnSlackMs =
+      _firstBurnSlackFrames === null ? null : _firstBurnSlackFrames * INTERVAL;
+
     gameEndData = {
       landed,
       struckByAsteroid,
@@ -135,6 +174,21 @@ export const makeLander = (state, onGameEnd) => {
         CRASH_ANGLE,
         getAngleDeltaUpright(_angle)
       ),
+      engineActivations: _engineActivations,
+      engineActivationsFormatted: Intl.NumberFormat().format(
+        _engineActivations
+      ),
+      burnSlackMs:
+        burnSlackMs !== null && Number.isFinite(burnSlackMs)
+          ? Math.round(burnSlackMs)
+          : null,
+      hoverslam: isHoverslam({
+        landed,
+        struckByAsteroid,
+        engineActivations: _engineActivations,
+        engineHeldToTouchdown: _engineHeldToTouchdown,
+        burnSlackMs,
+      }),
     };
 
     if (landed) {
@@ -179,6 +233,9 @@ export const makeLander = (state, onGameEnd) => {
         flips: gameEndData.rotationsInt,
         maxSpeed: gameEndData.maxSpeed,
         maxHeight: gameEndData.maxHeight,
+        engineActivations: gameEndData.engineActivations,
+        burnSlackMs: gameEndData.burnSlackMs,
+        hoverslam: gameEndData.hoverslam,
       });
     });
 
@@ -287,6 +344,16 @@ export const makeLander = (state, onGameEnd) => {
         _babySoundPlayed = false;
       }
     } else if (!gameEndData) {
+      // Must be read before the engine is force-cleared just below, which
+      // happens well before _setGameEndData runs. The grace window covers a
+      // finger that lifted a frame or two early. Note this branch and destroy()
+      // both assign _engineOn directly rather than calling engineOff(), so
+      // neither is mistaken for the player releasing.
+      _engineHeldToTouchdown =
+        _engineOn ||
+        (_engineOffAt !== null &&
+          _timeSinceStart - _engineOffAt <= HOVERSLAM_RELEASE_GRACE_MS);
+
       _engineOn = false;
       _rotatingLeft = false;
       _rotatingRight = false;
@@ -629,8 +696,21 @@ export const makeLander = (state, onGameEnd) => {
     getVelocity: () => _velocity,
     activateShield: () => (_shieldActive = true),
     hasShield: () => _shieldActive,
-    engineOn: () => (_engineOn = true),
-    engineOff: () => (_engineOn = false),
+    // Only off→on transitions count as an activation. Keydown has no repeat
+    // guard, and multi-touch or a finger sliding between columns can re-fire the
+    // center zone, so a held engine would otherwise register hundreds of starts.
+    engineOn: () => {
+      if (_engineOn || gameEndData) return;
+      _engineOn = true;
+      if (++_engineActivations === 1) {
+        _firstBurnSlackFrames = _burnSlackFrames();
+      }
+    },
+    engineOff: () => {
+      if (!_engineOn) return;
+      _engineOn = false;
+      _engineOffAt = _timeSinceStart;
+    },
     rotateLeft: () => (_rotatingLeft = true),
     rotateRight: () => (_rotatingRight = true),
     stopLeftRotation: () => (_rotatingLeft = false),
