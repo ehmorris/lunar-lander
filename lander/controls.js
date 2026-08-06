@@ -3,7 +3,12 @@ export const makeControls = (state, lander, audioManager) => {
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const canvasElement = state.get("canvasElement");
-  const allActiveTouches = new Set();
+  // Which zone each active touch currently occupies, keyed by Touch.identifier.
+  // Zones are reference counted off this map: a second finger landing in a
+  // column must not re-trigger the control, and lifting one of two fingers in
+  // the same column must not release it. Without the count, holding the center
+  // column with two fingers and lifting either one cut the engine mid-burn.
+  const activeTouchZones = new Map();
   const touchColumnMap = ["left", "center", "center", "right"];
 
   let showCenterOverlay = false;
@@ -95,6 +100,27 @@ export const makeControls = (state, lander, audioManager) => {
     return touchColumnMap[clampedColumnNumber];
   };
 
+  const zoneTouchCount = (zoneName) => {
+    let count = 0;
+    activeTouchZones.forEach((zone) => {
+      if (zone === zoneName) count++;
+    });
+    return count;
+  };
+
+  const enterTouchZone = (identifier, zoneName) => {
+    activeTouchZones.set(identifier, zoneName);
+    if (zoneTouchCount(zoneName) === 1) activateTouchZone(zoneName);
+  };
+
+  const leaveTouchZone = (identifier) => {
+    const zoneName = activeTouchZones.get(identifier);
+    if (zoneName === undefined) return;
+
+    activeTouchZones.delete(identifier);
+    if (zoneTouchCount(zoneName) === 0) deactivateTouchZone(zoneName);
+  };
+
   const getColumnBoundary = (colName) => {
     const start =
       touchColumnMap.findIndex((e) => e === colName) / touchColumnMap.length;
@@ -110,8 +136,8 @@ export const makeControls = (state, lander, audioManager) => {
 
   function onTouchStart(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
-      activateTouchZone(getTouchZone(e.changedTouches[index].clientX));
-      allActiveTouches.add(e.changedTouches[index]);
+      const touch = e.changedTouches[index];
+      enterTouchZone(touch.identifier, getTouchZone(touch.clientX));
     }
 
     if (e.cancelable) e.preventDefault();
@@ -119,37 +145,28 @@ export const makeControls = (state, lander, audioManager) => {
 
   function onTouchMove(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
-      let touchPreviousData;
-      allActiveTouches.forEach((touch) => {
-        if (touch.identifier === e.changedTouches[index].identifier) {
-          touchPreviousData = touch;
-        }
-      });
-      if (!touchPreviousData) continue;
+      const touch = e.changedTouches[index];
+      const previousZone = activeTouchZones.get(touch.identifier);
+      if (previousZone === undefined) continue;
 
-      const previousTouchZone = getTouchZone(touchPreviousData.clientX);
-      const currentTouchZone = getTouchZone(e.changedTouches[index].clientX);
+      // Two of the four columns are both "center", so sliding between them
+      // reads as the same zone and leaves the engine alone
+      const currentZone = getTouchZone(touch.clientX);
+      if (previousZone === currentZone) continue;
 
-      if (previousTouchZone !== currentTouchZone) {
-        deactivateTouchZone(previousTouchZone);
-        activateTouchZone(currentTouchZone);
-        allActiveTouches.delete(touchPreviousData);
-        allActiveTouches.add(e.changedTouches[index]);
-      }
+      leaveTouchZone(touch.identifier);
+      enterTouchZone(touch.identifier, currentZone);
     }
 
     if (e.cancelable) e.preventDefault();
   }
 
+  // Released zones come from the tracked map rather than from the touch's final
+  // coordinates, so a control can't be left stuck on by a touchend that reports
+  // a position in a different column than the one the finger was holding.
   function onTouchEnd(e) {
     for (let index = 0; index < e.changedTouches.length; index++) {
-      deactivateTouchZone(getTouchZone(e.changedTouches[index].clientX));
-
-      allActiveTouches.forEach((touch) => {
-        if (touch.identifier === e.changedTouches[index].identifier) {
-          allActiveTouches.delete(touch);
-        }
-      });
+      leaveTouchZone(e.changedTouches[index].identifier);
     }
 
     if (e.cancelable) e.preventDefault();
@@ -161,6 +178,9 @@ export const makeControls = (state, lander, audioManager) => {
     canvasElement.addEventListener("touchstart", onTouchStart);
     canvasElement.addEventListener("touchmove", onTouchMove);
     canvasElement.addEventListener("touchend", onTouchEnd);
+    // A touch the browser takes away — a system gesture, an incoming call —
+    // never gets its touchend, and without this its zone stayed held down
+    canvasElement.addEventListener("touchcancel", onTouchEnd);
   };
 
   const detachEventListeners = () => {
@@ -169,12 +189,13 @@ export const makeControls = (state, lander, audioManager) => {
     canvasElement.removeEventListener("touchstart", onTouchStart);
     canvasElement.removeEventListener("touchmove", onTouchMove);
     canvasElement.removeEventListener("touchend", onTouchEnd);
+    canvasElement.removeEventListener("touchcancel", onTouchEnd);
 
     // Whatever the player was holding when the listeners went away can never
     // receive its matching keyup or touchend, so release all three zones.
     // Otherwise crashing mid-thrust leaves the engine sound looping into the
     // next round and the touch column tinted for the rest of the session.
-    allActiveTouches.clear();
+    activeTouchZones.clear();
     deactivateTouchZone("left");
     deactivateTouchZone("center");
     deactivateTouchZone("right");
