@@ -29,6 +29,7 @@ import {
   landingScoreDescription,
   crashScoreDescription,
   destroyedDescription,
+  hoverslamDescription,
 } from "./helpers/scoring.js";
 
 // SETUP
@@ -194,7 +195,9 @@ function onGameEnd(data) {
 
   const finalScore = data.landerScore + bonusPointsManager.getTotalPoints();
   const scoreDescription = data.landed
-    ? landingScoreDescription(finalScore)
+    ? data.hoverslam
+      ? hoverslamDescription
+      : landingScoreDescription(finalScore)
     : data.struckByAsteroid
     ? destroyedDescription()
     : crashScoreDescription(finalScore);
