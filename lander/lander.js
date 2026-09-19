@@ -7,8 +7,11 @@ import {
   getAngleDeltaUpright,
   getAngleDeltaUprightWithSign,
   heightInFeet,
+  heightInFeetCompact,
   percentProgress,
   formatDuration,
+  formatNumber,
+  fillTextTabular,
   framesOfBurnSlack,
 } from "../helpers/helpers.js";
 import {
@@ -155,13 +158,11 @@ export const makeLander = (state, onGameEnd) => {
       landed,
       struckByAsteroid,
       speed: velocityInMPH(_velocity),
-      angle: Intl.NumberFormat().format(
-        getAngleDeltaUpright(_angle).toFixed(1)
-      ),
+      angle: formatNumber(getAngleDeltaUpright(_angle), 1),
       duration: formatDuration(_timeSinceStart),
       durationMs: Math.round(_timeSinceStart),
       rotationsInt: _rotationCount,
-      rotationsFormatted: Intl.NumberFormat().format(_rotationCount),
+      rotationsFormatted: formatNumber(_rotationCount),
       maxSpeed: velocityInMPH(_maxVelocity),
       maxHeight: heightInFeet(_maxHeight, _groundedHeight),
       speedPercent: percentProgress(
@@ -175,9 +176,7 @@ export const makeLander = (state, onGameEnd) => {
         getAngleDeltaUpright(_angle)
       ),
       engineActivations: _engineActivations,
-      engineActivationsFormatted: Intl.NumberFormat().format(
-        _engineActivations
-      ),
+      engineActivationsFormatted: formatNumber(_engineActivations),
       burnSlackMs:
         burnSlackMs !== null && Number.isFinite(burnSlackMs)
           ? Math.round(burnSlackMs)
@@ -378,7 +377,16 @@ export const makeLander = (state, onGameEnd) => {
     }
   };
 
+  const _hudFont = "400 10px -apple-system, BlinkMacSystemFont, sans-serif";
+
   const _drawHUD = () => {
+    CTX.save();
+    CTX.font = _hudFont;
+
+    // Measured in the font it is drawn in. This used to run before the font
+    // was set, so the width came back in whatever font the context happened to
+    // be left in — the 10px sans-serif default — and the readout was placed
+    // against an edge it did not actually clear.
     const textWidth = CTX.measureText("100.0 MPH").width + 2;
     const xPosBasis =
       Math.abs(_velocity.x) > 6
@@ -397,8 +405,6 @@ export const makeLander = (state, onGameEnd) => {
         : "rgb(0, 255, 0)";
 
     // Draw HUD text
-    CTX.save();
-    CTX.font = "400 10px -apple-system, BlinkMacSystemFont, sans-serif";
     CTX.fillStyle = speedColor;
     CTX.fillText(
       `${velocityInMPH(_velocity)} MPH`,
@@ -417,7 +423,6 @@ export const makeLander = (state, onGameEnd) => {
       xPosBasis,
       yPosBasis + lineHeight
     );
-    CTX.restore();
 
     // Draw hud rotation direction arrow
     const arrowHeight = 7;
@@ -460,6 +465,8 @@ export const makeLander = (state, onGameEnd) => {
       CTX.stroke();
       CTX.restore();
     }
+
+    CTX.restore();
   };
 
   const _drawBottomHUD = () => {
@@ -476,59 +483,59 @@ export const makeLander = (state, onGameEnd) => {
           )
         : 99;
 
+    // A big tabular number with its unit label beneath it, drawn from the
+    // current textAlign. The letter spacing belongs to the label alone — it
+    // used to be left set from the previous label and applied to the next
+    // number, so only the speed readout was drawn the way the design intends.
+    const _drawReadout = (value, label, xPos, baselineY) => {
+      CTX.letterSpacing = "0px";
+      CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      fillTextTabular(CTX, value, xPos, baselineY - 24);
+
+      CTX.letterSpacing = "1px";
+      CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.fillText(label, xPos, baselineY);
+    };
+
     CTX.save();
 
     CTX.fillStyle = state.get("theme").infoFontColor;
-    CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
+
     CTX.textAlign = "left";
-    CTX.fillText(
-      `${velocityInMPH(_velocity, 0)}`,
+    _drawReadout(
+      velocityInMPH(_velocity, 0),
+      "MPH",
       xPadding,
-      canvasHeight - yPadding - 24
+      canvasHeight - yPadding
     );
-    CTX.letterSpacing = "1px";
-    CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-    CTX.fillText("MPH", xPadding, canvasHeight - yPadding);
 
     CTX.textAlign = "right";
-    CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-    CTX.fillText(
-      `${heightInFeet(_position.y, _groundedHeight)}`,
+    _drawReadout(
+      // Abbreviated, because altitude is the one readout that reaches five
+      // figures. Height is still drawn in full beside the lander near the
+      // ground, where the numbers are small, and in full on the stats screen.
+      heightInFeetCompact(_position.y, _groundedHeight),
+      "FT",
       canvasWidth - xPadding,
-      canvasHeight - yPadding - 24
+      canvasHeight - yPadding
     );
-    CTX.letterSpacing = "1px";
-    CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-    CTX.fillText("FT", canvasWidth - xPadding, canvasHeight - yPadding);
 
+    CTX.textAlign = "center";
     if (secondsUntilTerrain < 20) {
       CTX.fillStyle = "rgb(255, 0, 0)";
-      CTX.textAlign = "center";
-      CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText(
-        Intl.NumberFormat().format(secondsUntilTerrain),
-        canvasWidth / 2,
-        canvasHeight - yPadding - 24
-      );
-      CTX.letterSpacing = "1px";
-      CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText(
+      _drawReadout(
+        formatNumber(secondsUntilTerrain),
         "SECONDS UNTIL TERRAIN",
         canvasWidth / 2,
         canvasHeight - yPadding
       );
     } else {
-      CTX.fillStyle = state.get("theme").infoFontColor;
-      CTX.textAlign = "center";
-      CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText(
+      _drawReadout(
         formatDuration(_timeSinceStart),
+        "DURATION",
         canvasWidth / 2,
-        canvasHeight - yPadding - 24
+        canvasHeight - yPadding
       );
-      CTX.letterSpacing = "1px";
-      CTX.font = "400 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
-      CTX.fillText("DURATION", canvasWidth / 2, canvasHeight - yPadding);
     }
 
     CTX.restore();

@@ -211,13 +211,146 @@ export const getAngleDeltaUprightWithSign = (angle) => {
   return repeatingAngle > 180 ? repeatingAngle - 360 : repeatingAngle;
 };
 
+// Building a formatter is the expensive part of the Intl APIs, and every
+// readout below is rebuilt from inside the render loop. Construct each one
+// once and reuse it, guarded the same way the duration formatter is: an
+// engine that rejects an option must not throw on every frame.
+const makeNumberFormatter = (options) => {
+  try {
+    return new Intl.NumberFormat(undefined, options);
+  } catch {
+    return null;
+  }
+};
+
+const fixedDecimalFormatters = new Map();
+
+// Formatting the output of toFixed handed Intl a string that it then reformatted
+// with the default fraction digits, so a one-decimal readout of 12.0 came back
+// as "12" and 12.3 as "12.3" — the readout changed width as it ticked over.
+// Pinning min and max keeps the decimals the caller asked for.
+export const formatNumber = (value, decimals = 0) => {
+  if (!fixedDecimalFormatters.has(decimals)) {
+    fixedDecimalFormatters.set(
+      decimals,
+      makeNumberFormatter({
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })
+    );
+  }
+
+  const formatter = fixedDecimalFormatters.get(decimals);
+  return formatter ? formatter.format(value) : value.toFixed(decimals);
+};
+
 export const velocityInMPH = (velocity, decimals = 1) =>
-  Intl.NumberFormat().format(
-    (getVectorVelocity(velocity) * VELOCITY_MULTIPLIER).toFixed(decimals)
-  );
+  formatNumber(getVectorVelocity(velocity) * VELOCITY_MULTIPLIER, decimals);
+
+const feetFromPixels = (yPos, groundedHeight) =>
+  -1 * Math.round((yPos - groundedHeight) / 3.5);
 
 export const heightInFeet = (yPos, groundedHeight) =>
-  Intl.NumberFormat().format(-1 * Math.round((yPos - groundedHeight) / 3.5));
+  formatNumber(feetFromPixels(yPos, groundedHeight));
+
+// Altitude is the one readout that runs into five figures, and "10,000" at
+// 24px bold eats a third of a phone screen. Compact notation is still the
+// player's own locale deciding what short means: en-US gets "10K", de-DE has
+// no short form below a million and keeps "10.000", ar-EG gets "١٠ آلاف".
+const compactFormatter = makeNumberFormatter({
+  notation: "compact",
+  compactDisplay: "short",
+});
+
+export const heightInFeetCompact = (yPos, groundedHeight) => {
+  const feet = feetFromPixels(yPos, groundedHeight);
+
+  return compactFormatter ? compactFormatter.format(feet) : formatNumber(feet);
+};
+
+// Canvas 2D has no font-variant-numeric, so tabular figures are laid out by
+// hand: every digit advances by the width of the widest digit in the current
+// font and is centred inside it. Without this the HUD readouts shimmy
+// sideways as their digits tick over — "1" is far narrower than "0" in the
+// system UI font, and at 24px bold against a fixed edge it's impossible to
+// miss. Non-digits (a decimal separator, "K", a duration's unit letters) keep
+// their natural width.
+const isDigit = (character) => /\p{Nd}/u.test(character);
+
+const measurementCache = new Map();
+
+const cachedMeasurement = (key, measure) => {
+  if (!measurementCache.has(key)) measurementCache.set(key, measure());
+  return measurementCache.get(key);
+};
+
+// Every Unicode decimal-digit block is ten contiguous code points starting at
+// that script's zero, so the set of digits to measure can be derived from any
+// one digit in the text. Measuring ASCII 0–9 instead would leave a locale
+// using its own digits misaligned.
+const digitZeroCodePoint = (character) => {
+  let codePoint = character.codePointAt(0);
+
+  for (let step = 0; step < 9; step++) {
+    if (codePoint === 0 || !isDigit(String.fromCodePoint(codePoint - 1))) break;
+    codePoint--;
+  }
+
+  return codePoint;
+};
+
+const glyphWidth = (CTX, character) =>
+  cachedMeasurement(`${CTX.font}|${CTX.letterSpacing}|glyph:${character}`, () =>
+    CTX.measureText(character).width
+  );
+
+const widestDigitWidth = (CTX, zeroCodePoint) =>
+  cachedMeasurement(`${CTX.font}|${CTX.letterSpacing}|zero:${zeroCodePoint}`, () => {
+    let widest = 0;
+
+    for (let digit = 0; digit < 10; digit++) {
+      widest = Math.max(
+        widest,
+        glyphWidth(CTX, String.fromCodePoint(zeroCodePoint + digit))
+      );
+    }
+
+    return widest;
+  });
+
+export const fillTextTabular = (CTX, text, x, y) => {
+  const characters = [...String(text)];
+  const firstDigit = characters.find(isDigit);
+
+  // Nothing to align — let the canvas lay the string out itself
+  if (!firstDigit) {
+    CTX.fillText(text, x, y);
+    return;
+  }
+
+  const digitWidth = widestDigitWidth(CTX, digitZeroCodePoint(firstDigit));
+  const advances = characters.map((character) =>
+    isDigit(character) ? digitWidth : glyphWidth(CTX, character)
+  );
+  const totalWidth = advances.reduce((total, advance) => total + advance, 0);
+  const alignment = CTX.textAlign;
+
+  let cursor = x;
+  if (alignment === "right" || alignment === "end") cursor -= totalWidth;
+  else if (alignment === "center") cursor -= totalWidth / 2;
+
+  CTX.save();
+  CTX.textAlign = "left";
+  characters.forEach((character, index) => {
+    CTX.fillText(
+      character,
+      cursor + (advances[index] - glyphWidth(CTX, character)) / 2,
+      y
+    );
+    cursor += advances[index];
+  });
+  CTX.restore();
+};
 
 export const progress = (start, end, current) =>
   (current - start) / (end - start);
