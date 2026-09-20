@@ -382,11 +382,6 @@ export const makeLander = (state, onGameEnd) => {
   const _drawHUD = () => {
     CTX.save();
     CTX.font = _hudFont;
-
-    // Measured in the font it is drawn in. This used to run before the font
-    // was set, so the width came back in whatever font the context happened to
-    // be left in — the 10px sans-serif default — and the readout was placed
-    // against an edge it did not actually clear.
     const textWidth = CTX.measureText("100.0 MPH").width + 2;
     const xPosBasis =
       Math.abs(_velocity.x) > 6
@@ -483,10 +478,6 @@ export const makeLander = (state, onGameEnd) => {
           )
         : 99;
 
-    // A big tabular number with its unit label beneath it, drawn from the
-    // current textAlign. The letter spacing belongs to the label alone — it
-    // used to be left set from the previous label and applied to the next
-    // number, so only the speed readout was drawn the way the design intends.
     const _drawReadout = (value, label, xPos, baselineY) => {
       CTX.letterSpacing = "0px";
       CTX.font = "800 24px/1.5 -apple-system, BlinkMacSystemFont, sans-serif";
@@ -511,9 +502,6 @@ export const makeLander = (state, onGameEnd) => {
 
     CTX.textAlign = "right";
     _drawReadout(
-      // Abbreviated, because altitude is the one readout that reaches five
-      // figures. Height is still drawn in full beside the lander near the
-      // ground, where the numbers are small, and in full on the stats screen.
       heightInFeetCompact(_position.y, _groundedHeight),
       "FT",
       canvasWidth - xPadding,
