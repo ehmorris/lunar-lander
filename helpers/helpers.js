@@ -211,13 +211,122 @@ export const getAngleDeltaUprightWithSign = (angle) => {
   return repeatingAngle > 180 ? repeatingAngle - 360 : repeatingAngle;
 };
 
+const makeNumberFormatter = (options) => {
+  try {
+    return new Intl.NumberFormat(undefined, options);
+  } catch {
+    return null;
+  }
+};
+
+const fixedDecimalFormatters = new Map();
+
+export const formatNumber = (value, decimals = 0) => {
+  if (!fixedDecimalFormatters.has(decimals)) {
+    fixedDecimalFormatters.set(
+      decimals,
+      makeNumberFormatter({
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })
+    );
+  }
+
+  const formatter = fixedDecimalFormatters.get(decimals);
+  return formatter ? formatter.format(value) : value.toFixed(decimals);
+};
+
 export const velocityInMPH = (velocity, decimals = 1) =>
-  Intl.NumberFormat().format(
-    (getVectorVelocity(velocity) * VELOCITY_MULTIPLIER).toFixed(decimals)
-  );
+  formatNumber(getVectorVelocity(velocity) * VELOCITY_MULTIPLIER, decimals);
+
+const feetFromPixels = (yPos, groundedHeight) =>
+  -1 * Math.round((yPos - groundedHeight) / 3.5);
 
 export const heightInFeet = (yPos, groundedHeight) =>
-  Intl.NumberFormat().format(-1 * Math.round((yPos - groundedHeight) / 3.5));
+  formatNumber(feetFromPixels(yPos, groundedHeight));
+
+const compactFormatter = makeNumberFormatter({
+  notation: "compact",
+  compactDisplay: "short",
+});
+
+export const heightInFeetCompact = (yPos, groundedHeight) => {
+  const feet = feetFromPixels(yPos, groundedHeight);
+
+  return compactFormatter ? compactFormatter.format(feet) : formatNumber(feet);
+};
+
+const isDigit = (character) => /\p{Nd}/u.test(character);
+
+const measurementCache = new Map();
+
+const cachedMeasurement = (key, measure) => {
+  if (!measurementCache.has(key)) measurementCache.set(key, measure());
+  return measurementCache.get(key);
+};
+
+const digitZeroCodePoint = (character) => {
+  let codePoint = character.codePointAt(0);
+
+  for (let step = 0; step < 9; step++) {
+    if (codePoint === 0 || !isDigit(String.fromCodePoint(codePoint - 1))) break;
+    codePoint--;
+  }
+
+  return codePoint;
+};
+
+const glyphWidth = (CTX, character) =>
+  cachedMeasurement(`${CTX.font}|${CTX.letterSpacing}|glyph:${character}`, () =>
+    CTX.measureText(character).width
+  );
+
+const widestDigitWidth = (CTX, zeroCodePoint) =>
+  cachedMeasurement(`${CTX.font}|${CTX.letterSpacing}|zero:${zeroCodePoint}`, () => {
+    let widest = 0;
+
+    for (let digit = 0; digit < 10; digit++) {
+      widest = Math.max(
+        widest,
+        glyphWidth(CTX, String.fromCodePoint(zeroCodePoint + digit))
+      );
+    }
+
+    return widest;
+  });
+
+export const fillTextTabular = (CTX, text, x, y) => {
+  const characters = [...String(text)];
+  const firstDigit = characters.find(isDigit);
+
+  if (!firstDigit) {
+    CTX.fillText(text, x, y);
+    return;
+  }
+
+  const digitWidth = widestDigitWidth(CTX, digitZeroCodePoint(firstDigit));
+  const advances = characters.map((character) =>
+    isDigit(character) ? digitWidth : glyphWidth(CTX, character)
+  );
+  const totalWidth = advances.reduce((total, advance) => total + advance, 0);
+  const alignment = CTX.textAlign;
+
+  let cursor = x;
+  if (alignment === "right" || alignment === "end") cursor -= totalWidth;
+  else if (alignment === "center") cursor -= totalWidth / 2;
+
+  CTX.save();
+  CTX.textAlign = "left";
+  characters.forEach((character, index) => {
+    CTX.fillText(
+      character,
+      cursor + (advances[index] - glyphWidth(CTX, character)) / 2,
+      y
+    );
+    cursor += advances[index];
+  });
+  CTX.restore();
+};
 
 export const progress = (start, end, current) =>
   (current - start) / (end - start);

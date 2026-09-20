@@ -1,6 +1,7 @@
 import {
   animate,
   clampedProgress,
+  formatNumber,
   generateCanvas,
   randomBetween,
   seededRandomBetween,
@@ -201,7 +202,7 @@ function onGameEnd(data) {
     : data.struckByAsteroid
     ? destroyedDescription()
     : crashScoreDescription(finalScore);
-  const scoreForDisplay = Intl.NumberFormat().format(finalScore.toFixed(1));
+  const scoreForDisplay = formatNumber(finalScore, 1);
 
   showStatsAndResetControl(
     appState,
