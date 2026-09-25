@@ -1,15 +1,17 @@
 // Drag controls point the lander straight at the player's finger, but the
 // lander still turns by firing its side boosters rather than snapping to the
-// new heading. Rotation velocity is steered toward a speed proportional to how
-// far the lander is from its target, and can only change as fast as the
-// boosters could push it, so the lander swings around and settles smoothly.
+// new heading. Each frame the rotation velocity is steered toward whatever
+// would close most of the remaining gap, capped at the speed from which the
+// boosters can still stop in time, so it swings around fast without
+// overshooting and without depending on the frame rate.
 
+// How quickly the lander closes on the target: the remaining angle shrinks by
+// about two thirds every STEERING_TIME_CONSTANT_MS once it's close
+const STEERING_TIME_CONSTANT_MS = 40;
 // Rotation velocity is in degrees per INTERVAL frame, like the rest of the
-// lander physics. The gain is the fraction of the remaining angle the lander
-// tries to cover per frame; its inverse is roughly the settling time in frames.
-const STEERING_GAIN = 0.06;
-const MAX_STEERING_VELOCITY = 5;
-const MAX_STEERING_ACCELERATION = 0.35;
+// lander physics, and acceleration in degrees per INTERVAL frame squared
+const MAX_STEERING_VELOCITY = 12;
+const MAX_STEERING_ACCELERATION = 1.2;
 
 // Corrections smaller than this are the lander holding its heading and don't
 // read as a booster firing
@@ -57,11 +59,18 @@ export const makeSteering = (audioManager) => {
       Math.cos(_targetAngle - angle)
     );
     const deltaDegrees = (delta * 180) / Math.PI;
+    const distance = Math.abs(deltaDegrees);
 
-    const desiredVelocity = Math.max(
-      -MAX_STEERING_VELOCITY,
-      Math.min(MAX_STEERING_VELOCITY, deltaDegrees * STEERING_GAIN)
-    );
+    // Per frame rather than per INTERVAL, so that a slow frame closes more of
+    // the gap instead of overshooting it
+    const closingSpeed =
+      (distance * (1 - Math.exp(-deltaTime / STEERING_TIME_CONSTANT_MS))) /
+      Math.max(deltaTimeMultiplier, 1e-6);
+    // Fastest speed the boosters can still brake from before the target
+    const brakingSpeed = Math.sqrt(2 * MAX_STEERING_ACCELERATION * distance);
+    const desiredVelocity =
+      Math.sign(deltaDegrees) *
+      Math.min(closingSpeed, brakingSpeed, MAX_STEERING_VELOCITY);
     const maxChange = MAX_STEERING_ACCELERATION * deltaTimeMultiplier;
     const change = Math.max(
       -maxChange,

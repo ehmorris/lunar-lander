@@ -102,7 +102,12 @@ export const makeAudioManager = () => {
 
     // Resolved after initialization, so the buffer is read once it exists
     // rather than captured as undefined by an early caller.
-    return Promise.all([audioCTX.resume(), getAudioBuffer()]).then((e) =>
+    // Boosters start and stop many times a second while steering, and
+    // resume() is a round trip to the audio thread even when it's a no-op
+    const resumed =
+      audioCTX.state === "running" ? undefined : audioCTX.resume();
+
+    return Promise.all([resumed, getAudioBuffer()]).then((e) =>
       playBuffer(e[1])
     );
   }
@@ -118,11 +123,17 @@ export const makeAudioManager = () => {
   };
 
   // Drag controls vary the throttle, and the engine sound follows it. Ramped
-  // rather than set so pointer moves don't click.
+  // rather than set so throttle changes don't click. Every ramp is an event on
+  // the gain's automation timeline, and WebKit walks that timeline on the
+  // audio thread, so skip changes too small to hear and clear the previous
+  // ramp instead of stacking a new one on it.
   const setEngineVolume = (volume) => {
+    if (Math.abs(volume - engineVolume) < 0.02) return;
     engineVolume = volume;
     if (engineGain) {
-      engineGain.gain.setTargetAtTime(volume, audioCTX.currentTime, 0.03);
+      const now = audioCTX.currentTime;
+      engineGain.gain.cancelScheduledValues(now);
+      engineGain.gain.setTargetAtTime(volume, now, 0.03);
     }
   };
 

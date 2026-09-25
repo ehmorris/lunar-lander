@@ -38,6 +38,13 @@ export const makeControls = (state, lander, audioManager) => {
   // Active fingers (or the mouse), keyed by pointerId. Each has a role:
   // "stick", "steer" or "throttle". A third finger is ignored.
   const pointers = new Map();
+  // Pointer events can arrive several times per frame. They only record where
+  // the fingers are; the result is worked out and handed to the lander once
+  // per frame, just before it's drawn.
+  let pointersChanged = false;
+  // Read once per gesture: getBoundingClientRect can force a layout, and the
+  // canvas doesn't move while a finger is down
+  let canvasBounds = null;
   // What was last drawn and how visible it is, so the overlay can fade out in
   // place after the fingers lift
   let lastWidgets = [];
@@ -80,7 +87,7 @@ export const makeControls = (state, lander, audioManager) => {
   }
 
   const toCanvasPoint = (clientX, clientY) => {
-    const bounds = canvasElement.getBoundingClientRect();
+    const bounds = canvasBounds;
     return bounds.width && bounds.height
       ? {
           x: ((clientX - bounds.left) / bounds.width) * canvasWidth,
@@ -202,13 +209,12 @@ export const makeControls = (state, lander, audioManager) => {
       audioManager.stopEngineSound();
     }
 
-    // Once every finger is up, keep the last frame so it can fade out in place
+    // Once every finger is up, keep the last frame so it can fade out in
+    // place. A lifted pointer's object is never touched again, so holding on
+    // to it is as good as a copy.
     if (pointers.size > 0) {
       lastDial = { angle, throttle };
-      lastWidgets = [...pointers.values()].map((pointer) => ({
-        ...pointer,
-        origin: pointer.origin && { ...pointer.origin },
-      }));
+      lastWidgets = [...pointers.values()];
     }
   };
 
@@ -250,6 +256,9 @@ export const makeControls = (state, lander, audioManager) => {
       return;
     }
 
+    if (pointers.size === 0) {
+      canvasBounds = canvasElement.getBoundingClientRect();
+    }
     const position = toCanvasPoint(e.clientX, e.clientY);
     if (pointers.size === 0) {
       pointers.set(e.pointerId, {
@@ -264,7 +273,7 @@ export const makeControls = (state, lander, audioManager) => {
     } else {
       addSecondPointer(e.pointerId, position);
     }
-    applyControls();
+    pointersChanged = true;
 
     // Keep receiving moves when the finger or mouse leaves the canvas
     try {
@@ -280,7 +289,7 @@ export const makeControls = (state, lander, audioManager) => {
 
     pointer.position = toCanvasPoint(e.clientX, e.clientY);
     updaters[pointer.role](pointer);
-    applyControls();
+    pointersChanged = true;
 
     if (e.cancelable) e.preventDefault();
   }
@@ -289,13 +298,15 @@ export const makeControls = (state, lander, audioManager) => {
   // incoming call — which never gets its pointerup
   function onPointerUp(e) {
     if (!pointers.delete(e.pointerId)) return;
-    applyControls();
+    pointersChanged = true;
   }
 
   const releaseAllPointers = () => {
-    if (pointers.size === 0) return;
+    if (pointers.size === 0 && !pointersChanged) return;
     pointers.clear();
+    // Immediately, since the overlay may never be drawn again to apply it
     applyControls();
+    pointersChanged = false;
   };
 
   // Touch events still fire alongside pointer events. Cancelling them stops
@@ -527,7 +538,14 @@ export const makeControls = (state, lander, audioManager) => {
     CTX.restore();
   };
 
+  // Called once per frame before the lander is drawn, so this is also where
+  // the frame's input takes effect
   const drawTouchOverlay = () => {
+    if (pointersChanged) {
+      pointersChanged = false;
+      applyControls();
+    }
+
     const now = performance.now();
     const frameTime = lastOverlayTime === null ? 0 : now - lastOverlayTime;
     lastOverlayTime = now;
