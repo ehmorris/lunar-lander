@@ -149,6 +149,8 @@ export const makeToyLander = (
   return {
     draw,
     getAngle: () => _angle,
+    getDisplayPosition: () => _position,
+    getDialRadius: () => _toyLanderHeight * 1.2,
     engineOn: () => setThrottle(1),
     engineOff: () => setThrottle(0),
     setThrottle,

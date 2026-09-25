@@ -5,17 +5,21 @@ export const makeControls = (state, lander, audioManager) => {
   const canvasElement = state.get("canvasElement");
   // Drag controls: touch (or click) anywhere and drag. The lander points the
   // way the drag points, and the further the drag, the harder the engine
-  // burns. Sizes are in CSS pixels and scale with the screen within limits so
-  // the full-throttle ring always fits comfortably under a thumb.
+  // burns. Sizes are in CSS pixels and scale with the screen, big enough that
+  // thumb jitter barely moves the throttle but still within a thumb's reach.
   const outerRadius = Math.max(
-    80,
-    Math.min(140, Math.min(canvasWidth, canvasHeight) * 0.22)
+    120,
+    Math.min(200, Math.min(canvasWidth, canvasHeight) * 0.36)
   );
   // Inside this ring the drag only steers, so the lander can be turned
   // without firing the engine
-  const deadZoneRadius = outerRadius * 0.25;
+  const deadZoneRadius = outerRadius * 0.2;
   // Below this the drag direction is too noisy to steer by
-  const aimRadius = 6;
+  const aimRadius = 12;
+  // Throttle rises with the square of the drag, so the first half of the
+  // drag covers only the first quarter of the thrust. Hovering needs about
+  // 30%, which lands a little past the middle of the drag.
+  const throttleCurve = 2;
 
   // The pointer being tracked, and where the gesture's origin is. Only the
   // first pointer down controls the lander; later fingers are ignored.
@@ -75,9 +79,15 @@ export const makeControls = (state, lander, audioManager) => {
     Math.atan2(position.x - origin.x, -(position.y - origin.y));
 
   const dragThrottle = (distance) =>
-    Math.max(
-      0,
-      Math.min(1, (distance - deadZoneRadius) / (outerRadius - deadZoneRadius))
+    Math.pow(
+      Math.max(
+        0,
+        Math.min(
+          1,
+          (distance - deadZoneRadius) / (outerRadius - deadZoneRadius)
+        )
+      ),
+      throttleCurve
     );
 
   const applyThrottle = (throttle) => {
@@ -203,23 +213,10 @@ export const makeControls = (state, lander, audioManager) => {
     audioManager.stopBoosterSound2();
   };
 
-  const drawTouchOverlay = () => {
-    const now = performance.now();
-    const frameTime = lastOverlayTime === null ? 0 : now - lastOverlayTime;
-    lastOverlayTime = now;
-
-    // Fade in quickly, fade out a little slower so the last reading lingers
-    overlayOpacity = drag
-      ? Math.min(1, overlayOpacity + frameTime / 80)
-      : Math.max(0, overlayOpacity - frameTime / 220);
-
-    if (!overlay || overlayOpacity === 0) return;
-
-    const { origin, position, distance, throttle, angle } = overlay;
-    const pip = Math.PI / 20;
-
+  // Under the thumb: only where the finger is relative to the rings. None of
+  // it needs reading, since the thumb covers most of it.
+  const drawJoystick = ({ origin, distance, throttle, angle }) => {
     CTX.save();
-    CTX.globalAlpha = overlayOpacity;
     CTX.translate(origin.x, origin.y);
     CTX.lineCap = "round";
 
@@ -237,31 +234,20 @@ export const makeControls = (state, lander, audioManager) => {
     CTX.stroke();
     CTX.setLineDash([]);
 
-    // Where the lander is actually pointed right now, as a dim pip on the ring,
-    // so the player can see it swinging around to catch up
-    const landerAngle = lander.getAngle() - Math.PI / 2;
-    CTX.strokeStyle = "rgba(255, 255, 255, 0.35)";
-    CTX.lineWidth = 3;
-    CTX.beginPath();
-    CTX.arc(0, 0, outerRadius, landerAngle - pip / 2, landerAngle + pip / 2);
-    CTX.stroke();
-
     if (angle !== null) {
       // Canvas angles start at 3 o'clock, the lander's at 12
-      const canvasAngle = angle - Math.PI / 2;
-      CTX.rotate(canvasAngle);
+      CTX.rotate(angle - Math.PI / 2);
 
-      // Heading pip on the ring
-      CTX.strokeStyle = "#fff";
-      CTX.lineWidth = 3;
+      // Thin guide inside the dead zone
+      CTX.strokeStyle = "rgba(255, 255, 255, 0.4)";
       CTX.beginPath();
-      CTX.arc(0, 0, outerRadius, -pip, pip);
+      CTX.moveTo(0, 0);
+      CTX.lineTo(Math.min(distance, deadZoneRadius), 0);
       CTX.stroke();
 
       // Throttle bar from the dead zone out to the finger, drawn in the
       // engine flame's colors
       if (throttle > 0) {
-        const barEnd = Math.min(distance, outerRadius);
         const gradient = CTX.createLinearGradient(
           deadZoneRadius,
           0,
@@ -274,40 +260,99 @@ export const makeControls = (state, lander, audioManager) => {
         CTX.lineWidth = 4;
         CTX.beginPath();
         CTX.moveTo(deadZoneRadius, 0);
-        CTX.lineTo(barEnd, 0);
+        CTX.lineTo(Math.min(distance, outerRadius), 0);
         CTX.stroke();
       }
-
-      // Thin guide inside the dead zone so the heading still reads while
-      // steering without thrust
-      CTX.strokeStyle = "rgba(255, 255, 255, 0.4)";
-      CTX.lineWidth = 1;
-      CTX.beginPath();
-      CTX.moveTo(0, 0);
-      CTX.lineTo(Math.min(distance, deadZoneRadius), 0);
-      CTX.stroke();
     }
 
     CTX.restore();
 
-    // Origin dot and finger dot, drawn unrotated
     CTX.save();
-    CTX.globalAlpha = overlayOpacity;
     CTX.fillStyle = "rgba(255, 255, 255, 0.5)";
     CTX.beginPath();
     CTX.arc(origin.x, origin.y, 3, 0, Math.PI * 2);
     CTX.fill();
+    CTX.restore();
+  };
 
+  // Around the lander, where the player is already looking and the thumb
+  // isn't: which way the drag is steering, and how hard the engine is burning
+  const drawLanderDial = ({ throttle, angle }) => {
+    const { x, y } = lander.getDisplayPosition();
+    const radius = lander.getDialRadius();
+
+    CTX.save();
+    CTX.translate(x, y);
+    CTX.lineCap = "round";
+
+    CTX.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    CTX.lineWidth = 1;
+    CTX.beginPath();
+    CTX.arc(0, 0, radius, 0, Math.PI * 2);
+    CTX.stroke();
+
+    if (angle !== null) {
+      CTX.save();
+      CTX.rotate(angle);
+
+      // Throttle arc on the exhaust side, growing outward from straight
+      // behind the target heading like a second flame
+      if (throttle > 0) {
+        const sweep = (Math.PI / 2) * throttle;
+        CTX.strokeStyle = "#F3AFA3";
+        CTX.lineWidth = 3;
+        CTX.beginPath();
+        CTX.arc(0, 0, radius, Math.PI / 2 - sweep, Math.PI / 2 + sweep);
+        CTX.stroke();
+      }
+
+      // Target heading: a notch pointing in at the ring
+      const size = 5;
+      CTX.fillStyle = "#fff";
+      CTX.beginPath();
+      CTX.moveTo(0, -radius + 1);
+      CTX.lineTo(-size, -radius - size * 1.4);
+      CTX.lineTo(size, -radius - size * 1.4);
+      CTX.closePath();
+      CTX.fill();
+      CTX.restore();
+    }
+
+    // Throttle readout under the dial, clear of the speed and angle readouts
+    // beside the lander, and kept on screen when the lander is at an edge
     if (throttle > 0) {
       CTX.font = "400 10px -apple-system, BlinkMacSystemFont, sans-serif";
+      CTX.fillStyle = "rgba(255, 255, 255, 0.8)";
       CTX.textAlign = "center";
-      CTX.fillStyle = "rgba(255, 255, 255, 0.7)";
-      CTX.fillText(
-        `${Math.round(throttle * 100)}%`,
-        origin.x,
-        origin.y + outerRadius + 16
+      CTX.textBaseline = "top";
+      const label = `${Math.round(throttle * 100)}%`;
+      const halfWidth = CTX.measureText(label).width / 2 + 4;
+      const labelX = Math.max(
+        halfWidth - x,
+        Math.min(canvasWidth - halfWidth - x, 0)
       );
+      CTX.fillText(label, labelX, radius + 8);
     }
+
+    CTX.restore();
+  };
+
+  const drawTouchOverlay = () => {
+    const now = performance.now();
+    const frameTime = lastOverlayTime === null ? 0 : now - lastOverlayTime;
+    lastOverlayTime = now;
+
+    // Fade in quickly, fade out a little slower so the last reading lingers
+    overlayOpacity = drag
+      ? Math.min(1, overlayOpacity + frameTime / 80)
+      : Math.max(0, overlayOpacity - frameTime / 220);
+
+    if (!overlay || overlayOpacity === 0) return;
+
+    CTX.save();
+    CTX.globalAlpha = overlayOpacity;
+    drawJoystick(overlay);
+    drawLanderDial(overlay);
     CTX.restore();
   };
 

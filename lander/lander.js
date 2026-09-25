@@ -730,6 +730,8 @@ export const makeLander = (state, onGameEnd) => {
     activateShield: () => (_shieldActive = true),
     hasShield: () => _shieldActive,
     getAngle: () => _angle,
+    // Clears the nose and most of the engine flame
+    getDialRadius: () => LANDER_HEIGHT * 1.5,
     engineOn: () => setThrottle(1),
     engineOff: () => setThrottle(0),
     setThrottle,
