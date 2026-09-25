@@ -13,6 +13,8 @@ export const makeAudioManager = () => {
   let confetti2FileBuffer;
   let babyFileBuffer;
   let themeAudio;
+  let engineGain;
+  let engineVolume = 1;
 
   let engineFileBufferSource = false;
   let booster1FileBufferSource = false;
@@ -29,6 +31,8 @@ export const makeAudioManager = () => {
     if (!hasInitialized) {
       hasInitialized = true;
       audioCTX = new AudioContext();
+      engineGain = new GainNode(audioCTX, { gain: engineVolume });
+      engineGain.connect(audioCTX.destination);
       engineFileBuffer = _loadFile(audioCTX, "./audio/engine.mp3");
       boosterFileBuffer = _loadFile(audioCTX, "./audio/booster.mp3");
       crash1FileBuffer = _loadFile(audioCTX, "./audio/crash1.mp3");
@@ -81,13 +85,15 @@ export const makeAudioManager = () => {
     }
   });
 
-  async function _playTrack(getAudioBuffer, loop = true) {
+  async function _playTrack(getAudioBuffer, loop = true, getDestination) {
     const playBuffer = (buffer) => {
       const trackSource = new AudioBufferSourceNode(audioCTX, {
         buffer: buffer,
         loop: loop,
       });
-      trackSource.connect(audioCTX.destination);
+      trackSource.connect(
+        getDestination ? getDestination() : audioCTX.destination
+      );
       trackSource.start();
       return trackSource;
     };
@@ -103,7 +109,20 @@ export const makeAudioManager = () => {
 
   const playEngineSound = () => {
     if (!engineFileBufferSource) {
-      engineFileBufferSource = _playTrack(() => engineFileBuffer);
+      engineFileBufferSource = _playTrack(
+        () => engineFileBuffer,
+        true,
+        () => engineGain
+      );
+    }
+  };
+
+  // Drag controls vary the throttle, and the engine sound follows it. Ramped
+  // rather than set so pointer moves don't click.
+  const setEngineVolume = (volume) => {
+    engineVolume = volume;
+    if (engineGain) {
+      engineGain.gain.setTargetAtTime(volume, audioCTX.currentTime, 0.03);
     }
   };
 
@@ -164,6 +183,7 @@ export const makeAudioManager = () => {
 
   return {
     playEngineSound,
+    setEngineVolume,
     playBoosterSound1,
     playBoosterSound2,
     stopEngineSound,

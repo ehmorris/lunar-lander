@@ -56,7 +56,7 @@ export const manageInstructions = (onCloseInstructions) => {
       _closeArmed = true;
       const closeTimeout = () => setTimeout(close, 1000);
       const options = { once: true };
-      document.addEventListener("touchend", closeTimeout, options);
+      document.addEventListener("pointerup", closeTimeout, options);
       document.addEventListener("keyup", closeTimeout, options);
     }
   };
