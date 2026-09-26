@@ -32,6 +32,7 @@ import {
 import { makeLanderExplosion } from "./explosion.js";
 import { makeConfetti } from "./confetti.js";
 import { drawTrajectory } from "./trajectory.js";
+import { makeSteering } from "./steering.js";
 import {
   transition,
   clampedProgress,
@@ -50,6 +51,7 @@ export const makeLander = (state, onGameEnd) => {
   let _groundedHeight =
     _landingData.terrainAvgHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
   const _thrust = 0.012;
+  const _steering = makeSteering(audioManager);
 
   let _position;
   let _displayPosition;
@@ -57,6 +59,8 @@ export const makeLander = (state, onGameEnd) => {
   let _rotationVelocity;
   let _angle;
   let _engineOn;
+  // 0–1. Keyboard is always full throttle; drag controls vary it.
+  let _throttle;
   let _rotatingLeft;
   let _rotatingRight;
   let _shieldActive;
@@ -102,8 +106,10 @@ export const makeLander = (state, onGameEnd) => {
     _rotationVelocity = seededRandomBetween(-0.2, 0.2, seededRandom);
     _angle = seededRandomBetween(Math.PI * 1.5, Math.PI * 2.5, seededRandom);
     _engineOn = false;
+    _throttle = 0;
     _rotatingLeft = false;
     _rotatingRight = false;
+    _steering.reset();
     _shieldActive = false;
 
     _timeSinceStart = 0;
@@ -251,6 +257,7 @@ export const makeLander = (state, onGameEnd) => {
       _engineOn = false;
       _rotatingLeft = false;
       _rotatingRight = false;
+      _steering.reset();
       audioManager.stopEngineSound();
       audioManager.stopBoosterSound1();
       audioManager.stopBoosterSound2();
@@ -275,6 +282,12 @@ export const makeLander = (state, onGameEnd) => {
       // Update ballistic properties
       if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
       if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
+      _rotationVelocity = _steering.update(
+        _angle,
+        _rotationVelocity,
+        deltaTime,
+        deltaTimeMultiplier
+      );
 
       _position.x += deltaTimeMultiplier * _velocity.x;
       _position.x = ((_position.x % canvasWidth) + canvasWidth) % canvasWidth;
@@ -283,8 +296,9 @@ export const makeLander = (state, onGameEnd) => {
       _displayPosition.x = _position.x;
 
       if (_engineOn) {
-        _velocity.x += deltaTimeMultiplier * (_thrust * Math.sin(_angle));
-        _velocity.y -= deltaTimeMultiplier * (_thrust * Math.cos(_angle));
+        const thrust = _thrust * _throttle;
+        _velocity.x += deltaTimeMultiplier * (thrust * Math.sin(_angle));
+        _velocity.y -= deltaTimeMultiplier * (thrust * Math.cos(_angle));
       }
 
       // Log new rotations
@@ -356,6 +370,7 @@ export const makeLander = (state, onGameEnd) => {
       _engineOn = false;
       _rotatingLeft = false;
       _rotatingRight = false;
+      _steering.reset();
       audioManager.stopEngineSound();
       audioManager.stopBoosterSound1();
       audioManager.stopBoosterSound2();
@@ -590,13 +605,16 @@ export const makeLander = (state, onGameEnd) => {
     // flames can be drawn from 0, 0
     CTX.translate(-LANDER_WIDTH / 2, -LANDER_HEIGHT / 2);
 
-    if (_engineOn || _rotatingLeft || _rotatingRight) {
+    const showLeftRotation = _rotatingLeft || _steering.isBoostingLeft();
+    const showRightRotation = _rotatingRight || _steering.isBoostingRight();
+
+    if (_engineOn || showLeftRotation || showRightRotation) {
       CTX.fillStyle = randomBool() ? "#415B8C" : "#F3AFA3";
     }
 
     // Main engine flame
     if (_engineOn) {
-      const _flameHeight = randomBetween(10, 50);
+      const _flameHeight = randomBetween(10, 50) * (0.25 + 0.75 * _throttle);
       const _flameMargin = 3;
       CTX.beginPath();
       CTX.moveTo(_flameMargin, LANDER_HEIGHT);
@@ -608,7 +626,7 @@ export const makeLander = (state, onGameEnd) => {
 
     const _boosterLength = randomBetween(5, 25);
     // Right booster flame
-    if (_rotatingLeft) {
+    if (showLeftRotation) {
       CTX.beginPath();
       CTX.moveTo(LANDER_WIDTH, 0);
       CTX.lineTo(LANDER_WIDTH + _boosterLength, LANDER_HEIGHT * 0.05);
@@ -618,7 +636,7 @@ export const makeLander = (state, onGameEnd) => {
     }
 
     // Left booster flame
-    if (_rotatingRight) {
+    if (showRightRotation) {
       CTX.beginPath();
       CTX.moveTo(0, 0);
       CTX.lineTo(-_boosterLength, LANDER_HEIGHT * 0.05);
@@ -676,6 +694,26 @@ export const makeLander = (state, onGameEnd) => {
     }
   };
 
+  // Only off→on transitions count as an activation. Keydown has no repeat
+  // guard and drag controls set the throttle on every pointer move, so a held
+  // engine would otherwise register hundreds of starts.
+  const setThrottle = (throttle) => {
+    if (throttle > 0) {
+      if (gameEndData) return;
+      _throttle = Math.min(1, throttle);
+      if (_engineOn) return;
+      _engineOn = true;
+      if (++_engineActivations === 1) {
+        _firstBurnSlackFrames = _burnSlackFrames();
+      }
+    } else {
+      _throttle = 0;
+      if (!_engineOn) return;
+      _engineOn = false;
+      _engineOffAt = _timeSinceStart;
+    }
+  };
+
   const updateLandingData = () => {
     _landingData = state.get("terrain").getLandingData();
     _groundedHeight = _landingData.terrainAvgHeight - LANDER_HEIGHT + LANDER_HEIGHT / 2;
@@ -691,21 +729,16 @@ export const makeLander = (state, onGameEnd) => {
     getVelocity: () => _velocity,
     activateShield: () => (_shieldActive = true),
     hasShield: () => _shieldActive,
-    // Only off→on transitions count as an activation. Keydown has no repeat
-    // guard, and multi-touch or a finger sliding between columns can re-fire the
-    // center zone, so a held engine would otherwise register hundreds of starts.
-    engineOn: () => {
-      if (_engineOn || gameEndData) return;
-      _engineOn = true;
-      if (++_engineActivations === 1) {
-        _firstBurnSlackFrames = _burnSlackFrames();
-      }
+    getAngle: () => _angle,
+    // Clears the nose and most of the engine flame
+    getDialRadius: () => LANDER_HEIGHT * 1.5,
+    engineOn: () => setThrottle(1),
+    engineOff: () => setThrottle(0),
+    setThrottle,
+    setTargetAngle: (angle) => {
+      if (!gameEndData) _steering.setTargetAngle(angle);
     },
-    engineOff: () => {
-      if (!_engineOn) return;
-      _engineOn = false;
-      _engineOffAt = _timeSinceStart;
-    },
+    clearTargetAngle: () => _steering.clearTargetAngle(),
     rotateLeft: () => (_rotatingLeft = true),
     rotateRight: () => (_rotatingRight = true),
     stopLeftRotation: () => (_rotatingLeft = false),

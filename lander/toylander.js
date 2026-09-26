@@ -1,5 +1,6 @@
 import { randomBetween, randomBool } from "../helpers/helpers.js";
 import { INTERVAL } from "../helpers/constants.js";
+import { makeSteering } from "./steering.js";
 
 export const makeToyLander = (
   state,
@@ -26,12 +27,15 @@ export const makeToyLander = (
   let _rotationVelocity = 0;
   let _angle = Math.PI * 2;
   let _engineOn = false;
+  let _throttle = 0;
   let _rotatingLeft = false;
   let _rotatingRight = false;
+  const _steering = makeSteering(state.get("audioManager"));
 
-  const engineOn = () => {
-    _engineOn = true;
-    onEngineOn();
+  const setThrottle = (throttle) => {
+    _throttle = Math.min(1, throttle);
+    _engineOn = throttle > 0;
+    if (_engineOn) onEngineOn();
   };
 
   const rotateLeft = () => {
@@ -47,12 +51,23 @@ export const makeToyLander = (
   const draw = (deltaTime) => {
     const deltaTimeMultiplier = deltaTime / INTERVAL;
 
-    if ((_engineOn && _rotatingLeft) || (_engineOn && _rotatingRight)) {
-      onEngineAndRotation();
-    }
-
     if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
     if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
+    _rotationVelocity = _steering.update(
+      _angle,
+      _rotationVelocity,
+      deltaTime,
+      deltaTimeMultiplier
+    );
+
+    const showLeftRotation = _rotatingLeft || _steering.isBoostingLeft();
+    const showRightRotation = _rotatingRight || _steering.isBoostingRight();
+
+    if (_steering.isBoostingLeft()) onLeftRotation();
+    if (_steering.isBoostingRight()) onRightRotation();
+    if (_engineOn && (showLeftRotation || showRightRotation)) {
+      onEngineAndRotation();
+    }
     _angle += (Math.PI / 180) * _rotationVelocity;
 
     // Move to top left of the lander and then rotate at that origin
@@ -86,16 +101,15 @@ export const makeToyLander = (
     // flames can be drawn from 0, 0
     CTX.translate(-_toyLanderWidth / 2, -_toyLanderHeight / 2);
 
-    if (_engineOn || _rotatingLeft || _rotatingRight) {
+    if (_engineOn || showLeftRotation || showRightRotation) {
       CTX.fillStyle = randomBool() ? "#415B8C" : "#F3AFA3";
     }
 
     // Main engine flame
     if (_engineOn) {
-      const _flameHeight = randomBetween(
-        _toyLanderEngineLengthMin,
-        _toyLanderEngineLengthMax
-      );
+      const _flameHeight =
+        randomBetween(_toyLanderEngineLengthMin, _toyLanderEngineLengthMax) *
+        (0.25 + 0.75 * _throttle);
       const _flameMargin = _toyLanderWidth / 6;
       CTX.beginPath();
       CTX.moveTo(_flameMargin, _toyLanderHeight);
@@ -110,7 +124,7 @@ export const makeToyLander = (
       _toyLanderBoosterLengthMax
     );
     // Right booster flame
-    if (_rotatingLeft) {
+    if (showLeftRotation) {
       CTX.beginPath();
       CTX.moveTo(_toyLanderWidth, 0);
       CTX.lineTo(_toyLanderWidth + _boosterLength, _toyLanderHeight * 0.05);
@@ -120,7 +134,7 @@ export const makeToyLander = (
     }
 
     // Left booster flame
-    if (_rotatingRight) {
+    if (showRightRotation) {
       CTX.beginPath();
       CTX.moveTo(0, 0);
       CTX.lineTo(-_boosterLength, _toyLanderHeight * 0.05);
@@ -134,8 +148,14 @@ export const makeToyLander = (
 
   return {
     draw,
-    engineOn,
-    engineOff: () => (_engineOn = false),
+    getAngle: () => _angle,
+    getDisplayPosition: () => _position,
+    getDialRadius: () => _toyLanderHeight * 1.2,
+    engineOn: () => setThrottle(1),
+    engineOff: () => setThrottle(0),
+    setThrottle,
+    setTargetAngle: _steering.setTargetAngle,
+    clearTargetAngle: _steering.clearTargetAngle,
     rotateLeft,
     rotateRight,
     stopLeftRotation: () => (_rotatingLeft = false),
