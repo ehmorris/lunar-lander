@@ -49,12 +49,8 @@ export const makeAudioManager = () => {
     }
   };
 
-  // Every tap gets another try at unlocking sound, not just the first. Audio
-  // started from a touchstart (the first touch holding the engine on, say) is
-  // not a gesture iOS accepts, so the context it created could stay suspended
-  // with nothing ever resuming it. The same goes for a context iOS suspends
-  // for a phone call, and for the theme after returning to the tab, which
-  // visibilitychange can't restart on its own.
+  // Retried on every tap: iOS won't unlock audio from a touchstart, and
+  // suspends it again after interruptions like calls
   const _unlockFromGesture = () => {
     _initialize();
     if (audioCTX.state !== "running") audioCTX.resume().catch(() => {});
@@ -133,11 +129,8 @@ export const makeAudioManager = () => {
     }
   };
 
-  // The channel is cleared right away rather than once the sound has actually
-  // stopped. Clearing it in the .then left a window where a new play saw the
-  // old, dying source and did nothing, so a quick stop and start (a fast tap,
-  // or one finger leaving the center column as another entered it) left the
-  // engine burning in silence.
+  // Channels are cleared immediately, not in the .then, or a play that comes
+  // before the old source resolves is silently dropped
   const _stopTrack = (trackSource) => {
     trackSource.then((e) => e.stop()).catch(() => {});
   };

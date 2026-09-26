@@ -3,25 +3,11 @@ export const makeControls = (state, lander, audioManager) => {
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const canvasElement = state.get("canvasElement");
-  // Touches are read from the whole game area rather than just the canvas.
-  // The canvas keeps the shape it was generated at and is letterboxed to fit,
-  // so after rotating a phone to landscape it's a narrow strip down the middle
-  // and a thumb at either edge of the screen hit nothing at all. Columns are
-  // measured across the screen, which is where the player's thumbs are.
+  // Not the canvas, which is letterboxed to a narrow strip in landscape
   const touchArea = canvasElement.parentElement;
-  // Everything currently holding each control down: keys by their physical
-  // key code, touches by identifier. A control only releases when the last
-  // thing holding it lets go, so lifting one of two fingers in the center
-  // column, or letting go of W while still holding the up arrow, can't cut the
-  // engine mid-burn. Key repeat and a second finger in the same column are
-  // no-ops because the holder is already in the set.
   const holders = { left: new Set(), center: new Set(), right: new Set() };
-  // Which zone each active touch currently occupies, keyed by Touch.identifier
   const activeTouchZones = new Map();
-  // Which control each held key is driving, keyed by KeyboardEvent.code. The
-  // release is matched on the physical key rather than on the character,
-  // because the character can change while the key is down: press W, then
-  // Shift, and the keyup reports "W", which used to leave the engine stuck on.
+  // Keyed by code, since a held key's character can change (Shift, Caps Lock)
   const activeKeys = new Map();
   const keyZones = {
     w: "center",
@@ -74,18 +60,15 @@ export const makeControls = (state, lander, audioManager) => {
     if (zoneHolders.size === 0) deactivateZone(zoneName);
   };
 
-  // Only touches light up a column; the keyboard never did
   const isTouchedZone = (zoneName) =>
     [...holders[zoneName]].some((holder) => typeof holder === "number");
 
   function onKeyDown({ key, code, metaKey, ctrlKey }) {
     hasKeyboard = true;
 
-    // Shortcuts like Cmd+D or Ctrl+W aren't flying. On a Mac, a key released
-    // while Cmd is down never gets its keyup either, so it would stick.
+    // macOS drops keyups for keys released while Cmd is down
     if (metaKey || ctrlKey) return;
 
-    // Chrome fires keydown with no key at all when it autofills
     const zoneName = keyZones[(key || "").toLowerCase()];
     if (!zoneName || activeKeys.has(code)) return;
 
@@ -100,7 +83,6 @@ export const makeControls = (state, lander, audioManager) => {
       letGo(zoneName, code);
     }
 
-    // See onKeyDown: any key let go while Cmd was held got no keyup of its own
     if (key === "Meta") releaseAllKeys();
   }
 
@@ -109,9 +91,6 @@ export const makeControls = (state, lander, audioManager) => {
     activeKeys.clear();
   };
 
-  // Switching apps or tabs mid-burn swallows the keyup, and the engine was
-  // still firing on return. Touches get a touchcancel, but release them too in
-  // case the browser doesn't send one.
   const releaseEverything = () => {
     releaseAllKeys();
     activeTouchZones.forEach((zoneName, identifier) =>
@@ -152,11 +131,6 @@ export const makeControls = (state, lander, audioManager) => {
     letGo(zoneName, identifier);
   };
 
-  // The column's span on screen, converted to canvas pixels and clipped to the
-  // canvas, so the tint only covers the part of a column the canvas overlaps.
-  // lastIndexOf rather than findLastIndex, which only reached Safari in 15.4:
-  // on anything older it threw on every frame a column was lit, which also
-  // skipped drawing the lander for as long as a finger was down.
   const getColumnBoundary = (colName) => {
     const area = touchArea.getBoundingClientRect();
     const canvasBounds = canvasElement.getBoundingClientRect();
