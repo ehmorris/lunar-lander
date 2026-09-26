@@ -3,6 +3,12 @@ export const makeControls = (state, lander, audioManager) => {
   const canvasWidth = state.get("canvasWidth");
   const canvasHeight = state.get("canvasHeight");
   const canvasElement = state.get("canvasElement");
+  // Touches are read from the whole game area rather than just the canvas.
+  // The canvas keeps the shape it was generated at and is letterboxed to fit,
+  // so after rotating a phone to landscape it's a narrow strip down the middle
+  // and a thumb at either edge of the screen hit nothing at all. Columns are
+  // measured across the screen, which is where the player's thumbs are.
+  const touchArea = canvasElement.parentElement;
   // Everything currently holding each control down: keys by their physical
   // key code, touches by identifier. A control only releases when the last
   // thing holding it lets go, so lifting one of two fingers in the center
@@ -118,20 +124,14 @@ export const makeControls = (state, lander, audioManager) => {
     if (document.hidden) releaseEverything();
   }
 
-  const toCanvasX = (clientX) => {
-    const bounds = canvasElement.getBoundingClientRect();
-    return bounds.width
-      ? ((clientX - bounds.left) / bounds.width) * canvasWidth
-      : clientX;
-  };
-
   const getTouchZone = (clientX) => {
-    const x = toCanvasX(clientX);
+    const bounds = touchArea.getBoundingClientRect();
+    const progress = bounds.width ? (clientX - bounds.left) / bounds.width : 0;
 
     const clampedColumnNumber = Math.max(
       0,
       Math.min(
-        Math.floor(x / (canvasWidth / touchColumnMap.length)),
+        Math.floor(progress * touchColumnMap.length),
         touchColumnMap.length - 1
       )
     );
@@ -152,17 +152,35 @@ export const makeControls = (state, lander, audioManager) => {
     letGo(zoneName, identifier);
   };
 
-  // Array.prototype.findLastIndex only reached Safari in 15.4, and on anything
-  // older this threw on every frame a column was lit, which also skipped
-  // drawing the lander for as long as a finger was down
+  // The column's span on screen, converted to canvas pixels and clipped to the
+  // canvas, so the tint only covers the part of a column the canvas overlaps.
+  // lastIndexOf rather than findLastIndex, which only reached Safari in 15.4:
+  // on anything older it threw on every frame a column was lit, which also
+  // skipped drawing the lander for as long as a finger was down.
   const getColumnBoundary = (colName) => {
+    const area = touchArea.getBoundingClientRect();
+    const canvasBounds = canvasElement.getBoundingClientRect();
+    const toCanvasX = (clientX) =>
+      Math.max(
+        0,
+        Math.min(
+          canvasWidth,
+          canvasBounds.width
+            ? ((clientX - canvasBounds.left) / canvasBounds.width) *
+                canvasWidth
+            : clientX
+        )
+      );
+
     const start = touchColumnMap.indexOf(colName) / touchColumnMap.length;
     const end =
       (touchColumnMap.lastIndexOf(colName) + 1) / touchColumnMap.length;
+    const startPixel = toCanvasX(area.left + start * area.width);
+    const endPixel = toCanvasX(area.left + end * area.width);
 
     return {
-      startPixel: start * canvasWidth,
-      widthInPixels: (end - start) * canvasWidth,
+      startPixel,
+      widthInPixels: endPixel - startPixel,
     };
   };
 
@@ -207,12 +225,12 @@ export const makeControls = (state, lander, audioManager) => {
   const attachEventListeners = () => {
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("keyup", onKeyUp);
-    canvasElement.addEventListener("touchstart", onTouchStart);
-    canvasElement.addEventListener("touchmove", onTouchMove);
-    canvasElement.addEventListener("touchend", onTouchEnd);
+    touchArea.addEventListener("touchstart", onTouchStart);
+    touchArea.addEventListener("touchmove", onTouchMove);
+    touchArea.addEventListener("touchend", onTouchEnd);
     // A touch the browser takes away — a system gesture, an incoming call —
     // never gets its touchend, and without this its zone stayed held down
-    canvasElement.addEventListener("touchcancel", onTouchEnd);
+    touchArea.addEventListener("touchcancel", onTouchEnd);
     window.addEventListener("blur", releaseEverything);
     document.addEventListener("visibilitychange", onVisibilityChange);
   };
@@ -220,10 +238,10 @@ export const makeControls = (state, lander, audioManager) => {
   const detachEventListeners = () => {
     document.removeEventListener("keydown", onKeyDown);
     document.removeEventListener("keyup", onKeyUp);
-    canvasElement.removeEventListener("touchstart", onTouchStart);
-    canvasElement.removeEventListener("touchmove", onTouchMove);
-    canvasElement.removeEventListener("touchend", onTouchEnd);
-    canvasElement.removeEventListener("touchcancel", onTouchEnd);
+    touchArea.removeEventListener("touchstart", onTouchStart);
+    touchArea.removeEventListener("touchmove", onTouchMove);
+    touchArea.removeEventListener("touchend", onTouchEnd);
+    touchArea.removeEventListener("touchcancel", onTouchEnd);
     window.removeEventListener("blur", releaseEverything);
     document.removeEventListener("visibilitychange", onVisibilityChange);
 
