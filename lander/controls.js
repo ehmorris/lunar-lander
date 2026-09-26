@@ -166,8 +166,7 @@ export const makeControls = (state, lander, audioManager) => {
         Math.min(
           canvasWidth,
           canvasBounds.width
-            ? ((clientX - canvasBounds.left) / canvasBounds.width) *
-                canvasWidth
+            ? ((clientX - canvasBounds.left) / canvasBounds.width) * canvasWidth
             : clientX
         )
       );
