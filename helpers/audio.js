@@ -119,30 +119,33 @@ export const makeAudioManager = () => {
     }
   };
 
+  // The channel is cleared right away rather than once the sound has actually
+  // stopped. Clearing it in the .then left a window where a new play saw the
+  // old, dying source and did nothing, so a quick stop and start (a fast tap,
+  // or one finger leaving the center column as another entered it) left the
+  // engine burning in silence.
+  const _stopTrack = (trackSource) => {
+    trackSource.then((e) => e.stop()).catch(() => {});
+  };
+
   const stopEngineSound = () => {
     if (engineFileBufferSource) {
-      engineFileBufferSource.then((e) => {
-        e.stop();
-        engineFileBufferSource = false;
-      });
+      _stopTrack(engineFileBufferSource);
+      engineFileBufferSource = false;
     }
   };
 
   const stopBoosterSound1 = () => {
     if (booster1FileBufferSource) {
-      booster1FileBufferSource.then((e) => {
-        e.stop();
-        booster1FileBufferSource = false;
-      });
+      _stopTrack(booster1FileBufferSource);
+      booster1FileBufferSource = false;
     }
   };
 
   const stopBoosterSound2 = () => {
     if (booster2FileBufferSource) {
-      booster2FileBufferSource.then((e) => {
-        e.stop();
-        booster2FileBufferSource = false;
-      });
+      _stopTrack(booster2FileBufferSource);
+      booster2FileBufferSource = false;
     }
   };
 

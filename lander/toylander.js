@@ -53,7 +53,9 @@ export const makeToyLander = (
 
     if (_rotatingRight) _rotationVelocity += deltaTimeMultiplier * 0.01;
     if (_rotatingLeft) _rotationVelocity -= deltaTimeMultiplier * 0.01;
-    _angle += (Math.PI / 180) * _rotationVelocity;
+    // Scaled by frame time like the real lander. Without it the tutorial
+    // lander turned twice as fast on a 120Hz screen as on a 60Hz one.
+    _angle += deltaTimeMultiplier * ((Math.PI / 180) * _rotationVelocity);
 
     // Move to top left of the lander and then rotate at that origin
     CTX.save();
