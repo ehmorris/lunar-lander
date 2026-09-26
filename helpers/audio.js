@@ -49,8 +49,22 @@ export const makeAudioManager = () => {
     }
   };
 
-  document.addEventListener("touchend", _initialize, { once: true });
-  document.addEventListener("mousedown", _initialize, { once: true });
+  // Every tap gets another try at unlocking sound, not just the first. Audio
+  // started from a touchstart (the first touch holding the engine on, say) is
+  // not a gesture iOS accepts, so the context it created could stay suspended
+  // with nothing ever resuming it. The same goes for a context iOS suspends
+  // for a phone call, and for the theme after returning to the tab, which
+  // visibilitychange can't restart on its own.
+  const _unlockFromGesture = () => {
+    _initialize();
+    if (audioCTX.state !== "running") audioCTX.resume().catch(() => {});
+    if (themeAudio.paused && !document.hidden) {
+      themeAudio.play().catch(() => {});
+    }
+  };
+
+  document.addEventListener("touchend", _unlockFromGesture);
+  document.addEventListener("mousedown", _unlockFromGesture);
 
   // Removed by hand rather than with `once`, which would consume the unlock
   // on the very first keypress even when the guard below rejects it.

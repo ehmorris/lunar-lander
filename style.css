@@ -54,6 +54,24 @@ li.strikethrough {
   display: flex;
 }
 
+/* A short landscape phone can't fit every stat and the buttons, and with
+   nothing to scroll the play again button ended up off the bottom of the
+   screen. Auto margins centre the content when it fits, and unlike
+   justify-content they leave the top reachable when it doesn't. */
+#endGameStats {
+  justify-content: flex-start;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+#endGameStats > :first-child {
+  margin-top: auto;
+}
+
+#endGameStats > :last-child {
+  margin-bottom: auto;
+}
+
 .fullSizeContainer h1 {
   font-size: clamp(26px, 7vmin, 62px);
   font-weight: 900;
@@ -322,5 +340,14 @@ li.strikethrough {
   align-items: center;
   justify-content: center;
   width: 100vw;
+  /* 100vh is the viewport with the browser toolbars hidden, which is taller
+     than what's on screen while they're showing, and body doesn't scroll to
+     hide them. The canvas is sized to the visible height and centred in this,
+     so it sat pushed down under the bottom toolbar. */
   height: 100vh;
+  height: 100dvh;
+  /* Touches anywhere in here fly the lander; no zooming, scrolling or
+     long-press callouts */
+  touch-action: none;
+  -webkit-touch-callout: none;
 }
